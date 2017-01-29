@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TripToPrint.Core.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="HereApiAppId" Type="System.String" Scope="User">
+      <Value Profile="(Default)">put your HERE.com app id here</Value>
+    </Setting>
+    <Setting Name="HereApiAppCode" Type="System.String" Scope="User">
+      <Value Profile="(Default)">put your HERE.com app code here</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

@@ -1,0 +1,13 @@
+# Ignore folder with testing data
+_TestingData/
+
+# Ignore files build by Visual Studio and its tools
+[Bb]in
+[Dd]ebug*/ 
+obj/
+packages/
+_NCrunch_TripToPrint/
+*.ncrunchsolution
+*.ncrunchproject
+*.user
+*.suo
