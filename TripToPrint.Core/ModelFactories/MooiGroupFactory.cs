@@ -22,81 +22,61 @@ namespace TripToPrint.Core.ModelFactories
 
         public List<MooiGroup> CreateList(IEnumerable<KmlPlacemark> placemarks)
         {
-            List<MooiGroup> groups = new List<MooiGroup>();
+            var groups = new List<MooiGroup>();
 
             var placemarksConverted = placemarks.Select(ConvertKmlPlacemarkToMooiPlacemark).ToList();
 
             if (placemarksConverted.Count <= MIN_GROUP_COUNT)
             {
-                var group = new MooiGroup();
-                foreach (var pm in placemarksConverted)
-                {
-                    pm.Group = group;
-                    group.Placemarks.Add(pm);
-                }
-
-                return new List<MooiGroup> { group };
+                return CreateSingleGroup(placemarksConverted);
             }
 
-            var placemarksWithDistances = from placemark in placemarksConverted
-                                          let neighbors = from neighbor in placemarksConverted.Except(new[] { placemark })
-                                                          let dist = placemark.Coordinate.GetDistanceTo(neighbor.Coordinate)
-                                                          let allowedDistCoef = Math.Exp(1 / Math.Max(MIN_DIST_TO_NEIGHBOR_IN_KM, dist / 1000d))
-                                                          orderby dist
-                                                          select new {
-                                                              placemark = neighbor,
-                                                              dist,
-                                                              allowedDist = Math.Max(MIN_DIST_TO_NEIGHBOR_IN_KM * 1000, allowedDistCoef * dist)
-                                                          }
-                                          let minDist = neighbors.First()
-                                          orderby minDist.dist
-                                          select new {
-                                              placemark,
-                                              neighbors,
-                                              minDist
-                                          };
-
-            var placemarksLookup = placemarksWithDistances.ToDictionary(x => x.placemark);
+            var placemarksWithNeighbors = GetPlacemarksWithNeighbors(placemarksConverted).ToList();
+            var placemarksWithNeighborsLookup = placemarksWithNeighbors.ToDictionary(x => x.Placemark);
 
             MooiGroup currentGroup = new MooiGroup();
             groups.Add(currentGroup);
 
-            var placemarksToProcess = placemarksWithDistances.ToList();
+            var placemarksToProcess = placemarksWithNeighbors.ToList();
             while (placemarksToProcess.Any())
             {
                 var startingPoint = placemarksToProcess[0];
                 placemarksToProcess.RemoveAt(0);
 
-                if (groups.Any(g => g.Placemarks.Any(p => p == startingPoint.placemark)))
+                // Skip if the placemark has been added to any group before
+                if (groups.Any(g => g.Placemarks.Any(p => p == startingPoint.Placemark)))
                 {
                     continue;
                 }
 
-                currentGroup.Placemarks.Add(startingPoint.placemark);
+                currentGroup.Placemarks.Add(startingPoint.Placemark);
 
-                if (!groups.Any(g => g.Placemarks.Any(p => p == startingPoint.minDist.placemark)))
+                // Add its closest neighbor to current group
+                if (!groups.Any(g => g.Placemarks.Any(p => p == startingPoint.NeighborWithMinDistance.Placemark)))
                 {
-                    currentGroup.Placemarks.Add(startingPoint.minDist.placemark);
+                    currentGroup.Placemarks.Add(startingPoint.NeighborWithMinDistance.Placemark);
                 }
 
                 foreach (var pm in placemarksToProcess.Skip(1).ToList())
                 {
-                    if (currentGroup.Placemarks.Any(x => x == pm.placemark || x == pm.minDist.placemark))
+                    if (currentGroup.Placemarks.Any(x => x == pm.Placemark || x == pm.NeighborWithMinDistance.Placemark))
                     {
                         if (currentGroup.Placemarks.Count >= MIN_GROUP_COUNT)
                         {
                             /*var linkToFirst = placemarksLookup[currentGroup.Placemarks[0]]
                                 .neighbors.First(x => x.placemark == pm.placemark);*/
-                            var maxDistanceAmongAddedPlacemarks = placemarksLookup[currentGroup.Placemarks[0]]
-                                .neighbors.Where(x => currentGroup.Placemarks.Any(y => y == x.placemark))
-                                .Select(x => x.allowedDist)
+                            var maxDistanceAmongAddedPlacemarks = placemarksWithNeighborsLookup[currentGroup.Placemarks[0]]
+                                .Neighbors.Where(x => currentGroup.Placemarks.Any(y => y == x.Placemark))
+                                .Select(x => x.AllowedDistance)
                                 .Max();
 
-                            if (pm.minDist.dist > maxDistanceAmongAddedPlacemarks) // * COEF_ROOM_OVER_MAX_DISTANCE)
+                            if (pm.NeighborWithMinDistance.Distance > maxDistanceAmongAddedPlacemarks) // * COEF_ROOM_OVER_MAX_DISTANCE)
+                            {
                                 continue;
+                            }
                         }
 
-                        currentGroup.Placemarks.Add(pm.placemark);
+                        currentGroup.Placemarks.Add(pm.Placemark);
                         placemarksToProcess.Remove(pm);
                     }
 
@@ -115,12 +95,61 @@ namespace TripToPrint.Core.ModelFactories
             // Trim out the last group which is always empty
             groups = groups.Where(x => x.Placemarks.Count > 0).ToList();
 
-            Merge(groups);
+            MergeGroups(groups);
 
             return groups;
         }
 
-        private void Merge(List<MooiGroup> groups)
+        public MooiPlacemark ConvertKmlPlacemarkToMooiPlacemark(KmlPlacemark kmlPlacemark)
+        {
+            var description = ReorderImagesInContent(kmlPlacemark.Description);
+            description = FilterContent(description);
+
+            return new MooiPlacemark
+            {
+                Name = kmlPlacemark.Name,
+                Description = description,
+                Coordinate = kmlPlacemark.Coordinate,
+                IconPath = kmlPlacemark.IconPath
+            };
+        }
+
+        public List<MooiGroup> CreateSingleGroup(List<MooiPlacemark> placemarks)
+        {
+            var group = new MooiGroup();
+            foreach (var pm in placemarks)
+            {
+                pm.Group = group;
+                group.Placemarks.Add(pm);
+            }
+
+            return new List<MooiGroup> { group };
+        }
+
+        public virtual IEnumerable<PlacemarkWithNeighbors> GetPlacemarksWithNeighbors(IList<MooiPlacemark> placemarks)
+        {
+            return from placemark in placemarks
+                   let neighbors = from neighbor in placemarks.Except(new[] { placemark })
+                                   let dist = placemark.Coordinate.GetDistanceTo(neighbor.Coordinate)
+                                   let allowedDistCoef = Math.Exp(1 / Math.Max(MIN_DIST_TO_NEIGHBOR_IN_KM, dist / 1000d))
+                                   orderby dist
+                                   select new PlacemarkNeighbor
+                                   {
+                                       Placemark = neighbor,
+                                       Distance = dist,
+                                       AllowedDistance = Math.Max(MIN_DIST_TO_NEIGHBOR_IN_KM * 1000, allowedDistCoef * dist)
+                                   }
+                   let minDist = neighbors.First()
+                   orderby minDist.Distance
+                   select new PlacemarkWithNeighbors
+                   {
+                       Placemark = placemark,
+                       Neighbors = neighbors,
+                       NeighborWithMinDistance = minDist
+                   };
+        }
+
+        public void MergeGroups(List<MooiGroup> groups)
         {
             while (true)
             {
@@ -149,20 +178,6 @@ namespace TripToPrint.Core.ModelFactories
 
                 groups.Remove(groupToMerge);
             }
-        }
-
-        public MooiPlacemark ConvertKmlPlacemarkToMooiPlacemark(KmlPlacemark kmlPlacemark)
-        {
-            var description = ReorderImagesInContent(kmlPlacemark.Description);
-            description = FilterContent(description);
-
-            return new MooiPlacemark
-            {
-                Name = kmlPlacemark.Name,
-                Description = description,
-                Coordinate = kmlPlacemark.Coordinate,
-                IconPath = kmlPlacemark.IconPath
-            };
         }
 
         private string FilterContent(string content)
@@ -204,5 +219,18 @@ namespace TripToPrint.Core.ModelFactories
             return placemark1.Coordinate.GetDistanceTo(placemark2.Coordinate);
         }
 
+        public class PlacemarkNeighbor
+        {
+            public MooiPlacemark Placemark { get; set; }
+            public double Distance { get; set; }
+            public double AllowedDistance { get; set; }
+        }
+
+        public class PlacemarkWithNeighbors
+        {
+            public MooiPlacemark Placemark { get; set; }
+            public IEnumerable<PlacemarkNeighbor> Neighbors { get; set; }
+            public PlacemarkNeighbor NeighborWithMinDistance { get; set; }
+        }
     }
 }
