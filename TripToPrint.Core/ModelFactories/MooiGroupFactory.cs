@@ -17,8 +17,7 @@ namespace TripToPrint.Core.ModelFactories
         private const int MIN_GROUP_COUNT = 4;
         private const int MAX_GROUP_COUNT = 8;
         private const double MIN_DIST_TO_NEIGHBOR_IN_KM = 0.75d;
-        //private const double COEF_ROOM_OVER_AVG_DISTANCE = 1.2; // 20%
-        //private const double COEF_ROOM_OVER_MAX_DISTANCE = 1.5; // 50%
+        private const double COEF_ROOM_OVER_MAX_DISTANCE = 1.5; // 50%
 
         public List<MooiGroup> CreateList(IEnumerable<KmlPlacemark> placemarks)
         {
@@ -102,13 +101,15 @@ namespace TripToPrint.Core.ModelFactories
 
         public MooiPlacemark ConvertKmlPlacemarkToMooiPlacemark(KmlPlacemark kmlPlacemark)
         {
-            var description = ReorderImagesInContent(kmlPlacemark.Description);
+            string imagesContent;
+            var description = ExtractImagesFromContent(kmlPlacemark.Description, out imagesContent);
             description = FilterContent(description);
 
             return new MooiPlacemark
             {
                 Name = kmlPlacemark.Name,
                 Description = description,
+                ImagesContent = imagesContent,
                 Coordinate = kmlPlacemark.Coordinate,
                 IconPath = kmlPlacemark.IconPath
             };
@@ -151,33 +152,59 @@ namespace TripToPrint.Core.ModelFactories
 
         public void MergeGroups(List<MooiGroup> groups)
         {
+            var groupsConsideredAsFine = new List<MooiGroup>();
+
             while (true)
             {
-                var groupToMerge = groups.FirstOrDefault(x => x.Placemarks.Count < MIN_GROUP_COUNT);
+                var groupToMerge = groups
+                    .Except(groupsConsideredAsFine)
+                    .FirstOrDefault(x => x.Placemarks.Count < MIN_GROUP_COUNT);
                 if (groupToMerge == null)
                     break;
 
-                var groupForMerge = (from forMergeCandidate in groups.Except(new[] { groupToMerge })
-                                     where forMergeCandidate.Placemarks.Count + groupToMerge.Placemarks.Count <= MAX_GROUP_COUNT
-                                     let minDist = (from pm1 in forMergeCandidate.Placemarks
-                                                    from pm2 in groupToMerge.Placemarks
-                                                    select DistanceBetweenPlacemarks(pm1, pm2)).Min()
-                                     orderby minDist
-                                     select forMergeCandidate).FirstOrDefault();
+                var groupForMerge =
+                    (from forMergeCandidate in groups.Except(new[] { groupToMerge })
+                     where forMergeCandidate.Placemarks.Count + groupToMerge.Placemarks.Count <= MAX_GROUP_COUNT
+                     let minDist = CalculateDistances(groupToMerge, forMergeCandidate).Min()
+                     let placemarksInGroup = (double) forMergeCandidate.Placemarks.Count
+                     orderby placemarksInGroup < MIN_GROUP_COUNT
+                         ? minDist * (placemarksInGroup / MIN_GROUP_COUNT)
+                         : minDist
+                     select new { @group = forMergeCandidate, minDist }).FirstOrDefault();
 
                 if (groupForMerge == null)
                 {
                     break;
                 }
 
+                if (groupToMerge.Placemarks.Count == MIN_GROUP_COUNT - 1
+                    && groupForMerge.group.Placemarks.Count >= MIN_GROUP_COUNT)
+                {
+                    var dist1 = CalculateDistances(groupForMerge.group, groupForMerge.group).Max();
+
+                    if (dist1 * COEF_ROOM_OVER_MAX_DISTANCE < groupForMerge.minDist)
+                    {
+                        groupsConsideredAsFine.Add(groupToMerge);
+                        continue;
+                    }
+                }
+
                 foreach (var pm in groupToMerge.Placemarks)
                 {
-                    pm.Group = groupForMerge;
-                    groupForMerge.Placemarks.Add(pm);
+                    pm.Group = groupForMerge.group;
+                    groupForMerge.group.Placemarks.Add(pm);
                 }
 
                 groups.Remove(groupToMerge);
             }
+        }
+
+        private IEnumerable<double> CalculateDistances(MooiGroup group1, MooiGroup group2)
+        {
+            return from pm1 in group2.Placemarks
+                   from pm2 in group1.Placemarks
+                   where pm1 != pm2
+                   select DistanceBetweenPlacemarks(pm1, pm2);
         }
 
         private string FilterContent(string content)
@@ -189,29 +216,30 @@ namespace TripToPrint.Core.ModelFactories
             content = Regex.Replace(content, @"(<br>){2,}", "<br>");
 
             // Remove br's which go after images
-            content = Regex.Replace(content, @"/><br>", "/>");
-
-            // Remove br's which go before images
-            //content = Regex.Replace(content, @"<br><img", "<img");
-
-            // Remove image sizes
-            content = Regex.Replace(content, @"\s*(height|width)=['""](\d+|auto)['""]", "");
+            //content = Regex.Replace(content, @"/><br>", "/>");
 
             return content;
         }
 
-        private string ReorderImagesInContent(string content)
+        private string ExtractImagesFromContent(string content, out string imagesContent)
         {
             if (string.IsNullOrEmpty(content))
+            {
+                imagesContent = null;
                 return content;
+            }
 
             var foundImages = new List<string>();
             content = Regex.Replace(content, @"<img.+?>", m => {
-                foundImages.Add(m.Value);
+                // Remove image sizes
+                var imageFiltered = Regex.Replace(m.Value, @"\s*(height|width)=['""](\d+|auto)['""]", "");
+                foundImages.Add(imageFiltered);
                 return string.Empty;
             });
 
-            return string.Join(string.Empty, foundImages.Concat(new[] { content }));
+            imagesContent = string.Join(string.Empty, foundImages);
+
+            return content;
         }
 
         private double DistanceBetweenPlacemarks(IHaveCoordinate placemark1, IHaveCoordinate placemark2)

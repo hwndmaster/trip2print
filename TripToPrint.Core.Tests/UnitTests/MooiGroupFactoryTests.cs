@@ -104,7 +104,8 @@ namespace TripToPrint.Tests
             var result = _factory.Object.ConvertKmlPlacemarkToMooiPlacemark(placemark);
 
             // Verify
-            Assert.AreEqual("<img 1/><img 2/>text<br>text<br>text", result.Description);
+            Assert.AreEqual("text<br>text<br>text", result.Description);
+            Assert.AreEqual("<img 1/><img 2/>", result.ImagesContent);
         }
     }
 }

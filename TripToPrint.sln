@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripToPrint", "TripToPrint\TripToPrint.csproj", "{5759D828-2D26-4935-B86D-824D116FA591}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripToPrint.Tests", "TripToPrint.Tests\TripToPrint.Tests.csproj", "{9070DD84-8D16-478A-BAC6-D8A9C55660E6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripToPrint.Core.Tests", "TripToPrint.Core.Tests\TripToPrint.Core.Tests.csproj", "{9070DD84-8D16-478A-BAC6-D8A9C55660E6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripToPrint.Core", "TripToPrint.Core\TripToPrint.Core.csproj", "{52A4B333-14E2-47CD-877F-808CDBE2A85B}"
 EndProject
