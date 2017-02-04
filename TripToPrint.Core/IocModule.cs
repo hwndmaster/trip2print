@@ -13,6 +13,7 @@ namespace TripToPrint.Core
             builder.RegisterType<HereAdapter>().As<IHereAdapter>();
             builder.RegisterType<ReportGenerator>().As<IReportGenerator>();
             builder.RegisterType<ReportWriter>().As<IReportWriter>();
+            builder.RegisterType<FileService>().As<IFileService>();
 
             // Logging
             builder.RegisterType<LogStorage>().As<ILogStorage>().SingleInstance();

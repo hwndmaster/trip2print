@@ -26,8 +26,13 @@ A WinForms application which converts KMZ/KML files to a handy HTML report
 * Optional rendering of overview maps
 * Optional rendering of placemark's thumbnails
 * Use a Google MyMap url as a source for report generation (in addition to a file source)
+* Export to PDF directly from application
+* Option to select the map source:
+    1) HERE (implemented)
+    2) Google Static Maps (https://developers.google.com/maps/documentation/static-maps/intro)
 
 # Known issues
 * Placemarks layout is still stupid
 * Old Google MyMaps icons are not supported
+* Google MyMaps Directions are not supported
 * Sometimes not a beautiful output of placemarks

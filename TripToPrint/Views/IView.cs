@@ -1,10 +1,8 @@
 ﻿namespace TripToPrint.Views
 {
-    public interface IView<TPresenter, TViewModel>
+    public interface IView<TPresenter>
     {
         TPresenter Presenter { get; set; }
-        TViewModel ViewModel { get; set; }
-        void BindData();
-        void Refresh();
+        object DataContext { get; set; }
     }
 }

@@ -19,8 +19,12 @@ namespace TripToPrint
             builder.RegisterType<DialogService>().As<IDialogService>();
 
             // Views and Presenters
-            builder.RegisterType<MainFormPresenter>().As<IMainFormPresenter>();
-            builder.RegisterType<MainFormView>().As<IMainFormView>();
+            builder.RegisterType<MainWindowPresenter>().As<IMainWindowPresenter>();
+            builder.RegisterType<StepIntroPresenter>().As<IStepIntroPresenter>();
+            builder.RegisterType<StepGenerationPresenter>().As<IStepGenerationPresenter>();
+            builder.RegisterType<MainWindow>().As<IMainWindowView>();
+            builder.RegisterType<StepIntro>().As<IStepIntroView>();
+            builder.RegisterType<StepGenerationView>().As<IStepGenerationView>();
 
             return builder.Build();
         }

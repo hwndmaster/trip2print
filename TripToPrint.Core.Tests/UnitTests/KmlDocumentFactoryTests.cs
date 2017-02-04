@@ -1,4 +1,6 @@
-﻿using System.Xml.Linq;
+﻿using System.Globalization;
+using System.Threading;
+using System.Xml.Linq;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -63,11 +65,12 @@ namespace TripToPrint.Tests
         public void When_creating_kmlfolder_the_placemarks_with_details_are_extracted()
         {
             // Arrange
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("fr-Fr"); // To test floating numbers parsing
             var content = @"<Folder><name></name>
                     <Placemark>
 				        <name>placemark-1</name>
 				        <description><![CDATA[description-1]]></description>
-				        <Point><coordinates>1,2,3</coordinates></Point>
+				        <Point><coordinates>11.33,22.11,33.44</coordinates></Point>
                     </Placemark>
                     <Placemark>
 				        <name>placemark-2</name>
@@ -84,9 +87,9 @@ namespace TripToPrint.Tests
             Assert.AreEqual(2, result.Placemarks.Count);
             Assert.AreEqual("placemark-1", result.Placemarks[0].Name);
             Assert.AreEqual("description-1", result.Placemarks[0].Description);
-            Assert.AreEqual(2d, result.Placemarks[0].Coordinate.Latitude);
-            Assert.AreEqual(1d, result.Placemarks[0].Coordinate.Longitude);
-            Assert.AreEqual(3d, result.Placemarks[0].Coordinate.Altitude);
+            Assert.AreEqual(22.11d, result.Placemarks[0].Coordinate.Latitude);
+            Assert.AreEqual(11.33d, result.Placemarks[0].Coordinate.Longitude);
+            Assert.AreEqual(33.44d, result.Placemarks[0].Coordinate.Altitude);
             Assert.AreEqual("placemark-2", result.Placemarks[1].Name);
             Assert.AreEqual("description-2", result.Placemarks[1].Description);
             Assert.AreEqual(8d, result.Placemarks[1].Coordinate.Latitude);

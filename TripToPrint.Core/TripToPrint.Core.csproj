@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileService.cs" />
     <Compile Include="HereAdapter.cs" />
     <Compile Include="IocModule.cs" />
     <Compile Include="Logging\Logger.cs" />

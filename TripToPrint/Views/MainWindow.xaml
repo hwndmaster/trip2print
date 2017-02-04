@@ -1,0 +1,44 @@
+﻿<Window x:Class="TripToPrint.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TripToPrint.Views"
+        mc:Ignorable="d"
+        Title="Trip-to-Print" Height="650" Width="900" Background="WhiteSmoke">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="40"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TabControl x:Name="tabWizard" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,-4,0,0" SelectionChanged="TabWizard_OnSelectionChanged" SelectedIndex="{Binding WizardStepIndex}">
+            <TabItem Height="0">
+                <Grid HorizontalAlignment="Stretch" Margin="10,10,10,0">
+                    <local:StepIntro x:Name="stepIntro" />
+                </Grid>
+            </TabItem>
+            <TabItem Height="0">
+                <Grid>
+                    <local:StepGenerationView x:Name="stepGeneration" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Label Content="Made by Dmytro Kravtsov 'Genius'" Foreground="DimGray" />
+                <Label>
+                    <Hyperlink Name="linkGithub" NavigateUri="https://github.com/hwndmaster/trip2print" Foreground="DarkSlateGray" RequestNavigate="LinkGithub_OnRequestNavigate">
+                        Github link
+                    </Hyperlink>
+                </Label>
+            </StackPanel>
+            <Button x:Name="buttonBack" Grid.Column="1" Content="Back" Margin="0,10,10,0" VerticalAlignment="Top" Width="75" Click="ButtonBack_OnClick"/>
+            <Button x:Name="buttonNext" Grid.Column="2" Content="Next" Margin="0,10,10,0" VerticalAlignment="Top" Width="75" Click="ButtonNext_OnClick"/>
+        </Grid>
+    </Grid>
+</Window>

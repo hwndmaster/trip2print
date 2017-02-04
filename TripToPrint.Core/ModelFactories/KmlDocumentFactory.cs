@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Device.Location;
+using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -14,6 +15,8 @@ namespace TripToPrint.Core.ModelFactories
 
     public class KmlDocumentFactory : IKmlDocumentFactory
     {
+        private CultureInfo _cultureForParsingFloatingNumbers = new CultureInfo("en-US");
+
         public KmlDocument Create(string content)
         {
             var xdoc = XDocument.Parse(content, LoadOptions.None);
@@ -68,7 +71,9 @@ namespace TripToPrint.Core.ModelFactories
             }
 
             var coordinates = xplacemark.ElementByLocalName("Point")
-                .ElementByLocalName("coordinates").Value.Split(',').Select(double.Parse).ToArray();
+                .ElementByLocalName("coordinates").Value.Split(',')
+                .Select(x => double.Parse(x, _cultureForParsingFloatingNumbers))
+                .ToArray();
             model.Coordinate = new GeoCoordinate(coordinates[1], coordinates[0], coordinates[2]);
 
             var xextendeddata = xplacemark.ElementByLocalName("ExtendedData");
