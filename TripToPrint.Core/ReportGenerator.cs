@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Ionic.Zip;
+using Codaxy.WkHtmlToPdf;
 
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.ModelFactories;
@@ -13,7 +13,9 @@ namespace TripToPrint.Core
 {
     public interface IReportGenerator
     {
-        Task Generate(string inputFileName, string reportFileName, IProgressTracker progress);
+        Task<string> Generate(string inputFileName, IProgressTracker progress);
+
+        void SaveHtmlReportAsPdf(string tempPath, string pdfFilePath);
     }
 
     public class ReportGenerator : IReportGenerator
@@ -23,96 +25,96 @@ namespace TripToPrint.Core
         private readonly IHereAdapter _hereAdapter;
         private readonly IReportWriter _reportWriter;
         private readonly ILogger _logger;
+        private readonly IFileService _file;
+        private readonly IZipService _zipService;
+        private readonly IResourceNameProvider _resourceName;
+        private readonly IWebClientService _webClient;
 
-        public ReportGenerator(IKmlDocumentFactory kmlDocumentFactory, IMooiDocumentFactory mooiDocumentFactory, IHereAdapter hereAdapter, IReportWriter reportWriter, ILogger logger)
+        public ReportGenerator(IKmlDocumentFactory kmlDocumentFactory, IMooiDocumentFactory mooiDocumentFactory, IHereAdapter hereAdapter, IReportWriter reportWriter, ILogger logger, IFileService file, IZipService zipService, IResourceNameProvider resourceName, IWebClientService webClient)
         {
             _kmlDocumentFactory = kmlDocumentFactory;
             _mooiDocumentFactory = mooiDocumentFactory;
             _hereAdapter = hereAdapter;
             _reportWriter = reportWriter;
             _logger = logger;
+            _file = file;
+            _zipService = zipService;
+            _resourceName = resourceName;
+            _webClient = webClient;
         }
 
-        public async Task Generate(string inputFileName, string reportFileName, IProgressTracker progress)
+        public async Task<string> Generate(string inputFileName, IProgressTracker progress)
         {
             var ext = Path.GetExtension(inputFileName);
 
             if (ext.Equals(".kmz", StringComparison.OrdinalIgnoreCase))
             {
-                await GenerateForKmz(inputFileName, reportFileName, progress);
+                return await GenerateForKmz(inputFileName, progress);
             }
-            else if (ext.Equals(".kml", StringComparison.OrdinalIgnoreCase))
+            if (ext.Equals(".kml", StringComparison.OrdinalIgnoreCase))
             {
-                await GenerateForKml(inputFileName, reportFileName, progress);
+                return await GenerateForKml(inputFileName, progress);
             }
-            else
-            {
-                throw new NotSupportedException();
-            }
+
+            throw new NotSupportedException();
         }
 
-        private async Task GenerateForKml(string inputFileName, string reportFileName, IProgressTracker progress)
+        public void SaveHtmlReportAsPdf(string tempPath, string pdfFilePath)
+        {
+            var environment = new PdfConvertEnvironment {
+                WkHtmlToPdfPath = @"wkhtmltopdf.exe",
+                Timeout = 60000
+            };
+
+            PdfConvert.ConvertHtmlToPdf(new PdfDocument {
+                Url = Path.Combine(tempPath, _resourceName.GetDefaultHtmlReportName())
+            }, environment, new PdfOutput { OutputFilePath = pdfFilePath });
+        }
+
+        private async Task<string> GenerateForKml(string inputFileName, IProgressTracker progress)
         {
             throw new NotImplementedException("Sorry, KML files are not supported at the moment");
         }
 
-        private async Task GenerateForKmz(string kmzFileName, string reportFileName, IProgressTracker progress)
+        private async Task<string> GenerateForKmz(string kmzFileName, IProgressTracker progress)
         {
+            var tempPath = CreateAndGetTempPath();
+
             _logger.Info($"Reading '{kmzFileName}'");
-            using (var zip = ZipFile.Read(kmzFileName))
+            using (var zip = _zipService.Open(kmzFileName))
             {
-                var kmlEntry = zip.Entries.First(x => Path.GetExtension(x.FileName).Equals(".kml"));
-                using (var stream = new MemoryStream(new byte[kmlEntry.UncompressedSize]))
+                var resourceEntries = zip.GetFileNames().Where(x => x.StartsWith("images/")).ToList();
+                foreach (var filename in resourceEntries)
                 {
-                    kmlEntry.Extract(stream);
-
-                    stream.Seek(0, SeekOrigin.Begin);
-
-                    using (var reader = new StreamReader(stream))
-                    {
-                        var resourcesPath = Path.Combine(Path.GetDirectoryName(reportFileName),
-                            Path.GetFileNameWithoutExtension(reportFileName) + "_resources");
-
-                        var resourceEntries = zip.Entries.Where(x => x.FileName.StartsWith("images/")).ToList();
-                        foreach (var entry in resourceEntries)
-                        {
-                            entry.Extract(resourcesPath, ExtractExistingFileAction.OverwriteSilently);
-                        }
-                        progress.ReportResourceEntriesProcessed();
-
-                        var kmlContent = await reader.ReadToEndAsync();
-                        var kmlDocument = _kmlDocumentFactory.Create(kmlContent);
-                        var mooiDocument = _mooiDocumentFactory.Create(kmlDocument);
-
-                        var content = await _reportWriter.WriteReportAsync(mooiDocument, resourcesPath);
-
-                        progress.ReportContentGenerationDone();
-
-                        await FetchMapImages(mooiDocument, resourcesPath, progress);
-                        await CopyGeneralResources(resourcesPath);
-
-                        _logger.Info($"Writing report to '{reportFileName}'");
-                        using (var reportStream = File.OpenWrite(reportFileName))
-                        {
-                            using (var reportWriter = new StreamWriter(reportStream))
-                            {
-                                await reportWriter.WriteAsync(content);
-                            }
-                        }
-
-                        progress.ReportDone();
-                    }
+                    zip.SaveToFolder(filename, tempPath);
                 }
+                progress.ReportResourceEntriesProcessed();
+
+                var kmlFileName = zip.GetFileNames().FirstOrDefault(x => Path.GetExtension(x).Equals(".kml"));
+                if (kmlFileName == null)
+                {
+                    throw new InvalidOperationException("Provided KMZ file is invalid. An entry for KML was not found");
+                }
+                var kmlContent = await zip.GetFileContent(kmlFileName);
+
+                var kmlDocument = _kmlDocumentFactory.Create(kmlContent);
+                var mooiDocument = _mooiDocumentFactory.Create(kmlDocument);
+
+                var content = await _reportWriter.WriteReportAsync(mooiDocument);
+
+                progress.ReportContentGenerationDone();
+
+                await FetchMapImages(mooiDocument, tempPath, progress);
+
+                await _file.WriteStringAsync(Path.Combine(tempPath, _resourceName.GetDefaultHtmlReportName()), content);
+
+                progress.ReportDone();
             }
+
+            return tempPath;
         }
 
-        private async Task CopyGeneralResources(string resourcesPath)
-        {
-            //File.WriteAllText($"{resourcesPath}/jquery.min.js", Resources.JqueryScript);
-            //File.WriteAllText($"{resourcesPath}/jquery.masonry.min.js", Resources.JqueryMasonryScript);
-        }
-
-        private async Task FetchMapImages(MooiDocument document, string resourcesPath, IProgressTracker progress)
+        private async Task FetchMapImages(MooiDocument document, string tempPath, IProgressTracker progress)
         {
             var groups = document.Sections.SelectMany(x => x.Groups).ToList();
             var placemarks = document.Sections.SelectMany(x => x.Groups).SelectMany(x => x.Placemarks).ToList();
@@ -122,55 +124,52 @@ namespace TripToPrint.Core
             _logger.Info("Downloading overviews");
             foreach (var group in groups)
             {
-                await FetchGroupMapImage(resourcesPath, group);
-
+                await FetchGroupMapImage(group, tempPath);
                 progress.ReportFetchImageProcessed();
             }
 
             _logger.Info("Downloading sections");
             foreach (var placemark in placemarks)
             {
-                await FetchPlacemarkMapImage(resourcesPath, placemark);
-
+                await FetchPlacemarkMapImage(placemark, tempPath);
                 progress.ReportFetchImageProcessed();
             }
         }
 
-        private async Task FetchGroupMapImage(string resourcesPath, MooiGroup group)
+        private async Task FetchGroupMapImage(MooiGroup group, string tempPath)
         {
-            var fileName = $"{resourcesPath}/{group.OverviewMapFileName}";
-            if (File.Exists(fileName))
-            {
-                _logger.Warn($"A map image '{fileName}' wasn't downloaded since file already exists");
-            }
-            else
-            {
-                var imageBytes = await _hereAdapter.FetchOverviewMap(group);
-                using (var stream = File.OpenWrite(fileName))
-                {
-                    await stream.WriteAsync(imageBytes, 0, imageBytes.Length);
-                }
-
-                _logger.Info($"A map image '{fileName}' has been successfully downloaded");
-            }
+            var imageBytes = await _hereAdapter.FetchOverviewMap(group);
+            var filePath = Path.Combine(tempPath, _resourceName.CreateFileNameForOverviewMap(group));
+            await _file.WriteBytesAsync(filePath, imageBytes);
+            _logger.Info($"An overview map for '{group.Id}' has been successfully downloaded");
         }
 
-        private async Task FetchPlacemarkMapImage(string resourcesPath, MooiPlacemark placemark)
+        private async Task FetchPlacemarkMapImage(MooiPlacemark placemark, string tempPath)
         {
-            var fileName = $"{resourcesPath}/{placemark.Id}.jpg";
-            if (File.Exists(fileName))
+            var imageBytes = await _hereAdapter.FetchImage(placemark);
+            var filePath = Path.Combine(tempPath, _resourceName.CreateFileNameForPlacemarkThumbnail(placemark));
+            await _file.WriteBytesAsync(filePath, imageBytes);
+
+            if (placemark.IconPathIsOnWeb)
             {
-                _logger.Warn($"A map image '{fileName}' wasn't downloaded since file already exists");
-            }
-            else
-            {
-                var imageBytes = await _hereAdapter.FetchImage(placemark);
-                using (var stream = File.OpenWrite(fileName))
+                filePath = Path.Combine(tempPath, StringHelper.MakeStringSafeForFileName(placemark.IconPath));
+                if (!_file.Exists(filePath))
                 {
-                    await stream.WriteAsync(imageBytes, 0, imageBytes.Length);
+                    imageBytes = await _webClient.DownloadDataAsync(placemark.IconPath);
+                    await _file.WriteBytesAsync(filePath, imageBytes);
                 }
-                _logger.Info($"A map image '{fileName}' has been successfully downloaded");
             }
+
+            _logger.Info($"A thumbnail image for '{placemark.Id}' has been successfully downloaded");
+        }
+
+        private string CreateAndGetTempPath()
+        {
+            var tempPath = Path.GetTempPath() + "Trip2Print_" + Guid.NewGuid();
+
+            _file.CreateFolder(tempPath);
+
+            return tempPath;
         }
     }
 }

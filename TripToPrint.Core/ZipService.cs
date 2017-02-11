@@ -1,0 +1,12 @@
+﻿namespace TripToPrint.Core
+{
+    public interface IZipService
+    {
+        IZipFileWrapper Open(string zipFileName);
+    }
+
+    public class ZipService : IZipService
+    {
+        public IZipFileWrapper Open(string zipFileName) => new ZipFileWrapper(zipFileName);
+    }
+}

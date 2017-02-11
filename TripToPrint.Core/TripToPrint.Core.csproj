@@ -41,6 +41,8 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Device" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -59,9 +61,16 @@
     <Compile Include="ModelFactories\KmlDocumentFactory.cs" />
     <Compile Include="ModelFactories\MooiDocumentFactory.cs" />
     <Compile Include="ModelFactories\MooiGroupFactory.cs" />
+    <Compile Include="Models\KmlExtendedData.cs" />
     <Compile Include="Models\IHaveCoordinate.cs" />
     <Compile Include="Models\KmlDocument.cs" />
+    <Compile Include="Models\KmlFolder.cs" />
+    <Compile Include="Models\KmlPlacemark.cs" />
     <Compile Include="Models\MooiDocument.cs" />
+    <Compile Include="Models\MooiGroup.cs" />
+    <Compile Include="Models\MooiPlacemark.cs" />
+    <Compile Include="Models\MooiSection.cs" />
+    <Compile Include="PdfConvert.cs" />
     <Compile Include="ProgressTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -71,7 +80,12 @@
     </Compile>
     <Compile Include="ReportGenerator.cs" />
     <Compile Include="ReportWriter.cs" />
+    <Compile Include="ResourceNameProvider.cs" />
+    <Compile Include="StringHelper.cs" />
+    <Compile Include="WebClientService.cs" />
     <Compile Include="XmlExtensionMethods.cs" />
+    <Compile Include="ZipFileWrapper.cs" />
+    <Compile Include="ZipService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -80,6 +94,12 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\packages\wkhtmltopdf-x86-win32.0.12.3.6\tools\wkhtmltopdf\wkhtmltopdf.exe">
+      <Link>wkhtmltopdf.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -10,8 +10,6 @@ namespace TripToPrint.Presenters
 {
     public interface IMainWindowPresenter : IPresenter<MainWindowViewModel, IMainWindowView>
     {
-        void OpenReport();
-        void OpenReportContainingFolder();
         Task GoBack();
         Task GoNext();
         void GetBackNextTitlesForCurrentStep(ref string back, ref string next);
@@ -21,13 +19,15 @@ namespace TripToPrint.Presenters
     {
         private readonly IStepIntroPresenter _stepIntroPresenter;
         private readonly IStepGenerationPresenter _stepGenerationPresenter;
+        private readonly IStepAdjustmentPresenter _stepAdjustmentPresenter;
         private readonly ILogger _logger;
 
-        public MainWindowPresenter(IStepIntroPresenter stepIntroPresenter, IStepGenerationPresenter stepGenerationPresenter, ILogger logger)
+        public MainWindowPresenter(ILogger logger, IStepIntroPresenter stepIntroPresenter, IStepGenerationPresenter stepGenerationPresenter, IStepAdjustmentPresenter stepAdjustmentPresenter)
         {
+            _logger = logger;
             _stepIntroPresenter = stepIntroPresenter;
             _stepGenerationPresenter = stepGenerationPresenter;
-            _logger = logger;
+            _stepAdjustmentPresenter = stepAdjustmentPresenter;
         }
 
 
@@ -43,39 +43,33 @@ namespace TripToPrint.Presenters
 
             _stepIntroPresenter.InitializePresenter(View.StepIntroView, ViewModel.StepIntro);
             _stepGenerationPresenter.InitializePresenter(View.StepGenerationView, ViewModel.StepGeneration);
+            _stepAdjustmentPresenter.InitializePresenter(View.StepAdjustmentView, ViewModel.StepAdjustment);
 
-            // TODO: Convert to Rx observable
             ViewModel.StepIntro.InputUriChanged += (sender, inputUri) => {
                 _logger.Info($"Input file selected: {inputUri}");
                 ViewModel.StepGeneration.InputUri = inputUri;
+                ViewModel.StepAdjustment.InputUri = inputUri;
             };
-            ViewModel.StepIntro.OutputFileNameChanged += (sender, outputFileName) => {
-                _logger.Info($"Output file selected: {outputFileName}");
-                ViewModel.StepGeneration.OutputFileName = outputFileName;
+            ViewModel.StepIntro.InputSourceChanged += (sender, inputSource) => {
+                _logger.Info($"Input source selected: {inputSource}");
+                ViewModel.StepGeneration.InputSource = inputSource;
+                ViewModel.StepAdjustment.InputSource = inputSource;
             };
+            ViewModel.StepGeneration.TempPathChanged += (sender, tempPath) => {
+                ViewModel.StepAdjustment.TempPath = tempPath;
+            };
+
+            _stepGenerationPresenter.GoNextRequested += async (sender, args) => { await GoNext(); };
 
             GetWizardStepPresenter(ViewModel.WizardStepIndex).Activated().GetAwaiter().GetResult();
-        }
-
-        // TODO: Use this method on the last wizard step
-        public void OpenReport()
-        {
-            Process.Start(ViewModel.StepIntro.OutputFileName);
-        }
-
-        // TODO: Use this method on the last wizard step
-        public void OpenReportContainingFolder()
-        {
-            string argument = "/select, \"" + ViewModel.StepIntro.OutputFileName + "\"";
-            Process.Start("explorer.exe", argument);
         }
 
         public async Task GoBack()
         {
             var currentStepPresenter = GetWizardStepPresenter(ViewModel.WizardStepIndex);
-            if (currentStepPresenter.ValidateToGoBack())
+            if (currentStepPresenter.BeforeToGoBack())
             {
-                ViewModel.WizardStepIndex--;
+                ViewModel.WizardStepIndex = 0;
 
                 await GetWizardStepPresenter(ViewModel.WizardStepIndex).Activated();
             }
@@ -84,11 +78,17 @@ namespace TripToPrint.Presenters
         public async Task GoNext()
         {
             var currentStepPresenter = GetWizardStepPresenter(ViewModel.WizardStepIndex);
-            if (currentStepPresenter.ValidateToGoNext())
+            if (currentStepPresenter.BeforeGoNext())
             {
                 ViewModel.WizardStepIndex++;
+                var wizardStep = GetWizardStepPresenter(ViewModel.WizardStepIndex);
+                if (wizardStep == null)
+                {
+                    ViewModel.WizardStepIndex = 0;
+                    wizardStep = GetWizardStepPresenter(ViewModel.WizardStepIndex);
+                }
 
-                await GetWizardStepPresenter(ViewModel.WizardStepIndex).Activated();
+                await wizardStep.Activated();
             }
         }
 
@@ -106,9 +106,11 @@ namespace TripToPrint.Presenters
                     return _stepIntroPresenter;
                 case 1:
                     return _stepGenerationPresenter;
+                case 2:
+                    return _stepAdjustmentPresenter;
+                default:
+                    return null;
             }
-
-            throw new NotSupportedException($"WizardStepIndex is invalid: {wizardStepIndex}");
         }
     }
 }

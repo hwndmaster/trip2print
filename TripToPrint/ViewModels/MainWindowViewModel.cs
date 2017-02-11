@@ -8,10 +8,12 @@
         {
             StepIntro = new StepIntroViewModel();
             StepGeneration = new StepGenerationViewModel();
+            StepAdjustment = new StepAdjustmentViewModel();
         }
 
         public StepIntroViewModel StepIntro { get; private set; }
         public StepGenerationViewModel StepGeneration { get; private set; }
+        public StepAdjustmentViewModel StepAdjustment { get; private set; }
 
         public int WizardStepIndex
         {
@@ -22,7 +24,10 @@
                     return;
                 _wizardStepIndex = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(CanGoBack));
             }
         }
+
+        public bool CanGoBack => WizardStepIndex > 0;
     }
 }

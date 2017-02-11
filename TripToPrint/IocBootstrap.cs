@@ -22,9 +22,11 @@ namespace TripToPrint
             builder.RegisterType<MainWindowPresenter>().As<IMainWindowPresenter>();
             builder.RegisterType<StepIntroPresenter>().As<IStepIntroPresenter>();
             builder.RegisterType<StepGenerationPresenter>().As<IStepGenerationPresenter>();
+            builder.RegisterType<StepAdjustmentPresenter>().As<IStepAdjustmentPresenter>();
             builder.RegisterType<MainWindow>().As<IMainWindowView>();
             builder.RegisterType<StepIntro>().As<IStepIntroView>();
             builder.RegisterType<StepGenerationView>().As<IStepGenerationView>();
+            builder.RegisterType<StepAdjustmentView>().As<IStepAdjustmentView>();
 
             return builder.Build();
         }

@@ -3,11 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:TripToPrint.Views"
+             xmlns:l="clr-namespace:TripToPrint"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="600"
+             d:DesignHeight="400" d:DesignWidth="600"
              Background="WhiteSmoke">
     <Grid>
+        <Grid.Resources>
+            <l:EnumBooleanConverter x:Key="enumBooleanConverter" />
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -21,15 +24,17 @@
         <Label Grid.Row="0" Grid.Column="1" Content="Trip-to-Print" VerticalAlignment="Top" FontSize="19" FontWeight="Bold" Height="35"/>
         <Label Grid.Row="0" Grid.Column="1" Content="Your trip planning made easy" Margin="0,24,0,0" VerticalAlignment="Top" FontStyle="Italic" />
         <TextBlock Grid.Row="0" Grid.Column="1" TextWrapping="WrapWithOverflow" Margin="0,70,20,0" VerticalAlignment="Top" Width="Auto">
-                        Welcome to Trip-to-Print - a windows program which turns your trip plans in KML/KMZ formats into a handy and beautiful report for easier printing or offline use
+            Welcome to Trip-to-Print - a windows program which turns your trip plans in KML/KMZ formats into a handy and beautiful report for easier printing or offline use
         </TextBlock>
         <Separator Grid.Row="1" Grid.Column="1" Margin="0,10,0,10" />
         <StackPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Top">
             <Label Content="Select a source of KMZ/KML:" VerticalAlignment="Top" Margin="-4,0,0,0" />
-            <RadioButton GroupName="Source" Content="Local file" IsChecked="true" Margin="0,5" />
-            <RadioButton GroupName="Source" Content="Google MyMap URL" Margin="0,5" IsEnabled="False" />
+            <RadioButton GroupName="InputSource" Content="Local file" Margin="0,5"
+                         IsChecked="{Binding Path=InputSource, Converter={StaticResource enumBooleanConverter}, ConverterParameter=LocalFile}" />
+            <RadioButton GroupName="InputSource" Content="Google MyMap URL" IsEnabled="False"
+                         IsChecked="{Binding Path=InputSource, Converter={StaticResource enumBooleanConverter}, ConverterParameter=GoogleMyMapsUrl}" />
             <Separator Margin="0,10,0,10" />
-            <DockPanel LastChildFill="True">
+            <DockPanel LastChildFill="True" Margin="-4,0,0,0">
                 <Label DockPanel.Dock="Left" Content="Input file name:"/>
                 <Label>
                     <Hyperlink Name="labelInputFile" Click="LabelInputFile_OnClick">

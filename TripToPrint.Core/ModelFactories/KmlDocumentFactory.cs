@@ -79,10 +79,10 @@ namespace TripToPrint.Core.ModelFactories
             var xextendeddata = xplacemark.ElementByLocalName("ExtendedData");
             if (xextendeddata != null)
             {
-                model.ExtendedData = new List<ExtendedData>();
+                model.ExtendedData = new List<KmlExtendedData>();
                 foreach (var xdata in xextendeddata.ElementsByLocalName("Data"))
                 {
-                    model.ExtendedData.Add(new ExtendedData {
+                    model.ExtendedData.Add(new KmlExtendedData {
                         Name = xdata.Attribute("name").Value,
                         Value = xdata.ElementByLocalName("value").Value
                     });

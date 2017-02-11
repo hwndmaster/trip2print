@@ -1,9 +1,6 @@
 ﻿using System;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using Moq;
-
 using TripToPrint.Core;
 using TripToPrint.Core.Logging;
 using TripToPrint.Presenters;
@@ -19,12 +16,19 @@ namespace TripToPrint.Tests
         private readonly Mock<IReportGenerator> _reportGeneratorMock = new Mock<IReportGenerator>();
         private readonly Mock<ILogStorage> _logStorageMock = new Mock<ILogStorage>();
         private readonly Mock<ILogger> _loggerMock = new Mock<ILogger>();
+        private readonly Mock<IWebClientService> _webClientkMock = new Mock<IWebClientService>();
+        private readonly Mock<IFileService> _fileMock = new Mock<IFileService>();
         private Mock<StepGenerationPresenter> _presenter;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _presenter = new Mock<StepGenerationPresenter>(_reportGeneratorMock.Object, _logStorageMock.Object, _loggerMock.Object) {
+            _presenter = new Mock<StepGenerationPresenter>(
+                _reportGeneratorMock.Object,
+                _logStorageMock.Object,
+                _loggerMock.Object,
+                _webClientkMock.Object,
+                _fileMock.Object) {
                 CallBase = true
             };
         }
@@ -47,30 +51,29 @@ namespace TripToPrint.Tests
         {
             // Arrange
             _presenter.SetupGet(x => x.ViewModel).Returns(new StepGenerationViewModel {
-                InputUri = "input-uri",
-                OutputFileName = "output-filename"
+                InputUri = "input-uri"
             });
 
             // Act
             _presenter.Object.Activated().GetAwaiter().GetResult();
 
             // Verify
-            _reportGeneratorMock.Verify(x => x.Generate("input-uri", "output-filename", It.IsAny<IProgressTracker>()), Times.Once);
+            _reportGeneratorMock.Verify(x => x.Generate("input-uri", It.IsAny<IProgressTracker>()), Times.Once);
         }
 
         [TestMethod]
         public void When_step_is_activated_and_report_generation_has_failed_an_error_is_put_to_log()
         {
             // Arrange
-            _presenter.SetupGet(x => x.ViewModel).Returns(new StepGenerationViewModel {});
-            _reportGeneratorMock.Setup(x => x.Generate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IProgressTracker>()))
+            _presenter.SetupGet(x => x.ViewModel).Returns(new StepGenerationViewModel());
+            _reportGeneratorMock.Setup(x => x.Generate(It.IsAny<string>(), It.IsAny<IProgressTracker>()))
                 .Throws(new Exception("exception-message"));
 
             // Act
             _presenter.Object.Activated().GetAwaiter().GetResult();
 
             // Verify
-            _loggerMock.Verify(x => x.Error("exception-message"));
+            _loggerMock.Verify(x => x.Error(It.IsRegex("exception-message")));
         }
 
         [TestMethod]
@@ -80,7 +83,7 @@ namespace TripToPrint.Tests
             _presenter.SetupGet(x => x.ViewModel).Returns(new StepGenerationViewModel { ProgressInPercentage = 100 });
 
             // Act
-            var result = _presenter.Object.ValidateToGoNext();
+            var result = _presenter.Object.BeforeGoNext();
 
             // Verify
             Assert.AreEqual(true, result);
@@ -93,7 +96,7 @@ namespace TripToPrint.Tests
             _presenter.SetupGet(x => x.ViewModel).Returns(new StepGenerationViewModel { ProgressInPercentage = 99 });
 
             // Act
-            var result = _presenter.Object.ValidateToGoNext();
+            var result = _presenter.Object.BeforeGoNext();
 
             // Verify
             Assert.AreEqual(false, result);

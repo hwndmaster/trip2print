@@ -5,8 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TripToPrint.Views"
         mc:Ignorable="d"
-        Title="Trip-to-Print" Height="650" Width="900" Background="WhiteSmoke">
+        Title="Trip-to-Print" Height="650" Width="900" Background="WhiteSmoke"
+        WindowStartupLocation="CenterScreen">
     <Grid>
+        <Grid.Resources>
+            <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="40"></RowDefinition>
@@ -20,6 +24,11 @@
             <TabItem Height="0">
                 <Grid>
                     <local:StepGenerationView x:Name="stepGeneration" />
+                </Grid>
+            </TabItem>
+            <TabItem Height="0">
+                <Grid>
+                    <local:StepAdjustmentView x:Name="stepAdjustment" />
                 </Grid>
             </TabItem>
         </TabControl>
@@ -37,8 +46,8 @@
                     </Hyperlink>
                 </Label>
             </StackPanel>
-            <Button x:Name="buttonBack" Grid.Column="1" Content="Back" Margin="0,10,10,0" VerticalAlignment="Top" Width="75" Click="ButtonBack_OnClick"/>
-            <Button x:Name="buttonNext" Grid.Column="2" Content="Next" Margin="0,10,10,0" VerticalAlignment="Top" Width="75" Click="ButtonNext_OnClick"/>
+            <Button x:Name="buttonBack" Grid.Column="1" Content="Back" Margin="0,10,10,0" VerticalAlignment="Top" Width="85" Click="ButtonBack_OnClick" Visibility="{Binding Path=CanGoBack, Converter={StaticResource BoolToVis}}"/>
+            <Button x:Name="buttonNext" Grid.Column="2" Content="Next" Margin="0,10,10,0" VerticalAlignment="Top" Width="85" Click="ButtonNext_OnClick"/>
         </Grid>
     </Grid>
 </Window>

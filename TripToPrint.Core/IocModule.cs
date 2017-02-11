@@ -14,6 +14,9 @@ namespace TripToPrint.Core
             builder.RegisterType<ReportGenerator>().As<IReportGenerator>();
             builder.RegisterType<ReportWriter>().As<IReportWriter>();
             builder.RegisterType<FileService>().As<IFileService>();
+            builder.RegisterType<ZipService>().As<IZipService>();
+            builder.RegisterType<ResourceNameProvider>().As<IResourceNameProvider>();
+            builder.RegisterType<WebClientService>().As<IWebClientService>();
 
             // Logging
             builder.RegisterType<LogStorage>().As<ILogStorage>().SingleInstance();

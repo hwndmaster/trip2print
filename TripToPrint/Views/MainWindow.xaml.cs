@@ -11,19 +11,13 @@ namespace TripToPrint.Views
     {
         IStepIntroView StepIntroView { get; }
         IStepGenerationView StepGenerationView { get; }
+        IStepAdjustmentView StepAdjustmentView { get; }
 
         void Show();
     }
 
     public partial class MainWindow : Window, IMainWindowView
     {
-        // TODO: Add "Open report file" button on the last wizard step
-        //       Presenter.OpenReport();
-        // TODO: Add "Open report containing folder" button on the last wizard step
-        //       Presenter.OpenReportContainingFolder();
-        // TODO: Add "Copy report path to clipboard" button on the last wizard step
-        //       Clipboard.SetText(ViewModel.OutputFileName, TextDataFormat.Text);
-
         public MainWindow()
         {
             InitializeComponent();
@@ -32,6 +26,7 @@ namespace TripToPrint.Views
         public IMainWindowPresenter Presenter { get; set; }
         public IStepIntroView StepIntroView => stepIntro;
         public IStepGenerationView StepGenerationView => stepGeneration;
+        public IStepAdjustmentView StepAdjustmentView => stepAdjustment;
 
         private void TabWizard_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {

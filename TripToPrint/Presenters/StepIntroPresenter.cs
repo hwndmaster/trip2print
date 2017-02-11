@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using System;
 using System.Threading.Tasks;
 
 using TripToPrint.Core;
@@ -27,6 +27,7 @@ namespace TripToPrint.Presenters
 
         public IStepIntroView View { get; private set; }
         public virtual StepIntroViewModel ViewModel { get; private set; }
+        public event EventHandler GoNextRequested;
 
         public void InitializePresenter(IStepIntroView view, StepIntroViewModel viewModel = null)
         {
@@ -52,12 +53,12 @@ namespace TripToPrint.Presenters
             return Task.CompletedTask;
         }
 
-        public bool ValidateToGoBack()
+        public bool BeforeToGoBack()
         {
             return false;
         }
 
-        public bool ValidateToGoNext()
+        public bool BeforeGoNext()
         {
             if (string.IsNullOrEmpty(ViewModel.InputUri))
             {
@@ -65,23 +66,12 @@ namespace TripToPrint.Presenters
                 return false;
             }
 
-            if (!_fileService.Exists(ViewModel.InputUri))
+            if (ViewModel.InputSource == InputSource.LocalFile
+                && !_fileService.Exists(ViewModel.InputUri))
             {
                 _dialogService.InvalidOperationMessage("The selected file was not found");
                 return false;
             }
-
-            var outputFileName = Path.GetFileNameWithoutExtension(ViewModel.InputUri);
-            outputFileName = _dialogService.AskUserToSaveFile("Save output to a file", $"{outputFileName}.html", new[] {
-                "HTML files (*.html)|*.html"
-            });
-            if (outputFileName == null)
-            {
-                return false;
-            }
-
-            ViewModel.OutputFileName = outputFileName;
-
 
             return true;
         }

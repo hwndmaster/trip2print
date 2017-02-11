@@ -1,5 +1,5 @@
 # Trip to Print
-A WinForms application which converts KMZ/KML files to a handy HTML report
+A WPF application which converts KMZ/KML files to a handy HTML report
 
 # Usage
 1. Download and compile with [Visual Studio 2015](https://www.visualstudio.com)
@@ -25,8 +25,7 @@ A WinForms application which converts KMZ/KML files to a handy HTML report
 * Make the output layout of placemarks more flexible
 * Optional rendering of overview maps
 * Optional rendering of placemark's thumbnails
-* Use a Google MyMap url as a source for report generation (in addition to a file source)
-* Export to PDF directly from application
+* Option to select Google MyMap url as a source for report generation (in addition to a file source)
 * Option to select the map source:
     1) HERE (implemented)
     2) Google Static Maps (https://developers.google.com/maps/documentation/static-maps/intro)

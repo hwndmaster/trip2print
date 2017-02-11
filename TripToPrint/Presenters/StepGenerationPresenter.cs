@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 using TripToPrint.Core;
@@ -17,17 +18,22 @@ namespace TripToPrint.Presenters
         private readonly IReportGenerator _reportGenerator;
         private readonly ILogStorage _logStorage;
         private readonly ILogger _logger;
+        private readonly IWebClientService _webClient;
+        private readonly IFileService _file;
 
-        public StepGenerationPresenter(IReportGenerator reportGenerator, ILogStorage logStorage, ILogger logger)
+        public StepGenerationPresenter(IReportGenerator reportGenerator, ILogStorage logStorage, ILogger logger, IWebClientService webClient, IFileService file)
         {
             _reportGenerator = reportGenerator;
             _logStorage = logStorage;
             _logger = logger;
+            _webClient = webClient;
+            _file = file;
         }
 
 
         public IStepGenerationView View { get; private set; }
         public virtual StepGenerationViewModel ViewModel { get; private set; }
+        public event EventHandler GoNextRequested;
 
         public void InitializePresenter(IStepGenerationView view, StepGenerationViewModel viewModel = null)
         {
@@ -45,7 +51,7 @@ namespace TripToPrint.Presenters
             await GenerateReport();
         }
 
-        public bool ValidateToGoBack()
+        public bool BeforeToGoBack()
         {
             if (ViewModel.ProgressInPercentage < 100)
             {
@@ -55,7 +61,7 @@ namespace TripToPrint.Presenters
             return true;
         }
 
-        public bool ValidateToGoNext()
+        public bool BeforeGoNext()
         {
             if (ViewModel.ProgressInPercentage < 100)
             {
@@ -71,18 +77,54 @@ namespace TripToPrint.Presenters
 
         private async Task GenerateReport()
         {
+            string inputFileName = null;
+
             _logStorage.ClearAll();
             ViewModel.ProgressInPercentage = 0;
 
             try
             {
-                await _reportGenerator.Generate(ViewModel.InputUri, ViewModel.OutputFileName, CreateProgressTracker());
+                var progressTracker = CreateProgressTracker();
+
+                switch (ViewModel.InputSource)
+                {
+                    case InputSource.LocalFile:
+                        inputFileName = ViewModel.InputUri;
+                        break;
+                    case InputSource.GoogleMyMapsUrl:
+                        var inputData = await _webClient.DownloadDataAsync(ViewModel.InputUri);
+                        inputFileName = $"{Path.GetTempPath()}Trip2Print_{Guid.NewGuid()}.kmz";
+                        await _file.WriteBytesAsync(inputFileName, inputData);
+                        break;
+                    default:
+                        throw new NotSupportedException($"Input source type is invalid: {ViewModel.InputSource}");
+                }
+
+                progressTracker.ReportSourceDownloaded();
+
+                ViewModel.TempPath = await _reportGenerator.Generate(inputFileName, progressTracker);
+
                 _logger.Info("Generation process complete");
+
+                GoNextRequested?.Invoke(this, null);
             }
             catch (Exception ex)
             {
+#if DEBUG
+                _logger.Error(ex.ToString());
+#else
                 _logger.Error(ex.Message);
+#endif
                 _logger.Error("Process stopped due to error");
+            }
+            finally
+            {
+                if (ViewModel.InputSource == InputSource.GoogleMyMapsUrl
+                    && !string.IsNullOrEmpty(inputFileName)
+                    && _file.Exists(inputFileName))
+                {
+                    _file.Delete(inputFileName);
+                }
             }
         }
 

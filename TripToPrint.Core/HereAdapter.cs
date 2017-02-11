@@ -17,6 +17,13 @@ namespace TripToPrint.Core
         private const string ROOT_URL = "https://image.maps.cit.api.here.com/mia/1.6";
         private const string MAPVIEW_URL = ROOT_URL + "/mapview?";
 
+        private readonly IWebClientService _webClient;
+
+        public HereAdapter(IWebClientService webClient)
+        {
+            _webClient = webClient;
+        }
+
         public async Task<byte[]> FetchImage(IHaveCoordinate placemark)
         {
             var url = $"{MAPVIEW_URL}c={placemark.Coordinate.Latitude}%2C{placemark.Coordinate.Longitude}&z=17";
@@ -35,7 +42,7 @@ namespace TripToPrint.Core
 
         private async Task<byte[]> DownloadData(string url)
         {
-            return await new WebClient().DownloadDataTaskAsync(url + GetAppCodeUrlPart());
+            return await _webClient.DownloadDataAsync(url + GetAppCodeUrlPart());
         }
 
         private string GetAppCodeUrlPart()

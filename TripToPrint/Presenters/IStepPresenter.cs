@@ -1,12 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace TripToPrint.Presenters
 {
     public interface IStepPresenter
     {
         Task Activated();
-        bool ValidateToGoBack();
-        bool ValidateToGoNext();
+        bool BeforeToGoBack();
+        bool BeforeGoNext();
         void GetBackNextTitles(ref string back, ref string next);
+
+        event EventHandler GoNextRequested;
     }
 }

@@ -5,7 +5,7 @@ namespace TripToPrint.ViewModels
     public class StepIntroViewModel : ViewModelBase
     {
         private string _inputUri;
-        private string _outputFileName;
+        private InputSource _inputSource;
 
         public string InputUri
         {
@@ -21,21 +21,21 @@ namespace TripToPrint.ViewModels
             }
         }
 
-        public string OutputFileName
+        public InputSource InputSource
         {
-            get { return _outputFileName; }
+            get { return _inputSource; }
             set
             {
-                if (value == _outputFileName)
+                if (value == _inputSource)
                     return;
-                _outputFileName = value;
+                _inputSource = value;
 
                 OnPropertyChanged();
-                OutputFileNameChanged?.Invoke(this, value);
+                InputSourceChanged?.Invoke(this, value);
             }
         }
 
         public event EventHandler<string> InputUriChanged;
-        public event EventHandler<string> OutputFileNameChanged;
+        public event EventHandler<InputSource> InputSourceChanged;
     }
 }

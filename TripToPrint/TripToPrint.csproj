@@ -66,11 +66,15 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="EnumBooleanConverter.cs" />
     <Compile Include="Presenters\IPresenter.cs" />
     <Compile Include="Presenters\IStepPresenter.cs" />
     <Compile Include="Presenters\StepGenerationPresenter.cs" />
+    <Compile Include="Presenters\StepAdjustmentPresenter.cs" />
     <Compile Include="Presenters\StepIntroPresenter.cs" />
     <Compile Include="Presenters\MainWindowPresenter.cs" />
+    <Compile Include="InputSource.cs" />
+    <Compile Include="ViewModels\StepAdjustmentViewModel.cs" />
     <Compile Include="ViewModels\StepGenerationViewModel.cs" />
     <Compile Include="ViewModels\StepIntroViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
@@ -82,6 +86,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StepAdjustmentView.xaml.cs">
+      <DependentUpon>StepAdjustmentView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\StepGenerationView.xaml.cs">
       <DependentUpon>StepGenerationView.xaml</DependentUpon>
@@ -133,6 +140,10 @@
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\StepAdjustmentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\StepGenerationView.xaml">
       <SubType>Designer</SubType>

@@ -68,20 +68,21 @@ namespace TripToPrint.Tests
         }
 
         [TestMethod]
-        public void When_input_parameters_are_ready_the_validation_to_go_next_is_passing_and_output_filename_is_asked()
+        public void When_input_parameters_are_ready_the_validation_to_go_next_is_passing()
         {
             // Arrange
-            _presenter.SetupGet(x => x.ViewModel).Returns(new StepIntroViewModel { InputUri = "input-uri" });
+            _presenter.SetupGet(x => x.ViewModel)
+                .Returns(new StepIntroViewModel { InputUri = "input-uri" });
             _fileServiceMock.Setup(x => x.Exists("input-uri")).Returns(true);
-            _dialogServiceMock.Setup(x => x.AskUserToSaveFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string[]>()))
-                .Returns("output-filename");
+            /* TODO: _dialogServiceMock.Setup(x => x.AskUserToSaveFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string[]>()))
+                .Returns("output-filename");*/
 
             // Act
-            var result = _presenter.Object.ValidateToGoNext();
+            var result = _presenter.Object.BeforeGoNext();
 
             // Verify
             Assert.AreEqual(true, result);
-            _dialogServiceMock.Verify(x => x.AskUserToSaveFile(It.IsAny<string>(), "input-uri.html", It.IsAny<string[]>()));
+            // TODO: _dialogServiceMock.Verify(x => x.AskUserToSaveFile(It.IsAny<string>(), "input-uri.pdf", It.IsAny<string[]>()));
         }
 
         [TestMethod]
@@ -91,7 +92,7 @@ namespace TripToPrint.Tests
             _presenter.SetupGet(x => x.ViewModel).Returns(new StepIntroViewModel { InputUri = null });
 
             // Act
-            var result = _presenter.Object.ValidateToGoNext();
+            var result = _presenter.Object.BeforeGoNext();
 
             // Verify
             Assert.AreEqual(false, result);
@@ -104,7 +105,7 @@ namespace TripToPrint.Tests
             _presenter.SetupGet(x => x.ViewModel).Returns(new StepIntroViewModel { InputUri = "absent-file" });
 
             // Act
-            var result = _presenter.Object.ValidateToGoNext();
+            var result = _presenter.Object.BeforeGoNext();
 
             // Verify
             Assert.AreEqual(false, result);

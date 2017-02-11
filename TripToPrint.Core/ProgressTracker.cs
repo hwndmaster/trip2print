@@ -5,25 +5,28 @@ namespace TripToPrint.Core
 {
     public interface IProgressTracker
     {
+        void ReportSourceDownloaded();
         void ReportResourceEntriesProcessed();
         void ReportContentGenerationDone();
-        void ReportDone();
         void ReportFetchImagesCount(int count);
         void ReportFetchImageProcessed();
+        void ReportDone();
     }
 
     public class ProgressTracker : IProgressTracker
     {
         private enum ProgressStages
         {
+            SourceDownload,
             ResourceEntriesExtract,
             ReportGeneration,
-            FetchMapImages
+            FetchMapImages,
         }
 
         private readonly IProgress<int> _progress;
         private readonly Dictionary<ProgressStages, int> _progressStageWeights;
 
+        private bool _sourceDownloadProcessed;
         private bool _resourceEntriesProcessed;
         private bool _reportGenerated;
         private int? _fetchImagesCount;
@@ -35,10 +38,17 @@ namespace TripToPrint.Core
             _progress = new Progress<int>(reportHandler);
 
             _progressStageWeights = new Dictionary<ProgressStages, int> {
+                { ProgressStages.SourceDownload, 10 },
                 { ProgressStages.ResourceEntriesExtract, 2 },
                 { ProgressStages.ReportGeneration, 2 },
-                { ProgressStages.FetchMapImages, 95 }
+                { ProgressStages.FetchMapImages, 85 }
             };
+        }
+
+        public void ReportSourceDownloaded()
+        {
+            _sourceDownloadProcessed = true;
+            _progress.Report(CalculateValue());
         }
 
         public void ReportResourceEntriesProcessed()
@@ -50,12 +60,6 @@ namespace TripToPrint.Core
         public void ReportContentGenerationDone()
         {
             _reportGenerated = true;
-            _progress.Report(CalculateValue());
-        }
-
-        public void ReportDone()
-        {
-            _done = true;
             _progress.Report(CalculateValue());
         }
 
@@ -71,6 +75,12 @@ namespace TripToPrint.Core
             _progress.Report(CalculateValue());
         }
 
+        public void ReportDone()
+        {
+            _done = true;
+            _progress.Report(CalculateValue());
+        }
+
         private int CalculateValue()
         {
             if (_done)
@@ -79,6 +89,11 @@ namespace TripToPrint.Core
             }
 
             var sum = 0;
+
+            if (_sourceDownloadProcessed)
+            {
+                sum += _progressStageWeights[ProgressStages.SourceDownload];
+            }
 
             if (_resourceEntriesProcessed)
             {

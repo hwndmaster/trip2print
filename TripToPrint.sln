@@ -12,6 +12,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B230FD1-9B1F-4513-8F64-2FF9DC3CCD7A}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+		Licenses\wkhtmltopdf-license.txt = Licenses\wkhtmltopdf-license.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripToPrint.Tests", "TripToPrint.Tests\TripToPrint.Tests.csproj", "{9FFB0279-950E-4FA2-9F5A-442FF790CA6D}"

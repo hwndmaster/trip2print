@@ -10,10 +10,12 @@
              Background="WhiteSmoke">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="25" />
         </Grid.RowDefinitions>
-        <ListBox Grid.Row="0" x:Name="listLog" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Label Grid.Row="0" Grid.Column="0" Content="Wait a moment, a report is being created" Foreground="#2E74B5" FontSize="19" FontFamily="Calibri Light" />
+        <ListBox Grid.Row="1" x:Name="listLog" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="viewModels:LogItemViewModel">
                     <StackPanel Orientation="Horizontal">
@@ -27,6 +29,6 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <ProgressBar Grid.Row="1" x:Name="progressBar" />
+        <ProgressBar Grid.Row="2" x:Name="progressBar" Value="{Binding ProgressInPercentage}" />
     </Grid>
 </UserControl>

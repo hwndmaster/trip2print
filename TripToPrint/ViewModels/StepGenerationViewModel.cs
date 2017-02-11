@@ -1,11 +1,14 @@
-﻿namespace TripToPrint.ViewModels
+﻿using System;
+
+namespace TripToPrint.ViewModels
 {
     public class StepGenerationViewModel : ViewModelBase
     {
         private int _progressInPercentage;
+        private string _tempPath;
 
         public string InputUri;
-        public string OutputFileName;
+        public InputSource InputSource;
 
         public int ProgressInPercentage
         {
@@ -18,5 +21,20 @@
                 OnPropertyChanged();
             }
         }
+
+        public string TempPath
+        {
+            get { return _tempPath; }
+            set
+            {
+                if (value == _tempPath)
+                    return;
+                _tempPath = value;
+                OnPropertyChanged();
+                TempPathChanged?.Invoke(this, value);
+            }
+        }
+
+        public event EventHandler<string> TempPathChanged;
     }
 }
