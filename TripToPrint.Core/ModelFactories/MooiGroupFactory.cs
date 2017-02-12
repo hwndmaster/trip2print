@@ -9,7 +9,7 @@ namespace TripToPrint.Core.ModelFactories
 {
     public interface IMooiGroupFactory
     {
-        List<MooiGroup> CreateList(IEnumerable<KmlPlacemark> placemarks);
+        List<MooiGroup> CreateList(KmlFolder folder);
     }
 
     public class MooiGroupFactory : IMooiGroupFactory
@@ -19,21 +19,30 @@ namespace TripToPrint.Core.ModelFactories
         private const double MIN_DIST_TO_NEIGHBOR_IN_KM = 0.75d;
         private const double COEF_ROOM_OVER_MAX_DISTANCE = 1.5; // 50%
 
-        public List<MooiGroup> CreateList(IEnumerable<KmlPlacemark> placemarks)
+        public List<MooiGroup> CreateList(KmlFolder folder)
         {
             var groups = new List<MooiGroup>();
 
-            var placemarksConverted = placemarks.Select(ConvertKmlPlacemarkToMooiPlacemark).ToList();
+            var placemarksConverted = folder.Placemarks.Select(ConvertKmlPlacemarkToMooiPlacemark).ToList();
 
             if (placemarksConverted.Count <= MIN_GROUP_COUNT)
             {
                 return CreateSingleGroup(placemarksConverted);
             }
 
+            if (folder.ContainsRoute && CompleteFolderIsRoute(folder))
+            {
+                return CreateSingleGroup(placemarksConverted);
+            }
+
+            // TODO: Add support of lines within a folder which are not 'routes'
+            placemarksConverted = placemarksConverted.Where(x => x.Coordinates.Length == 1).ToList();
+            // ^^^
+
             var placemarksWithNeighbors = GetPlacemarksWithNeighbors(placemarksConverted).ToList();
             var placemarksWithNeighborsLookup = placemarksWithNeighbors.ToDictionary(x => x.Placemark);
 
-            MooiGroup currentGroup = new MooiGroup();
+            var currentGroup = new MooiGroup();
             groups.Add(currentGroup);
 
             var placemarksToProcess = placemarksWithNeighbors.ToList();
@@ -99,6 +108,27 @@ namespace TripToPrint.Core.ModelFactories
             return groups;
         }
 
+        private bool CompleteFolderIsRoute(KmlFolder folder)
+        {
+            var routes = folder.Placemarks.Where(x => x.Coordinates.Length > 1).ToList();
+
+            if (routes.Count > 1)
+            {
+                return false;
+            }
+
+            Func<double, int> rounder = (d) => (int)Math.Round(d * 1000);
+
+            var points = folder.Placemarks.Where(x => x.Coordinates.Length == 1)
+                .Select(x => new[] { rounder(x.Coordinates[0].Latitude), rounder(x.Coordinates[0].Longitude) })
+                .ToList();
+            var routeCoords = routes[0].Coordinates.Select(x => new[] { rounder(x.Latitude), rounder(x.Longitude) }).ToList();
+
+            var pointsOutsideRoute = points.Any(x => !routeCoords.Any(y => y[0] == x[0] && y[1] == x[1]));
+
+            return pointsOutsideRoute != true;
+        }
+
         public MooiPlacemark ConvertKmlPlacemarkToMooiPlacemark(KmlPlacemark kmlPlacemark)
         {
             string imagesContent;
@@ -110,7 +140,7 @@ namespace TripToPrint.Core.ModelFactories
                 Name = kmlPlacemark.Name,
                 Description = description,
                 ImagesContent = imagesContent,
-                Coordinate = kmlPlacemark.Coordinate,
+                Coordinates = kmlPlacemark.Coordinates,
                 IconPath = kmlPlacemark.IconPath
             };
         }
@@ -131,7 +161,7 @@ namespace TripToPrint.Core.ModelFactories
         {
             return from placemark in placemarks
                    let neighbors = from neighbor in placemarks.Except(new[] { placemark })
-                                   let dist = placemark.Coordinate.GetDistanceTo(neighbor.Coordinate)
+                                   let dist = placemark.PrimaryCoordinate.GetDistanceTo(neighbor.PrimaryCoordinate)
                                    let allowedDistCoef = Math.Exp(1 / Math.Max(MIN_DIST_TO_NEIGHBOR_IN_KM, dist / 1000d))
                                    orderby dist
                                    select new PlacemarkNeighbor
@@ -242,9 +272,9 @@ namespace TripToPrint.Core.ModelFactories
             return content;
         }
 
-        private double DistanceBetweenPlacemarks(IHaveCoordinate placemark1, IHaveCoordinate placemark2)
+        private double DistanceBetweenPlacemarks(MooiPlacemark placemark1, MooiPlacemark placemark2)
         {
-            return placemark1.Coordinate.GetDistanceTo(placemark2.Coordinate);
+            return placemark1.PrimaryCoordinate.GetDistanceTo(placemark2.PrimaryCoordinate);
         }
 
         public class PlacemarkNeighbor

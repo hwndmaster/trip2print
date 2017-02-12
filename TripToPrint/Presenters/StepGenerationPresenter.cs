@@ -92,7 +92,7 @@ namespace TripToPrint.Presenters
                         inputFileName = ViewModel.InputUri;
                         break;
                     case InputSource.GoogleMyMapsUrl:
-                        var inputData = await _webClient.DownloadDataAsync(ViewModel.InputUri);
+                        var inputData = await _webClient.GetAsync(new Uri(ViewModel.InputUri));
                         inputFileName = $"{Path.GetTempPath()}Trip2Print_{Guid.NewGuid()}.kmz";
                         await _file.WriteBytesAsync(inputFileName, inputData);
                         break;

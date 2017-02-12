@@ -4,10 +4,9 @@ using System.Xml.Linq;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using TripToPrint.Core;
 using TripToPrint.Core.ModelFactories;
 
-namespace TripToPrint.Tests
+namespace TripToPrint.Core.Tests.UnitTests
 {
     [TestClass]
     public class KmlDocumentFactoryTests
@@ -77,6 +76,12 @@ namespace TripToPrint.Tests
 				        <description><![CDATA[description-2]]></description>
 				        <Point><coordinates>7,8,9</coordinates></Point>
                     </Placemark>
+                    <Placemark>
+				        <name>route-3</name>
+				        <LineString>
+                            <coordinates>66,55,0 77,44,0 88,77,0</coordinates>
+                        </LineString>
+                    </Placemark>
                 </Folder>";
             var xdoc = XDocument.Parse(content, LoadOptions.None);
 
@@ -84,17 +89,11 @@ namespace TripToPrint.Tests
             var result = _factory.CreateKmlFolder(xdoc.Root);
 
             // Verify
-            Assert.AreEqual(2, result.Placemarks.Count);
-            Assert.AreEqual("placemark-1", result.Placemarks[0].Name);
-            Assert.AreEqual("description-1", result.Placemarks[0].Description);
-            Assert.AreEqual(22.11d, result.Placemarks[0].Coordinate.Latitude);
-            Assert.AreEqual(11.33d, result.Placemarks[0].Coordinate.Longitude);
-            Assert.AreEqual(33.44d, result.Placemarks[0].Coordinate.Altitude);
-            Assert.AreEqual("placemark-2", result.Placemarks[1].Name);
-            Assert.AreEqual("description-2", result.Placemarks[1].Description);
-            Assert.AreEqual(8d, result.Placemarks[1].Coordinate.Latitude);
-            Assert.AreEqual(7d, result.Placemarks[1].Coordinate.Longitude);
-            Assert.AreEqual(9d, result.Placemarks[1].Coordinate.Altitude);
+            Assert.AreEqual(3, result.Placemarks.Count);
+            AssertPlacemark(result.Placemarks[0], "placemark-1", "description-1", new[] { 11.33, 22.11, 33.44 });
+            AssertPlacemark(result.Placemarks[1], "placemark-2", "description-2", new[] { 7d, 8d, 9d });
+            AssertPlacemark(result.Placemarks[2], "route-3", null,
+                new[] { 66d, 55d, 0d }, new[] { 77d, 44d, 0d }, new[] { 88d, 77d, 0d });
         }
 
         [TestMethod]
@@ -149,7 +148,7 @@ namespace TripToPrint.Tests
             var result = _factory.CreateKmlPlacemark(xdoc.Root);
 
             // Verify
-            Assert.AreEqual(1, result.ExtendedData.Count);
+            Assert.AreEqual(1, result.ExtendedData.Length);
             Assert.AreEqual("media-1", result.ExtendedData[0].Name);
             Assert.AreEqual("http://2", result.ExtendedData[0].Value);
         }
@@ -159,6 +158,19 @@ namespace TripToPrint.Tests
         public void When_creating_model_by_empty_content_an_exception_is_thrown()
         {
             _factory.Create(string.Empty);
+        }
+
+        private static void AssertPlacemark(Models.KmlPlacemark placemark, string name, string description, params double[][] coords)
+        {
+            Assert.AreEqual(name, placemark.Name);
+            Assert.AreEqual(description, placemark.Description);
+            Assert.AreEqual(coords.Length, placemark.Coordinates.Length);
+            for (var i = 0; i < coords.Length; i++)
+            {
+                Assert.AreEqual(coords[i][1], placemark.Coordinates[i].Latitude);
+                Assert.AreEqual(coords[i][0], placemark.Coordinates[i].Longitude);
+                Assert.AreEqual(coords[i][2], placemark.Coordinates[i].Altitude);
+            }
         }
     }
 }

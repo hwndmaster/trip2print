@@ -1,4 +1,4 @@
-namespace TripToPrint.Tests.SpecflowDefinitions
+namespace TripToPrint.Core.Tests.SpecflowDefinitions
 {
     public class PlacemarkInGroupTableRow
     {

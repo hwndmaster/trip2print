@@ -1,4 +1,6 @@
-﻿using TripToPrint.Core.Models;
+﻿using System;
+
+using TripToPrint.Core.Models;
 
 namespace TripToPrint.Core
 {
@@ -6,6 +8,7 @@ namespace TripToPrint.Core
     {
         string CreateFileNameForOverviewMap(MooiGroup group);
         string CreateFileNameForPlacemarkThumbnail(MooiPlacemark placemark);
+        string CreateTempFolderName(string suffix = null);
         string GetDefaultHtmlReportName();
     }
 
@@ -19,6 +22,13 @@ namespace TripToPrint.Core
         public string CreateFileNameForPlacemarkThumbnail(MooiPlacemark placemark)
         {
             return $"{placemark.Id}.jpg";
+        }
+
+        public string CreateTempFolderName(string suffix = null)
+        {
+            suffix = suffix ?? Guid.NewGuid().ToString();
+
+            return $"Trip2Print_{suffix}";
         }
 
         public string GetDefaultHtmlReportName()

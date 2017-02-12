@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace TripToPrint.Tests.SpecflowTests
+namespace TripToPrint.Core.Tests.SpecflowTests
 {
     using TechTalk.SpecFlow;
     
@@ -47,7 +47,7 @@ namespace TripToPrint.Tests.SpecflowTests
             if (((testRunner.FeatureContext != null) 
                         && (testRunner.FeatureContext.FeatureInfo.Title != "Groups Generation")))
             {
-                TripToPrint.Tests.SpecflowTests.GroupsGenerationFeature.FeatureSetup(null);
+                TripToPrint.Core.Tests.SpecflowTests.GroupsGenerationFeature.FeatureSetup(null);
             }
         }
         

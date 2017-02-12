@@ -32,6 +32,6 @@ A WPF application which converts KMZ/KML files to a handy HTML report
 
 # Known issues
 * Placemarks layout is still stupid
-* Old Google MyMaps icons are not supported
-* Google MyMaps Directions are not supported
 * Sometimes not a beautiful output of placemarks
+* Sometimes not a smart division of placemarks into groups
+* KML's polygons are not supported

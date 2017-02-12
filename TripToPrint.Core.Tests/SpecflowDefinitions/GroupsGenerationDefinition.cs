@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Device.Location;
 using System.Linq;
+
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 
 using TripToPrint.Core.ModelFactories;
 using TripToPrint.Core.Models;
 
-namespace TripToPrint.Tests.SpecflowDefinitions
+namespace TripToPrint.Core.Tests.SpecflowDefinitions
 {
     [Binding]
     public sealed class GroupsGenerationDefinition
@@ -23,13 +24,15 @@ namespace TripToPrint.Tests.SpecflowDefinitions
         [Then("these placemarks will be assigned to the following groups:")]
         public void ThenThesePlacemarksWillBeAssignedToTheFollowingGroups(Table table)
         {
-            var placemarks = _placemarkTableRows.Select(x => new KmlPlacemark {
-                Coordinate = new GeoCoordinate(x.Latitude, x.Longitude),
-                Name = x.Name
-            });
+            var folder = new KmlFolder {
+                Placemarks = _placemarkTableRows.Select(x => new KmlPlacemark {
+                    Coordinates = new[] { new GeoCoordinate(x.Latitude, x.Longitude) },
+                    Name = x.Name
+                }).ToList()
+            };
 
             var factory = new MooiGroupFactory();
-            var groups = factory.CreateList(placemarks);
+            var groups = factory.CreateList(folder);
             var result = groups
                 .SelectMany((@group, groupIndex)
                     => @group.Placemarks.Select(placemark

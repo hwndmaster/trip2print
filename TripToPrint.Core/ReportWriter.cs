@@ -43,13 +43,16 @@ namespace TripToPrint.Core
                 .ov img { width: 100%; }
                 .pm-cols { overflow: hidden; }
                 .pm-col { width: 49.9999%; float: left; }
-                .pm { border: 1px solid #ccc; overflow: hidden; margin: 0 1px 2px 0; padding: 1px; page-break-inside: avoid; }
+                .pm { overflow: hidden; padding: 1px; page-break-inside: avoid; }
+                .pm-col .pm { border: 1px solid #ccc; margin: 0 1px 2px 0; }
                 .pm .title { color: black; font-weight: bold; font-size: 12pt; }
                 .pm .header { font-family: 'Calibri Light'; }
                 .pm .ix { position: relative; float: left; top: 126px; margin-left: -30px; background: #4189b3; border-radius: 10px; padding: 1px 6px; color: white; font-family: 'Consolas' }
                 .pm-desc { font-size: 9.5pt; }
                 .pm-img img { max-width: 200px; max-height: 150px; float: left; margin-right: 4px; }
-                .icon { width: 30px; position: relative; z-index: 5; float: left; }
+                .icon { position: relative; z-index: 5; float: left; }
+                .pm-col .icon { width: 30px; }
+                .dir .icon { width: 20px; padding-right: 2px; }
                 .map { max-height: 150px; position: relative; vertical-align: top; left: -30px; float: left; margin-right: -26px; }
                 .coord { color: gray; font-size: 9pt; font-weight: bold; }
                 </style>");
@@ -89,40 +92,62 @@ namespace TripToPrint.Core
             sb.Append($"<img src='{_resourceName.CreateFileNameForOverviewMap(@group)}' />");
             sb.Append("</div>");
 
-            var meaningSizeOfGroup = group.Placemarks.Count + group.Placemarks
-                .Select(x => Math.Max(1, CountOfImagesInPlacemark(x)) - 1)
-                .Sum();
-
-            sb.Append("<div class='pm-cols'>");
-            sb.Append("<div class='pm-col'>");
-            var i = 0;
-            foreach (var placemark in group.Placemarks)
+            if (group.Type == GroupType.Points)
             {
-                if (i >= meaningSizeOfGroup / 2)
-                {
-                    sb.Append("</div><div class='pm-col'>");
-                    i = int.MinValue;
-                }
+                var meaningSizeOfGroup = group.Placemarks.Count + group.Placemarks
+                    .Select(x => Math.Max(1, CountOfImagesInPlacemark(x)) - 1)
+                    .Sum();
 
-                RenderPlacemark(group, placemark, sb);
-                i += Math.Max(1, CountOfImagesInPlacemark(placemark));
+                sb.Append("<div class='pm-cols'>");
+                sb.Append("<div class='pm-col'>");
+                var i = 0;
+                foreach (var placemark in group.Placemarks)
+                {
+                    if (i >= meaningSizeOfGroup / 2)
+                    {
+                        sb.Append("</div><div class='pm-col'>");
+                        i = int.MinValue;
+                    }
+
+                    RenderPlacemark(group, placemark, sb);
+                    i += Math.Max(1, CountOfImagesInPlacemark(placemark));
+                }
+                sb.Append("</div>");
+                sb.Append("</div>");
             }
-            sb.Append("</div>");
-            sb.Append("</div>");
+            else if (group.Type == GroupType.Routes)
+            {
+                sb.Append("<div class='dir'>");
+                foreach (var placemark in group.Placemarks)
+                {
+                    RenderPlacemark(group, placemark, sb);
+                }
+                sb.Append("</div>");
+            }
+            else
+            {
+                throw new NotSupportedException($"Group type is not supported: {group.Type}");
+            }
         }
 
         private void RenderPlacemark(MooiGroup group, MooiPlacemark placemark, StringBuilder sb)
         {
-            var coordinate = placemark.Coordinate.Latitude.ToString("0.######") + ","
-                + placemark.Coordinate.Longitude.ToString("0.######");
+            var coordinate = placemark.PrimaryCoordinate.Latitude.ToString("0.######") + ","
+                + placemark.PrimaryCoordinate.Longitude.ToString("0.######");
             var iconPath = placemark.IconPathIsOnWeb
                 ? StringHelper.MakeStringSafeForFileName(placemark.IconPath)
                 : $"{placemark.IconPath}";
             sb.Append("<div class='pm'>");
             sb.Append($"<img class='icon' src='{iconPath}' />");
-            sb.Append($"<img class='map' src='{_resourceName.CreateFileNameForPlacemarkThumbnail(placemark)}' />");
-            sb.Append($"<div class='ix'>{group.Placemarks.IndexOf(placemark) + 1}</div>");
+
+            if (group.Type == GroupType.Points)
+            {
+                sb.Append($"<img class='map' src='{_resourceName.CreateFileNameForPlacemarkThumbnail(placemark)}' />");
+                sb.Append($"<div class='ix'>{group.Placemarks.IndexOf(placemark) + 1}</div>");
+            }
+
             sb.Append($"<div class='header'><span class='coord'>(<a href='http://maps.google.com/?ll={coordinate}'>{coordinate}</a>)</span> <span class='title'>{placemark.Name}</span></div>");
+
             if (!string.IsNullOrEmpty(placemark.ImagesContent))
             {
                 sb.Append($"<div class='pm-img'>{placemark.ImagesContent}</div>");
@@ -131,6 +156,7 @@ namespace TripToPrint.Core
             {
                 sb.Append($"<div class='pm-desc'>{placemark.Description}</div>");
             }
+
             sb.AppendLine("</div>");
         }
 

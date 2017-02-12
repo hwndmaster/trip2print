@@ -71,12 +71,12 @@ namespace TripToPrint.Core
             }, environment, new PdfOutput { OutputFilePath = pdfFilePath });
         }
 
-        private async Task<string> GenerateForKml(string inputFileName, IProgressTracker progress)
+        public virtual async Task<string> GenerateForKml(string inputFileName, IProgressTracker progress)
         {
             throw new NotImplementedException("Sorry, KML files are not supported at the moment");
         }
 
-        private async Task<string> GenerateForKmz(string kmzFileName, IProgressTracker progress)
+        public virtual async Task<string> GenerateForKmz(string kmzFileName, IProgressTracker progress)
         {
             var tempPath = CreateAndGetTempPath();
 
@@ -114,7 +114,7 @@ namespace TripToPrint.Core
             return tempPath;
         }
 
-        private async Task FetchMapImages(MooiDocument document, string tempPath, IProgressTracker progress)
+        public virtual async Task FetchMapImages(MooiDocument document, string tempPath, IProgressTracker progress)
         {
             var groups = document.Sections.SelectMany(x => x.Groups).ToList();
             var placemarks = document.Sections.SelectMany(x => x.Groups).SelectMany(x => x.Placemarks).ToList();
@@ -146,16 +146,22 @@ namespace TripToPrint.Core
 
         private async Task FetchPlacemarkMapImage(MooiPlacemark placemark, string tempPath)
         {
-            var imageBytes = await _hereAdapter.FetchImage(placemark);
-            var filePath = Path.Combine(tempPath, _resourceName.CreateFileNameForPlacemarkThumbnail(placemark));
-            await _file.WriteBytesAsync(filePath, imageBytes);
+            string filePath;
+            byte[] imageBytes;
+
+            if (placemark.Type == PlacemarkType.Point)
+            {
+                imageBytes = await _hereAdapter.FetchImage(placemark);
+                filePath = Path.Combine(tempPath, _resourceName.CreateFileNameForPlacemarkThumbnail(placemark));
+                await _file.WriteBytesAsync(filePath, imageBytes);
+            }
 
             if (placemark.IconPathIsOnWeb)
             {
                 filePath = Path.Combine(tempPath, StringHelper.MakeStringSafeForFileName(placemark.IconPath));
                 if (!_file.Exists(filePath))
                 {
-                    imageBytes = await _webClient.DownloadDataAsync(placemark.IconPath);
+                    imageBytes = await _webClient.GetAsync(new Uri(placemark.IconPath));
                     await _file.WriteBytesAsync(filePath, imageBytes);
                 }
             }
@@ -165,7 +171,7 @@ namespace TripToPrint.Core
 
         private string CreateAndGetTempPath()
         {
-            var tempPath = Path.GetTempPath() + "Trip2Print_" + Guid.NewGuid();
+            var tempPath = Path.Combine(Path.GetTempPath(), _resourceName.CreateTempFolderName());
 
             _file.CreateFolder(tempPath);
 

@@ -62,7 +62,6 @@
     <Compile Include="ModelFactories\MooiDocumentFactory.cs" />
     <Compile Include="ModelFactories\MooiGroupFactory.cs" />
     <Compile Include="Models\KmlExtendedData.cs" />
-    <Compile Include="Models\IHaveCoordinate.cs" />
     <Compile Include="Models\KmlDocument.cs" />
     <Compile Include="Models\KmlFolder.cs" />
     <Compile Include="Models\KmlPlacemark.cs" />

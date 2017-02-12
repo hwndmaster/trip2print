@@ -74,15 +74,12 @@ namespace TripToPrint.Tests
             _presenter.SetupGet(x => x.ViewModel)
                 .Returns(new StepIntroViewModel { InputUri = "input-uri" });
             _fileServiceMock.Setup(x => x.Exists("input-uri")).Returns(true);
-            /* TODO: _dialogServiceMock.Setup(x => x.AskUserToSaveFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string[]>()))
-                .Returns("output-filename");*/
 
             // Act
             var result = _presenter.Object.BeforeGoNext();
 
             // Verify
             Assert.AreEqual(true, result);
-            // TODO: _dialogServiceMock.Verify(x => x.AskUserToSaveFile(It.IsAny<string>(), "input-uri.pdf", It.IsAny<string[]>()));
         }
 
         [TestMethod]
@@ -111,5 +108,4 @@ namespace TripToPrint.Tests
             Assert.AreEqual(false, result);
         }
     }
-
 }

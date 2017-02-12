@@ -64,32 +64,39 @@ namespace TripToPrint.Core.ModelFactories
             if (xstyleurl != null)
                 model.IconPath = ExtractIconPath(xstyleurl);
 
-            if (xplacemark.ElementByLocalName("Point") == null)
+            if (xplacemark.ElementByLocalName("Point") != null)
             {
-                // TODO: This is probably a route. Now not supported
-                return null;
+                model.Coordinates = ReadCoordinates(xplacemark.ElementByLocalName("Point"));
             }
-
-            var coordinates = xplacemark.ElementByLocalName("Point")
-                .ElementByLocalName("coordinates").Value.Split(',')
-                .Select(x => double.Parse(x, _cultureForParsingFloatingNumbers))
-                .ToArray();
-            model.Coordinate = new GeoCoordinate(coordinates[1], coordinates[0], coordinates[2]);
+            else if (xplacemark.ElementByLocalName("LineString") != null)
+            {
+                var xlineString = xplacemark.ElementByLocalName("LineString");
+                // TODO: How to apply? xlineString.ElementByLocalName("tessellate").Value;
+                model.Coordinates = ReadCoordinates(xlineString);
+            }
 
             var xextendeddata = xplacemark.ElementByLocalName("ExtendedData");
             if (xextendeddata != null)
             {
-                model.ExtendedData = new List<KmlExtendedData>();
-                foreach (var xdata in xextendeddata.ElementsByLocalName("Data"))
-                {
-                    model.ExtendedData.Add(new KmlExtendedData {
+                model.ExtendedData = xextendeddata.ElementsByLocalName("Data")
+                    .Select(xdata => new KmlExtendedData {
                         Name = xdata.Attribute("name").Value,
                         Value = xdata.ElementByLocalName("value").Value
-                    });
-                }
+                    })
+                    .ToArray();
             }
 
             return model;
+        }
+
+        private GeoCoordinate[] ReadCoordinates(XElement xcontainer)
+        {
+            return xcontainer
+                .ElementByLocalName("coordinates").Value
+                .Split(' ')
+                .Select(x => x.Split(',').Select(d => double.Parse(d, _cultureForParsingFloatingNumbers)).ToArray())
+                .Select(x => new GeoCoordinate(x[1], x[0], x[2]))
+                .ToArray();
         }
 
         private string ExtractIconPath(XElement xstyleurl)

@@ -26,7 +26,7 @@ namespace TripToPrint.Presenters
             _reportGenerator = reportGenerator;
         }
 
-        public IStepAdjustmentView View { get; private set; }
+        public virtual IStepAdjustmentView View { get; private set; }
         public virtual StepAdjustmentViewModel ViewModel { get; private set; }
         public event EventHandler GoNextRequested;
 

@@ -43,7 +43,7 @@ namespace TripToPrint.Core.ModelFactories
 
         private void ExtractGroupsFromFolderIntoSection(KmlFolder folder, MooiSection section)
         {
-            var groups = _mooiGroupFactory.CreateList(folder.Placemarks);
+            var groups = _mooiGroupFactory.CreateList(folder);
             groups.ForEach(x => x.Section = section);
             section.Groups.AddRange(groups);
         }

@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Device.Location;
 using System.Linq;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using Moq;
-
 using TripToPrint.Core.ModelFactories;
 using TripToPrint.Core.Models;
 
-namespace TripToPrint.Tests
+namespace TripToPrint.Core.Tests.UnitTests
 {
     [TestClass]
     public class MooiGroupFactoryTests
@@ -29,18 +25,41 @@ namespace TripToPrint.Tests
         public void When_creating_group_list_for_a_few_placemarks_a_single_group_is_created()
         {
             // Arrange
-            KmlPlacemark[] placemarks = {
-                new KmlPlacemark(),
-                new KmlPlacemark(),
-                new KmlPlacemark()
+            var folder = new KmlFolder {
+                Placemarks = new List<KmlPlacemark> {
+                    new KmlPlacemark(),
+                    new KmlPlacemark(),
+                    new KmlPlacemark()
+                }
             };
 
             // Act
-            var result = _factory.Object.CreateList(placemarks);
+            var result = _factory.Object.CreateList(folder);
 
             // Verify
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(placemarks.Length, result[0].Placemarks.Count);
+            Assert.AreEqual(folder.Placemarks.Count, result[0].Placemarks.Count);
+        }
+
+        [TestMethod]
+        public void When_creating_group_list_for_route_a_single_group_is_created()
+        {
+            // Arrange
+            var folder = new KmlFolder {
+                Placemarks = Enumerable.Range(0, 10)
+                    .Select(x => new KmlPlacemark { Coordinates = new[] { new GeoCoordinate(1, x) } })
+                    .Concat(new [] { new KmlPlacemark {
+                        Coordinates = Enumerable.Range(0, 10).Select(x => new GeoCoordinate(1, x)).ToArray()
+                    } })
+                    .ToList()
+            };
+
+            // Act
+            var result = _factory.Object.CreateList(folder);
+
+            // Verify
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(folder.Placemarks.Count, result[0].Placemarks.Count);
         }
 
         [TestMethod]
@@ -48,11 +67,11 @@ namespace TripToPrint.Tests
         {
             // Arrange
             var placemarks = new List<MooiPlacemark> {
-                new MooiPlacemark { Coordinate = new GeoCoordinate(10, 10, 10) },
-                new MooiPlacemark { Coordinate = new GeoCoordinate(12, 12, 12) },
-                new MooiPlacemark { Coordinate = new GeoCoordinate(20, 20, 20) },
-                new MooiPlacemark { Coordinate = new GeoCoordinate(22, 22, 22) },
-                new MooiPlacemark { Coordinate = new GeoCoordinate(23, 23, 23) }
+                new MooiPlacemark { Coordinates = new[] { new GeoCoordinate(10, 10, 10) } },
+                new MooiPlacemark { Coordinates = new[] { new GeoCoordinate(12, 12, 12) } },
+                new MooiPlacemark { Coordinates = new[] { new GeoCoordinate(20, 20, 20) } },
+                new MooiPlacemark { Coordinates = new[] { new GeoCoordinate(22, 22, 22) } },
+                new MooiPlacemark { Coordinates = new[] { new GeoCoordinate(23, 23, 23) } }
             };
 
             // Act
@@ -77,7 +96,7 @@ namespace TripToPrint.Tests
             var placemark = new KmlPlacemark {
                 Name = "placemark-name",
                 Description = "description-1",
-                Coordinate = new GeoCoordinate(1, 2, 3),
+                Coordinates = new [] { new GeoCoordinate(1, 2, 3) },
                 IconPath = "icon-path"
             };
 
@@ -87,7 +106,7 @@ namespace TripToPrint.Tests
             // Verify
             Assert.AreEqual(placemark.Name, result.Name);
             Assert.AreEqual(placemark.Description, result.Description);
-            Assert.AreEqual(placemark.Coordinate, result.Coordinate);
+            CollectionAssert.AreEqual(placemark.Coordinates, result.Coordinates);
             Assert.AreEqual(placemark.IconPath, result.IconPath);
         }
 

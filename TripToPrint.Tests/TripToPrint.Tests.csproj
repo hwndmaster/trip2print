@@ -58,6 +58,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="StepAdjustmentPresenterTests.cs" />
     <Compile Include="StepGenerationPresenterTests.cs" />
     <Compile Include="StepIntroPresenterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

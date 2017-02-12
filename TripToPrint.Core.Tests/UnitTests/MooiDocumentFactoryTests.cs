@@ -1,13 +1,10 @@
 ﻿using System.Collections.Generic;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using Moq;
-
 using TripToPrint.Core.ModelFactories;
 using TripToPrint.Core.Models;
 
-namespace TripToPrint.Tests
+namespace TripToPrint.Core.Tests.UnitTests
 {
     [TestClass]
     public class MooiDocumentFactoryTests
@@ -35,7 +32,7 @@ namespace TripToPrint.Tests
                     }
                 }
             };
-            _mooiGroupFactoryMock.Setup(x => x.CreateList(kmlDocument.Folders[0].Placemarks)).Returns(new List<MooiGroup>());
+            _mooiGroupFactoryMock.Setup(x => x.CreateList(kmlDocument.Folders[0])).Returns(new List<MooiGroup>());
 
             // Act
             var result = _factory.Create(kmlDocument);

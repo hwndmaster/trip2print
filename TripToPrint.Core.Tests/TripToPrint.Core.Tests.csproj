@@ -6,8 +6,8 @@
     <ProjectGuid>{9070DD84-8D16-478A-BAC6-D8A9C55660E6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TripToPrint.Tests</RootNamespace>
-    <AssemblyName>TripToPrint.Tests</AssemblyName>
+    <RootNamespace>TripToPrint.Core.Tests</RootNamespace>
+    <AssemblyName>TripToPrint.Core.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -86,6 +86,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>GroupsGeneration.feature</DependentUpon>
     </Compile>
+    <Compile Include="UnitTests\ReportGeneratorTests.cs" />
     <Compile Include="UnitTests\MooiGroupFactoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnitTests\KmlDocumentFactoryTests.cs" />
