@@ -7,7 +7,7 @@ namespace TripToPrint.Presenters
     {
         Task Activated();
         bool BeforeToGoBack();
-        bool BeforeGoNext();
+        Task<bool> BeforeGoNext();
         void GetBackNextTitles(ref string back, ref string next);
 
         event EventHandler GoNextRequested;

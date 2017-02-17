@@ -58,18 +58,18 @@ namespace TripToPrint.Presenters
             return false;
         }
 
-        public bool BeforeGoNext()
+        public async Task<bool> BeforeGoNext()
         {
             if (string.IsNullOrEmpty(ViewModel.InputUri))
             {
-                _dialogService.InvalidOperationMessage("You have not selected an input KMZ file");
+                await _dialogService.InvalidOperationMessage("You have not selected an input KMZ file");
                 return false;
             }
 
             if (ViewModel.InputSource == InputSource.LocalFile
                 && !_fileService.Exists(ViewModel.InputUri))
             {
-                _dialogService.InvalidOperationMessage("The selected file was not found");
+                await _dialogService.InvalidOperationMessage("The selected file was not found");
                 return false;
             }
 

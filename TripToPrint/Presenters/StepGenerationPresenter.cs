@@ -61,14 +61,14 @@ namespace TripToPrint.Presenters
             return true;
         }
 
-        public bool BeforeGoNext()
+        public Task<bool> BeforeGoNext()
         {
             if (ViewModel.ProgressInPercentage < 100)
             {
-                return false;
+                return Task.FromResult(false);
             }
 
-            return true;
+            return Task.FromResult(true);
         }
 
         public void GetBackNextTitles(ref string back, ref string next)

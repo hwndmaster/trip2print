@@ -83,7 +83,7 @@ namespace TripToPrint.Tests
             _presenter.SetupGet(x => x.ViewModel).Returns(new StepGenerationViewModel { ProgressInPercentage = 100 });
 
             // Act
-            var result = _presenter.Object.BeforeGoNext();
+            var result = _presenter.Object.BeforeGoNext().GetAwaiter().GetResult();
 
             // Verify
             Assert.AreEqual(true, result);
@@ -96,7 +96,7 @@ namespace TripToPrint.Tests
             _presenter.SetupGet(x => x.ViewModel).Returns(new StepGenerationViewModel { ProgressInPercentage = 99 });
 
             // Act
-            var result = _presenter.Object.BeforeGoNext();
+            var result = _presenter.Object.BeforeGoNext().GetAwaiter().GetResult();
 
             // Verify
             Assert.AreEqual(false, result);

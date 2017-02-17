@@ -1,13 +1,18 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
+
+using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
+
 using WinForms = System.Windows.Forms;
 
 namespace TripToPrint.Services
 {
     public interface IDialogService
     {
-        void InvalidOperationMessage(string message);
+        Task InvalidOperationMessage(string message);
         bool Confirm(string message, string title);
         string AskUserToSelectFile(string title, string initialFolder = null, string[] filter = null);
         string AskUserToSaveFile(string title, string fileName, string[] filter = null);
@@ -16,9 +21,13 @@ namespace TripToPrint.Services
 
     public class DialogService : IDialogService
     {
-        public void InvalidOperationMessage(string message)
+        public async Task InvalidOperationMessage(string message)
         {
-            MessageBox.Show(message, "Invalid operation", MessageBoxButton.OK, MessageBoxImage.Error);
+            var window = Application.Current.Windows.OfType<MetroWindow>().SingleOrDefault(x => x.IsActive);
+            await window.ShowMessageAsync("Invalid operation", message, MessageDialogStyle.Affirmative, new MetroDialogSettings {
+                AnimateShow = true,
+                ColorScheme = MetroDialogColorScheme.Accented
+            });
         }
 
         public bool Confirm(string message, string title)

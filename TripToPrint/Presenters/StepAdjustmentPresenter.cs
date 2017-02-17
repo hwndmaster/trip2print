@@ -50,19 +50,19 @@ namespace TripToPrint.Presenters
             return true;
         }
 
-        public bool BeforeGoNext()
+        public Task<bool> BeforeGoNext()
         {
             var outputFileName = GetDesiredOutputFileName();
             outputFileName = _dialogService.AskUserToSaveFile("Save output to a file",
                 $"{outputFileName}.pdf", new[] { "PDF files (*.pdf)|*.pdf" });
             if (outputFileName == null)
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             _reportGenerator.SaveHtmlReportAsPdf(ViewModel.TempPath, outputFileName);
 
-            return false;
+            return Task.FromResult(false);
         }
 
         public void GetBackNextTitles(ref string back, ref string next)

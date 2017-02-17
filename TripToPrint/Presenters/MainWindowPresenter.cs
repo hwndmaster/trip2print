@@ -78,7 +78,7 @@ namespace TripToPrint.Presenters
         public async Task GoNext()
         {
             var currentStepPresenter = GetWizardStepPresenter(ViewModel.WizardStepIndex);
-            if (currentStepPresenter.BeforeGoNext())
+            if (await currentStepPresenter.BeforeGoNext())
             {
                 ViewModel.WizardStepIndex++;
                 var wizardStep = GetWizardStepPresenter(ViewModel.WizardStepIndex);

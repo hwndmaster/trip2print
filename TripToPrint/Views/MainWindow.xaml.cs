@@ -16,7 +16,7 @@ namespace TripToPrint.Views
         void Show();
     }
 
-    public partial class MainWindow : Window, IMainWindowView
+    public partial class MainWindow : IMainWindowView
     {
         public MainWindow()
         {

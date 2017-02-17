@@ -71,7 +71,7 @@ namespace TripToPrint.Tests
                 .Returns("output-filename.pdf");
 
             // Act
-            var result = _presenter.Object.BeforeGoNext();
+            var result = _presenter.Object.BeforeGoNext().GetAwaiter().GetResult();
 
             // Verify
             Assert.AreEqual(false, result);

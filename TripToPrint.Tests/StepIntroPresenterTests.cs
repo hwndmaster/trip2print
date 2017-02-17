@@ -76,7 +76,7 @@ namespace TripToPrint.Tests
             _fileServiceMock.Setup(x => x.Exists("input-uri")).Returns(true);
 
             // Act
-            var result = _presenter.Object.BeforeGoNext();
+            var result = _presenter.Object.BeforeGoNext().GetAwaiter().GetResult();
 
             // Verify
             Assert.AreEqual(true, result);
@@ -89,7 +89,7 @@ namespace TripToPrint.Tests
             _presenter.SetupGet(x => x.ViewModel).Returns(new StepIntroViewModel { InputUri = null });
 
             // Act
-            var result = _presenter.Object.BeforeGoNext();
+            var result = _presenter.Object.BeforeGoNext().GetAwaiter().GetResult();
 
             // Verify
             Assert.AreEqual(false, result);
@@ -102,7 +102,7 @@ namespace TripToPrint.Tests
             _presenter.SetupGet(x => x.ViewModel).Returns(new StepIntroViewModel { InputUri = "absent-file" });
 
             // Act
-            var result = _presenter.Object.BeforeGoNext();
+            var result = _presenter.Object.BeforeGoNext().GetAwaiter().GetResult();
 
             // Verify
             Assert.AreEqual(false, result);
