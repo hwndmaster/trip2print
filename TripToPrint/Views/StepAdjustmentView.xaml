@@ -11,7 +11,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" Content="Got it! Preview and adjust your report" Foreground="#2E74B5" FontSize="19" FontFamily="Calibri Light" />
+        <Label Grid.Row="0" Content="Got it! Preview and adjust your report" Style="{DynamicResource StepHeader}" />
         <Grid Grid.Row="1">
             <WebBrowser x:Name="browser" />
         </Grid>
