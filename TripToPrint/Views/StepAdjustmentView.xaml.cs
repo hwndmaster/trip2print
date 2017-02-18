@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Windows.Controls;
+using System.Windows;
 using TripToPrint.Presenters;
 
 namespace TripToPrint.Views
@@ -9,15 +9,8 @@ namespace TripToPrint.Views
         void SetAddress(string address);
     }
 
-    public partial class StepAdjustmentView : UserControl, IStepAdjustmentView
+    public partial class StepAdjustmentView : IStepAdjustmentView
     {
-        // TODO: Add "Open report file" button on the last wizard step
-        //       Presenter.OpenReport();
-        // TODO: Add "Open report containing folder" button on the last wizard step
-        //       Presenter.OpenReportContainingFolder();
-        // TODO: Add "Copy report path to clipboard" button on the last wizard step
-        //       Clipboard.SetText(ViewModel.OutputFileName, TextDataFormat.Text);
-
         public StepAdjustmentView()
         {
             InitializeComponent();
@@ -28,6 +21,21 @@ namespace TripToPrint.Views
         public void SetAddress(string address)
         {
             browser.Source = new Uri(address);
+        }
+
+        private void OpenReport_OnClick(object sender, RoutedEventArgs e)
+        {
+            Presenter.OpenReport();
+        }
+
+        private void OpenContainingFolder_OnClick(object sender, RoutedEventArgs e)
+        {
+            Presenter.OpenReportContainingFolder();
+        }
+
+        private void CopyPath_OnClick(object sender, RoutedEventArgs e)
+        {
+            Presenter.CopyReportPathToClipboard();
         }
     }
 }

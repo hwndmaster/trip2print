@@ -10,6 +10,7 @@ namespace TripToPrint.Core
         string CreateFileNameForPlacemarkThumbnail(MooiPlacemark placemark);
         string CreateTempFolderName(string suffix = null);
         string GetDefaultHtmlReportName();
+        string GetTempFolderPrefix();
     }
 
     public class ResourceNameProvider : IResourceNameProvider
@@ -28,12 +29,17 @@ namespace TripToPrint.Core
         {
             suffix = suffix ?? Guid.NewGuid().ToString();
 
-            return $"Trip2Print_{suffix}";
+            return $"{GetTempFolderPrefix()}{suffix}";
         }
 
         public string GetDefaultHtmlReportName()
         {
             return "index.html";
+        }
+
+        public string GetTempFolderPrefix()
+        {
+            return "Trip2Print_";
         }
     }
 }

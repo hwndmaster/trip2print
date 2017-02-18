@@ -21,10 +21,12 @@ namespace TripToPrint.Presenters
         private readonly ILogger _logger;
         private readonly IFileService _file;
         private readonly IWebClientService _webClient;
+        private readonly IResourceNameProvider _resourceName;
 
-        public StepGenerationPresenter(IReportGenerator reportGenerator, ILogStorage logStorage, ILogger logger, IWebClientService webClient, IFileService file, IGoogleMyMapAdapter googleMyMapAdapter)
+        public StepGenerationPresenter(IReportGenerator reportGenerator, ILogStorage logStorage, ILogger logger, IWebClientService webClient, IFileService file, IGoogleMyMapAdapter googleMyMapAdapter, IResourceNameProvider resourceName)
         {
             _googleMyMapAdapter = googleMyMapAdapter;
+            _resourceName = resourceName;
             _reportGenerator = reportGenerator;
             _logStorage = logStorage;
             _logger = logger;
@@ -103,7 +105,7 @@ namespace TripToPrint.Presenters
                         try
                         {
                             var inputData = await _webClient.GetAsync(uri);
-                            inputFileName = $"{Path.GetTempPath()}Trip2Print_{Guid.NewGuid()}.kmz";
+                            inputFileName = $"{Path.GetTempPath()}{_resourceName.GetTempFolderPrefix()}{Guid.NewGuid()}.kmz";
                             await _file.WriteBytesAsync(inputFileName, inputData);
                         }
                         catch (Exception)

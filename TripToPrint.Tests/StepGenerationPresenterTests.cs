@@ -21,6 +21,7 @@ namespace TripToPrint.Tests
         private readonly Mock<IWebClientService> _webClientkMock = new Mock<IWebClientService>();
         private readonly Mock<IFileService> _fileMock = new Mock<IFileService>();
         private readonly Mock<IGoogleMyMapAdapter> _googleMyMapAdapterMock = new Mock<IGoogleMyMapAdapter>();
+        private readonly Mock<IResourceNameProvider> _resourceNameMock = new Mock<IResourceNameProvider>();
         private Mock<StepGenerationPresenter> _presenter;
 
         [TestInitialize]
@@ -32,7 +33,8 @@ namespace TripToPrint.Tests
                 _loggerMock.Object,
                 _webClientkMock.Object,
                 _fileMock.Object,
-                _googleMyMapAdapterMock.Object) {
+                _googleMyMapAdapterMock.Object,
+                _resourceNameMock.Object) {
                 CallBase = true
             };
         }
@@ -70,12 +72,14 @@ namespace TripToPrint.Tests
         {
             // Arrange
             var kmzUrl = new Uri("http://kml-uri");
+            var folderPrefix = "folder-prefix";
             _presenter.SetupGet(x => x.ViewModel).Returns(new StepGenerationViewModel
             {
                 InputSource = InputSource.GoogleMyMapsUrl,
                 InputUri = "http://input-uri"
             });
             _googleMyMapAdapterMock.Setup(x => x.GetKmlDownloadUrl(new Uri("http://input-uri"))).Returns(kmzUrl);
+            _resourceNameMock.Setup(x => x.GetTempFolderPrefix()).Returns(folderPrefix);
 
             // Act
             _presenter.Object.Activated().GetAwaiter().GetResult();
@@ -83,7 +87,7 @@ namespace TripToPrint.Tests
             // Verify
             _webClientkMock.Verify(x => x.GetAsync(kmzUrl), Times.Once);
             _reportGeneratorMock.Verify(x => x.Generate(
-                It.IsRegex($@"{Path.GetTempPath().Replace(@"\", @"\\")}Trip2Print_[\w\-]{{36}}\.kmz"),
+                It.IsRegex($@"{Path.GetTempPath().Replace(@"\", @"\\")}{folderPrefix}[\w\-]{{36}}\.kmz"),
                 It.IsAny<IProgressTracker>()), Times.Once);
         }
 

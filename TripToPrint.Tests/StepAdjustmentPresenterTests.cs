@@ -63,10 +63,11 @@ namespace TripToPrint.Tests
         public void When_going_next_the_user_is_asked_to_select_output_file_and_pdf_is_generated()
         {
             // Arrange
-            _presenter.SetupGet(x => x.ViewModel).Returns(new StepAdjustmentViewModel {
+            var vm = new StepAdjustmentViewModel {
                 InputUri = "input.kmz",
                 TempPath = "temp-path"
-            });
+            };
+            _presenter.SetupGet(x => x.ViewModel).Returns(vm);
             _dialogServiceMock.Setup(x => x.AskUserToSaveFile(It.IsAny<string>(), "input.pdf", It.IsAny<string[]>()))
                 .Returns("output-filename.pdf");
 
@@ -76,6 +77,7 @@ namespace TripToPrint.Tests
             // Verify
             Assert.AreEqual(false, result);
             _reportGeneratorMock.Verify(x => x.SaveHtmlReportAsPdf("temp-path", "output-filename.pdf"));
+            Assert.AreEqual("output-filename.pdf", vm.OutputFilePath);
         }
     }
 }

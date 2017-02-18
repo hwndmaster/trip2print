@@ -74,7 +74,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="EnumBooleanConverter.cs" />
+    <Compile Include="ValueConverters\EnumBooleanConverter.cs" />
     <Compile Include="EventFocusAttachment.cs" />
     <Compile Include="Presenters\IPresenter.cs" />
     <Compile Include="Presenters\IStepPresenter.cs" />
@@ -83,6 +83,7 @@
     <Compile Include="Presenters\StepIntroPresenter.cs" />
     <Compile Include="Presenters\MainWindowPresenter.cs" />
     <Compile Include="InputSource.cs" />
+    <Compile Include="ValueConverters\StringNullOrEmptyToVisibilityConverter.cs" />
     <Compile Include="ViewModels\StepAdjustmentViewModel.cs" />
     <Compile Include="ViewModels\StepGenerationViewModel.cs" />
     <Compile Include="ViewModels\StepIntroViewModel.cs" />

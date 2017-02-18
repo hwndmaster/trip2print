@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using System.Windows;
 
 using TripToPrint.Core;
 using TripToPrint.Services;
@@ -11,6 +13,9 @@ namespace TripToPrint.Presenters
 {
     public interface IStepAdjustmentPresenter : IPresenter<StepAdjustmentViewModel, IStepAdjustmentView>, IStepPresenter
     {
+        void OpenReport();
+        void OpenReportContainingFolder();
+        void CopyReportPathToClipboard();
     }
 
     public class StepAdjustmentPresenter : IStepAdjustmentPresenter
@@ -62,6 +67,8 @@ namespace TripToPrint.Presenters
 
             _reportGenerator.SaveHtmlReportAsPdf(ViewModel.TempPath, outputFileName);
 
+            ViewModel.OutputFilePath = outputFileName;
+
             return Task.FromResult(false);
         }
 
@@ -70,18 +77,21 @@ namespace TripToPrint.Presenters
             next = "Create report";
         }
 
-        // TODO: Use this method on the last wizard step
-        /*public void OpenReport()
+        public void OpenReport()
         {
-            Process.Start(ViewModel.OutputFileName);
-        }*/
+            Process.Start(ViewModel.OutputFilePath);
+        }
 
-        // TODO: Use this method on the last wizard step
-        /*public void OpenReportContainingFolder()
+        public void OpenReportContainingFolder()
         {
-            string argument = "/select, \"" + ViewModel.OutputFileName + "\"";
+            string argument = "/select, \"" + ViewModel.OutputFilePath + "\"";
             Process.Start("explorer.exe", argument);
-        }*/
+        }
+
+        public void CopyReportPathToClipboard()
+        {
+            Clipboard.SetText(ViewModel.OutputFilePath, TextDataFormat.UnicodeText);
+        }
 
         private string GetDesiredOutputFileName()
         {
