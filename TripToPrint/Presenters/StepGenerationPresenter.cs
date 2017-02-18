@@ -15,19 +15,21 @@ namespace TripToPrint.Presenters
 
     public class StepGenerationPresenter : IStepGenerationPresenter
     {
+        private readonly IGoogleMyMapAdapter _googleMyMapAdapter;
         private readonly IReportGenerator _reportGenerator;
         private readonly ILogStorage _logStorage;
         private readonly ILogger _logger;
-        private readonly IWebClientService _webClient;
         private readonly IFileService _file;
+        private readonly IWebClientService _webClient;
 
-        public StepGenerationPresenter(IReportGenerator reportGenerator, ILogStorage logStorage, ILogger logger, IWebClientService webClient, IFileService file)
+        public StepGenerationPresenter(IReportGenerator reportGenerator, ILogStorage logStorage, ILogger logger, IWebClientService webClient, IFileService file, IGoogleMyMapAdapter googleMyMapAdapter)
         {
+            _googleMyMapAdapter = googleMyMapAdapter;
             _reportGenerator = reportGenerator;
             _logStorage = logStorage;
             _logger = logger;
-            _webClient = webClient;
             _file = file;
+            _webClient = webClient;
         }
 
 
@@ -92,9 +94,22 @@ namespace TripToPrint.Presenters
                         inputFileName = ViewModel.InputUri;
                         break;
                     case InputSource.GoogleMyMapsUrl:
-                        var inputData = await _webClient.GetAsync(new Uri(ViewModel.InputUri));
-                        inputFileName = $"{Path.GetTempPath()}Trip2Print_{Guid.NewGuid()}.kmz";
-                        await _file.WriteBytesAsync(inputFileName, inputData);
+                        var errorMessage = "Cannot download KML file for provided URL. Make sure the map is shared publicly.";
+                        var uri = _googleMyMapAdapter.GetKmlDownloadUrl(new Uri(ViewModel.InputUri));
+                        if (uri == null)
+                        {
+                            throw new InvalidOperationException(errorMessage);
+                        }
+                        try
+                        {
+                            var inputData = await _webClient.GetAsync(uri);
+                            inputFileName = $"{Path.GetTempPath()}Trip2Print_{Guid.NewGuid()}.kmz";
+                            await _file.WriteBytesAsync(inputFileName, inputData);
+                        }
+                        catch (Exception)
+                        {
+                            throw new InvalidOperationException(errorMessage);
+                        }
                         break;
                     default:
                         throw new NotSupportedException($"Input source type is invalid: {ViewModel.InputSource}");

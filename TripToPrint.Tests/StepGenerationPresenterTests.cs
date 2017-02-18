@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TripToPrint.Core;
@@ -18,6 +20,7 @@ namespace TripToPrint.Tests
         private readonly Mock<ILogger> _loggerMock = new Mock<ILogger>();
         private readonly Mock<IWebClientService> _webClientkMock = new Mock<IWebClientService>();
         private readonly Mock<IFileService> _fileMock = new Mock<IFileService>();
+        private readonly Mock<IGoogleMyMapAdapter> _googleMyMapAdapterMock = new Mock<IGoogleMyMapAdapter>();
         private Mock<StepGenerationPresenter> _presenter;
 
         [TestInitialize]
@@ -28,7 +31,8 @@ namespace TripToPrint.Tests
                 _logStorageMock.Object,
                 _loggerMock.Object,
                 _webClientkMock.Object,
-                _fileMock.Object) {
+                _fileMock.Object,
+                _googleMyMapAdapterMock.Object) {
                 CallBase = true
             };
         }
@@ -47,7 +51,7 @@ namespace TripToPrint.Tests
         }
 
         [TestMethod]
-        public void When_step_is_activated_the_report_generation_process_is_started()
+        public void When_step_is_activated_with_local_file_is_provided_the_report_generation_process_is_started()
         {
             // Arrange
             _presenter.SetupGet(x => x.ViewModel).Returns(new StepGenerationViewModel {
@@ -62,10 +66,74 @@ namespace TripToPrint.Tests
         }
 
         [TestMethod]
-        public void When_step_is_activated_and_report_generation_has_failed_an_error_is_put_to_log()
+        public void When_step_is_activated_with_url_provided_the_kml_downloaded_and_report_generation_process_is_started()
         {
             // Arrange
-            _presenter.SetupGet(x => x.ViewModel).Returns(new StepGenerationViewModel());
+            var kmzUrl = new Uri("http://kml-uri");
+            _presenter.SetupGet(x => x.ViewModel).Returns(new StepGenerationViewModel
+            {
+                InputSource = InputSource.GoogleMyMapsUrl,
+                InputUri = "http://input-uri"
+            });
+            _googleMyMapAdapterMock.Setup(x => x.GetKmlDownloadUrl(new Uri("http://input-uri"))).Returns(kmzUrl);
+
+            // Act
+            _presenter.Object.Activated().GetAwaiter().GetResult();
+
+            // Verify
+            _webClientkMock.Verify(x => x.GetAsync(kmzUrl), Times.Once);
+            _reportGeneratorMock.Verify(x => x.Generate(
+                It.IsRegex($@"{Path.GetTempPath().Replace(@"\", @"\\")}Trip2Print_[\w\-]{{36}}\.kmz"),
+                It.IsAny<IProgressTracker>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void When_step_is_activated_with_invalid_url_provided_an_error_is_put_to_log()
+        {
+            // Arrange
+            _presenter.SetupGet(x => x.ViewModel).Returns(new StepGenerationViewModel
+            {
+                InputSource = InputSource.GoogleMyMapsUrl,
+                InputUri = "http://input-uri"
+            });
+
+            // Act
+            _presenter.Object.Activated().GetAwaiter().GetResult();
+
+            // Verify
+            _loggerMock.Verify(x => x.Error(It.IsRegex("InvalidOperationException")));
+        }
+
+        [TestMethod]
+        public void When_step_is_activated_with_not_accessible_url_provided_an_error_is_put_to_log()
+        {
+            // Arrange
+            var kmzUrl = new Uri("http://kml-uri");
+            _presenter.SetupGet(x => x.ViewModel).Returns(new StepGenerationViewModel
+            {
+                InputSource = InputSource.GoogleMyMapsUrl,
+                InputUri = "http://input-uri"
+            });
+            _googleMyMapAdapterMock.Setup(x => x.GetKmlDownloadUrl(new Uri("http://input-uri"))).Returns(kmzUrl);
+            _webClientkMock.Setup(x => x.GetAsync(kmzUrl)).Throws<Exception>();
+
+            // Act
+            _presenter.Object.Activated().GetAwaiter().GetResult();
+
+            // Verify
+            _loggerMock.Verify(x => x.Error(It.IsRegex("InvalidOperationException")));
+        }
+
+        [TestMethod]
+        public void When_step_is_activated_and_report_generation_has_failed_an_error_is_put_to_log_and_temporary_file_is_removed()
+        {
+            // Arrange
+            _presenter.SetupGet(x => x.ViewModel).Returns(new StepGenerationViewModel {
+                InputSource = InputSource.GoogleMyMapsUrl,
+                InputUri = "http://input-uri"
+            });
+            _googleMyMapAdapterMock.Setup(x => x.GetKmlDownloadUrl(new Uri("http://input-uri"))).Returns(new Uri("http://kmz-uri"));
+            _fileMock.Setup(x => x.Exists(It.IsAny<string>())).Returns(true);
             _reportGeneratorMock.Setup(x => x.Generate(It.IsAny<string>(), It.IsAny<IProgressTracker>()))
                 .Throws(new Exception("exception-message"));
 
@@ -74,6 +142,7 @@ namespace TripToPrint.Tests
 
             // Verify
             _loggerMock.Verify(x => x.Error(It.IsRegex("exception-message")));
+            _fileMock.Verify(x => x.Delete(It.IsAny<string>()), Times.Once);
         }
 
         [TestMethod]

@@ -16,8 +16,13 @@ namespace TripToPrint.ViewModels
                     return;
                 _inputUri = value;
 
+                if (_inputUri != null && _inputUri.Length == 0)
+                {
+                    _inputUri = null;
+                }
+
                 OnPropertyChanged();
-                InputUriChanged?.Invoke(this, value);
+                InputUriChanged?.Invoke(this, _inputUri);
             }
         }
 

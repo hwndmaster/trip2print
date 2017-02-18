@@ -248,6 +248,11 @@ namespace TripToPrint.Core.ModelFactories
             // Remove br's which go after images
             //content = Regex.Replace(content, @"/><br>", "/>");
 
+            // Wrap links with html <a> tags
+            content = Regex.Replace(content,
+                @"((http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?)",
+                "<a href='$1'>$1</a>");
+
             return content;
         }
 

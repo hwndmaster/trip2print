@@ -10,6 +10,7 @@
     <Grid>
         <Grid.Resources>
             <l:EnumBooleanConverter x:Key="enumBooleanConverter" />
+            <BooleanToVisibilityConverter x:Key="BoolToVis" />
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -29,18 +30,23 @@
         <Separator Grid.Row="1" Grid.Column="1" Margin="0,10,0,10" />
         <StackPanel Grid.Row="2" Grid.Column="1" VerticalAlignment="Top">
             <Label Content="Select a source of KMZ/KML:" VerticalAlignment="Top" Margin="-4,0,0,0" />
-            <RadioButton GroupName="InputSource" Content="Local file" Margin="0,5"
+            <RadioButton Name="radioInputSourceLocalFile" GroupName="InputSource" Content="Local file" Margin="0,5"
                          IsChecked="{Binding Path=InputSource, Converter={StaticResource enumBooleanConverter}, ConverterParameter=LocalFile}" />
-            <RadioButton GroupName="InputSource" Content="Google MyMap URL" IsEnabled="False"
+            <RadioButton Name="radioInputSourceMyMapUrl" GroupName="InputSource" Content="Google MyMap URL"
+                         l:EventFocusAttachment.ElementToFocus="{Binding ElementName=textBox}"
                          IsChecked="{Binding Path=InputSource, Converter={StaticResource enumBooleanConverter}, ConverterParameter=GoogleMyMapsUrl}" />
             <Separator Margin="0,10,0,10" />
-            <DockPanel LastChildFill="True" Margin="-4,0,0,0">
+            <DockPanel LastChildFill="True" Margin="-4,0,0,0" Visibility="{Binding Path=IsChecked, ElementName=radioInputSourceLocalFile, Converter={StaticResource BoolToVis}}">
                 <Label DockPanel.Dock="Left" Content="Input file name:"/>
                 <Label>
                     <Hyperlink Name="labelInputFile" Click="LabelInputFile_OnClick">
                         <TextBlock Text="{Binding InputUri, TargetNullValue='Click here to select a file'}" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
                     </Hyperlink>
                 </Label>
+            </DockPanel>
+            <DockPanel LastChildFill="True" Margin="-4,0,0,0" Visibility="{Binding Path=IsChecked, ElementName=radioInputSourceMyMapUrl, Converter={StaticResource BoolToVis}}">
+                <Label DockPanel.Dock="Left" Content="Input Google MyMap URL:"/>
+                <TextBox HorizontalAlignment="Stretch" Text="{Binding InputUri}" Name="textBox" />
             </DockPanel>
         </StackPanel>
     </Grid>

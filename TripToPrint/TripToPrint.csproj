@@ -75,6 +75,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="EnumBooleanConverter.cs" />
+    <Compile Include="EventFocusAttachment.cs" />
     <Compile Include="Presenters\IPresenter.cs" />
     <Compile Include="Presenters\IStepPresenter.cs" />
     <Compile Include="Presenters\StepGenerationPresenter.cs" />

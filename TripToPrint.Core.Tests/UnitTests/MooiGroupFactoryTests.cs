@@ -116,14 +116,14 @@ namespace TripToPrint.Core.Tests.UnitTests
             // Arrange
             var placemark = new KmlPlacemark
             {
-                Description = "text<br><br><img 1/><br>text<img width='200' height='100' 2/><br>text"
+                Description = "text<br><br><img 1/><br>text<img width='200' height='100' 2/><br>text http://sample.url/path/page?q=1&w=2 text"
             };
 
             // Act
             var result = _factory.Object.ConvertKmlPlacemarkToMooiPlacemark(placemark);
 
             // Verify
-            Assert.AreEqual("text<br>text<br>text", result.Description);
+            Assert.AreEqual("text<br>text<br>text <a href='http://sample.url/path/page?q=1&w=2'>http://sample.url/path/page?q=1&w=2</a> text", result.Description);
             Assert.AreEqual("<img 1/><img 2/>", result.ImagesContent);
         }
     }

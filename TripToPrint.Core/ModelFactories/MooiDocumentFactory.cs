@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-
 using TripToPrint.Core.Models;
 
 namespace TripToPrint.Core.ModelFactories
