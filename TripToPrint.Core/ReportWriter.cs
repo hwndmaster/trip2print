@@ -16,6 +16,9 @@ namespace TripToPrint.Core
     public class ReportWriter : IReportWriter
     {
         private readonly IResourceNameProvider _resourceName;
+        private readonly CultureAgnosticFormatter _formatter = new CultureAgnosticFormatter();
+
+        private const int COORDINATE_VALUE_PRECISION = 6;
 
         public ReportWriter(IResourceNameProvider resourceName)
         {
@@ -132,8 +135,8 @@ namespace TripToPrint.Core
 
         private void RenderPlacemark(MooiGroup group, MooiPlacemark placemark, StringBuilder sb)
         {
-            var coordinate = placemark.PrimaryCoordinate.Latitude.ToString("0.######") + ","
-                + placemark.PrimaryCoordinate.Longitude.ToString("0.######");
+            var coordinate = _formatter.Format(placemark.PrimaryCoordinate.Latitude, COORDINATE_VALUE_PRECISION) + ","
+                + _formatter.Format(placemark.PrimaryCoordinate.Longitude, COORDINATE_VALUE_PRECISION);
             var iconPath = placemark.IconPathIsOnWeb
                 ? StringHelper.MakeStringSafeForFileName(placemark.IconPath)
                 : $"{placemark.IconPath}";

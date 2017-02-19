@@ -73,7 +73,7 @@ namespace TripToPrint.Core
             });
         }
 
-        public virtual async Task<string> GenerateForKml(string inputFileName, IProgressTracker progress)
+        public virtual Task<string> GenerateForKml(string inputFileName, IProgressTracker progress)
         {
             throw new NotImplementedException("Sorry, KML files are not supported at the moment");
         }

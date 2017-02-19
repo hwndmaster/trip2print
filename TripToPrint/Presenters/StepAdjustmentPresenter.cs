@@ -23,12 +23,14 @@ namespace TripToPrint.Presenters
         private readonly IDialogService _dialogService;
         private readonly IResourceNameProvider _resourceName;
         private readonly IReportGenerator _reportGenerator;
+        private readonly IFileService _file;
 
-        public StepAdjustmentPresenter(IDialogService dialogService, IResourceNameProvider resourceName, IReportGenerator reportGenerator)
+        public StepAdjustmentPresenter(IDialogService dialogService, IResourceNameProvider resourceName, IReportGenerator reportGenerator, IFileService file)
         {
             _dialogService = dialogService;
             _resourceName = resourceName;
             _reportGenerator = reportGenerator;
+            _file = file;
         }
 
         public virtual IStepAdjustmentView View { get; private set; }
@@ -52,6 +54,8 @@ namespace TripToPrint.Presenters
 
         public bool BeforeToGoBack()
         {
+            ViewModel.OutputFilePath = null;
+
             return true;
         }
 
@@ -79,18 +83,39 @@ namespace TripToPrint.Presenters
 
         public void OpenReport()
         {
-            Process.Start(ViewModel.OutputFilePath);
+            if (ValidateReportToOpen())
+            {
+                Process.Start(ViewModel.OutputFilePath);
+            }
+        }
+
+        private bool ValidateReportToOpen()
+        {
+            if (_file.Exists(ViewModel.OutputFilePath))
+            {
+                return true;
+            }
+
+            ViewModel.OutputFilePath = null;
+            _dialogService.InvalidOperationMessage("A report no longer exists on the local disk. Please re-create it again.");
+            return false;
         }
 
         public void OpenReportContainingFolder()
         {
-            string argument = "/select, \"" + ViewModel.OutputFilePath + "\"";
-            Process.Start("explorer.exe", argument);
+            if (ValidateReportToOpen())
+            {
+                string argument = "/select, \"" + ViewModel.OutputFilePath + "\"";
+                Process.Start("explorer.exe", argument);
+            }
         }
 
         public void CopyReportPathToClipboard()
         {
-            Clipboard.SetText(ViewModel.OutputFilePath, TextDataFormat.UnicodeText);
+            if (ValidateReportToOpen())
+            {
+                Clipboard.SetText(ViewModel.OutputFilePath, TextDataFormat.UnicodeText);
+            }
         }
 
         private string GetDesiredOutputFileName()

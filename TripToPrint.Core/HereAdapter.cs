@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using TripToPrint.Core.Models;
@@ -14,18 +13,22 @@ namespace TripToPrint.Core
 
     public class HereAdapter : IHereAdapter
     {
-        private readonly CultureInfo _cultureForFormattingFloatingNumbers = new CultureInfo("en-US");
-
         private const string ROOT_URL = "https://image.maps.api.here.com/mia/1.6";
         private const string MAPVIEW_URL = ROOT_URL + "/mapview?";
         private const string ROUTE_URL = ROOT_URL + "/route?";
         private const int TOO_MUCH_OF_COORDINATE_POINTS = 400;
+        private const int MAX_COORDINATE_VALUE_PRECISION = 8;
+        private const int OVERVIEW_MAP_WIDTH = 800;
+        private const int OVERVIEW_MAP_HEIGHT = 420;
+        private const int THUMBNAIL_MAP_ZOOM = 17;
 
         private readonly IWebClientService _webClient;
+        private readonly CultureAgnosticFormatter _formatter;
 
         public HereAdapter(IWebClientService webClient)
         {
             _webClient = webClient;
+            _formatter = new CultureAgnosticFormatter();
         }
 
         public async Task<byte[]> FetchImage(MooiPlacemark placemark)
@@ -35,7 +38,7 @@ namespace TripToPrint.Core
                 throw new NotSupportedException("Routes are not supported");
             }
 
-            var url = $"c={CreateStringForCoordinates(null, placemark)}&z=17";
+            var url = $"c={CreateStringForCoordinates(null, placemark)}&z={THUMBNAIL_MAP_ZOOM}";
 
             return await DownloadData(MAPVIEW_URL, url);
         }
@@ -43,7 +46,7 @@ namespace TripToPrint.Core
         public async Task<byte[]> FetchOverviewMap(MooiGroup group)
         {
             var baseUrl = group.Type == GroupType.Routes ? ROUTE_URL : MAPVIEW_URL;
-            baseUrl = $"{baseUrl}w=800&h=420&sb=k";
+            baseUrl = $"{baseUrl}w={OVERVIEW_MAP_WIDTH}&h={OVERVIEW_MAP_HEIGHT}&sb=k";
 
             var parameters = string.Empty;
             if (group.Type == GroupType.Routes)
@@ -82,10 +85,10 @@ namespace TripToPrint.Core
 
         private string CreateStringForCoordinates(int? precision, params MooiPlacemark[] placemarks)
         {
-            var format = precision == null ? string.Empty : "0." + new string('0', precision.Value);
+            precision = precision ?? MAX_COORDINATE_VALUE_PRECISION;
             return string.Join(",", placemarks
                 .SelectMany(x => x.Coordinates)
-                .Select(x => $"{x.Latitude.ToString(format, _cultureForFormattingFloatingNumbers)},{x.Longitude.ToString(format, _cultureForFormattingFloatingNumbers)}")
+                .Select(x => $"{_formatter.Format(x.Latitude, precision.Value)},{_formatter.Format(x.Longitude, precision.Value)}")
                 .Distinct());
         }
 

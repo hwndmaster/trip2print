@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CultureAgnosticFormatter.cs" />
     <Compile Include="FileService.cs" />
     <Compile Include="GoogleMyMapAdapter.cs" />
     <Compile Include="HereAdapter.cs" />

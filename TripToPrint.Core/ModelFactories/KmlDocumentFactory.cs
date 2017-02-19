@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Device.Location;
-using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -16,7 +15,7 @@ namespace TripToPrint.Core.ModelFactories
 
     public class KmlDocumentFactory : IKmlDocumentFactory
     {
-        private readonly CultureInfo _cultureForParsingFloatingNumbers = new CultureInfo("en-US");
+        private readonly CultureAgnosticFormatter _formatter = new CultureAgnosticFormatter();
 
         public KmlDocument Create(string content)
         {
@@ -96,7 +95,7 @@ namespace TripToPrint.Core.ModelFactories
                 .ElementByLocalName("coordinates").Value
                 .Trim('\r', '\n', ' ')
                 .Split(new [] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x.Split(',').Select(d => double.Parse(d, _cultureForParsingFloatingNumbers)).ToArray())
+                .Select(x => x.Split(',').Select(d => _formatter.ParseDouble(d)).ToArray())
                 .Select(x => new GeoCoordinate(x[1], x[0], x[2]))
                 .ToArray();
         }
