@@ -15,7 +15,7 @@ namespace TripToPrint.Core
     {
         Task<string> Generate(string inputFileName, IProgressTracker progress);
 
-        void SaveHtmlReportAsPdf(string tempPath, string pdfFilePath);
+        Task SaveHtmlReportAsPdf(string tempPath, string pdfFilePath);
     }
 
     public class ReportGenerator : IReportGenerator
@@ -59,16 +59,18 @@ namespace TripToPrint.Core
             throw new NotSupportedException();
         }
 
-        public void SaveHtmlReportAsPdf(string tempPath, string pdfFilePath)
+        public Task SaveHtmlReportAsPdf(string tempPath, string pdfFilePath)
         {
-            var environment = new PdfConvertEnvironment {
-                WkHtmlToPdfPath = @"wkhtmltopdf.exe",
-                Timeout = 60000
-            };
+            return Task.Run(() => {
+                var environment = new PdfConvertEnvironment {
+                    WkHtmlToPdfPath = @"wkhtmltopdf.exe",
+                    Timeout = 60000
+                };
 
-            PdfConvert.ConvertHtmlToPdf(new PdfDocument {
-                Url = Path.Combine(tempPath, _resourceName.GetDefaultHtmlReportName())
-            }, environment, new PdfOutput { OutputFilePath = pdfFilePath });
+                PdfConvert.ConvertHtmlToPdf(new PdfDocument {
+                    Url = Path.Combine(tempPath, _resourceName.GetDefaultHtmlReportName())
+                }, environment, new PdfOutput { OutputFilePath = pdfFilePath });
+            });
         }
 
         public virtual async Task<string> GenerateForKml(string inputFileName, IProgressTracker progress)

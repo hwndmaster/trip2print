@@ -22,6 +22,8 @@ namespace TripToPrint.Tests
         private readonly Mock<IFileService> _fileMock = new Mock<IFileService>();
         private readonly Mock<IGoogleMyMapAdapter> _googleMyMapAdapterMock = new Mock<IGoogleMyMapAdapter>();
         private readonly Mock<IResourceNameProvider> _resourceNameMock = new Mock<IResourceNameProvider>();
+        private readonly Mock<IProgressTrackerFactory> _progressTrackerFactoryMock = new Mock<IProgressTrackerFactory>();
+
         private Mock<StepGenerationPresenter> _presenter;
 
         [TestInitialize]
@@ -34,9 +36,13 @@ namespace TripToPrint.Tests
                 _webClientkMock.Object,
                 _fileMock.Object,
                 _googleMyMapAdapterMock.Object,
-                _resourceNameMock.Object) {
+                _resourceNameMock.Object,
+                _progressTrackerFactoryMock.Object) {
                 CallBase = true
             };
+
+            _progressTrackerFactoryMock.Setup(x => x.Create(It.IsAny<Action<int>>()))
+                .Returns(new Mock<IProgressTracker>().Object);
         }
 
         [TestMethod]

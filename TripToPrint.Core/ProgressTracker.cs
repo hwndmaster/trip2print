@@ -13,16 +13,16 @@ namespace TripToPrint.Core
         void ReportDone();
     }
 
+    internal enum ProgressStages
+    {
+        SourceDownload,
+        ResourceEntriesExtract,
+        ReportGeneration,
+        FetchMapImages,
+    }
+
     public class ProgressTracker : IProgressTracker
     {
-        private enum ProgressStages
-        {
-            SourceDownload,
-            ResourceEntriesExtract,
-            ReportGeneration,
-            FetchMapImages,
-        }
-
         private readonly IProgress<int> _progress;
         private readonly Dictionary<ProgressStages, int> _progressStageWeights;
 
@@ -33,9 +33,9 @@ namespace TripToPrint.Core
         private int _fetchImagesProcessed;
         private bool _done;
 
-        public ProgressTracker(Action<int> reportHandler)
+        public ProgressTracker(IProgress<int> progress)
         {
-            _progress = new Progress<int>(reportHandler);
+            _progress = progress;
 
             _progressStageWeights = new Dictionary<ProgressStages, int> {
                 { ProgressStages.SourceDownload, 10 },
@@ -81,6 +81,11 @@ namespace TripToPrint.Core
             _progress.Report(CalculateValue());
         }
 
+        internal Dictionary<ProgressStages, int> GetProgressStageWeights()
+        {
+            return _progressStageWeights;
+        }
+
         private int CalculateValue()
         {
             if (_done)
@@ -107,7 +112,14 @@ namespace TripToPrint.Core
 
             if (_fetchImagesCount.HasValue)
             {
-                sum += (int) ((float) _fetchImagesProcessed / _fetchImagesCount.Value * _progressStageWeights[ProgressStages.FetchMapImages]);
+                if (_fetchImagesCount == 0)
+                {
+                    sum += _progressStageWeights[ProgressStages.FetchMapImages];
+                }
+                else
+                {
+                    sum += (int)((float)_fetchImagesProcessed / _fetchImagesCount.Value * _progressStageWeights[ProgressStages.FetchMapImages]);
+                }
             }
 
             return sum;

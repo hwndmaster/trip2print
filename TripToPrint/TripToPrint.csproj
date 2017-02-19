@@ -74,6 +74,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="NormalCursor.cs" />
     <Compile Include="ValueConverters\EnumBooleanConverter.cs" />
     <Compile Include="EventFocusAttachment.cs" />
     <Compile Include="Presenters\IPresenter.cs" />

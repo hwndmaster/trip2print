@@ -22,11 +22,15 @@ namespace TripToPrint.Presenters
         private readonly IFileService _file;
         private readonly IWebClientService _webClient;
         private readonly IResourceNameProvider _resourceName;
+        private readonly IProgressTrackerFactory _progressTrackerFactory;
 
-        public StepGenerationPresenter(IReportGenerator reportGenerator, ILogStorage logStorage, ILogger logger, IWebClientService webClient, IFileService file, IGoogleMyMapAdapter googleMyMapAdapter, IResourceNameProvider resourceName)
+        private const int PROGRESS_DONE_PERCENTAGE = 100;
+
+        public StepGenerationPresenter(IReportGenerator reportGenerator, ILogStorage logStorage, ILogger logger, IWebClientService webClient, IFileService file, IGoogleMyMapAdapter googleMyMapAdapter, IResourceNameProvider resourceName, IProgressTrackerFactory progressTrackerFactory)
         {
             _googleMyMapAdapter = googleMyMapAdapter;
             _resourceName = resourceName;
+            _progressTrackerFactory = progressTrackerFactory;
             _reportGenerator = reportGenerator;
             _logStorage = logStorage;
             _logger = logger;
@@ -57,7 +61,7 @@ namespace TripToPrint.Presenters
 
         public bool BeforeToGoBack()
         {
-            if (ViewModel.ProgressInPercentage < 100)
+            if (ViewModel.ProgressInPercentage < PROGRESS_DONE_PERCENTAGE)
             {
                 // TODO: Break the process
             }
@@ -67,7 +71,7 @@ namespace TripToPrint.Presenters
 
         public Task<bool> BeforeGoNext()
         {
-            if (ViewModel.ProgressInPercentage < 100)
+            if (ViewModel.ProgressInPercentage < PROGRESS_DONE_PERCENTAGE)
             {
                 return Task.FromResult(false);
             }
@@ -88,7 +92,7 @@ namespace TripToPrint.Presenters
 
             try
             {
-                var progressTracker = CreateProgressTracker();
+                var progressTracker = _progressTrackerFactory.Create(value => ViewModel.ProgressInPercentage = value);
 
                 switch (ViewModel.InputSource)
                 {
@@ -143,11 +147,6 @@ namespace TripToPrint.Presenters
                     _file.Delete(inputFileName);
                 }
             }
-        }
-
-        private IProgressTracker CreateProgressTracker()
-        {
-            return new ProgressTracker(valueInPercentage => ViewModel.ProgressInPercentage = valueInPercentage);
         }
     }
 }

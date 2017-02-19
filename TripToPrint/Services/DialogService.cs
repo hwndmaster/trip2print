@@ -13,26 +13,22 @@ namespace TripToPrint.Services
     public interface IDialogService
     {
         Task InvalidOperationMessage(string message);
-        bool Confirm(string message, string title);
         string AskUserToSelectFile(string title, string initialFolder = null, string[] filter = null);
         string AskUserToSaveFile(string title, string fileName, string[] filter = null);
-        string AskUserToSelectFolder(string initialFolder);
     }
 
     public class DialogService : IDialogService
     {
         public async Task InvalidOperationMessage(string message)
         {
-            var window = Application.Current.Windows.OfType<MetroWindow>().SingleOrDefault(x => x.IsActive);
-            await window.ShowMessageAsync("Invalid operation", message, MessageDialogStyle.Affirmative, new MetroDialogSettings {
-                AnimateShow = true,
-                ColorScheme = MetroDialogColorScheme.Accented
-            });
-        }
-
-        public bool Confirm(string message, string title)
-        {
-            return MessageBox.Show(message, title, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+            using (new NormalCursor())
+            {
+                var window = Application.Current.Windows.OfType<MetroWindow>().SingleOrDefault(x => x.IsActive);
+                await window.ShowMessageAsync("Invalid operation", message, MessageDialogStyle.Affirmative, new MetroDialogSettings {
+                    AnimateShow = true,
+                    ColorScheme = MetroDialogColorScheme.Accented
+                });
+            }
         }
 
         public string AskUserToSelectFile(string title, string initialFolder = null, string[] filter = null)
@@ -61,20 +57,6 @@ namespace TripToPrint.Services
 
             if (saveDialog.ShowDialog() == true)
                 return saveDialog.FileName;
-
-            return null;
-        }
-
-        public string AskUserToSelectFolder(string initialFolder)
-        {
-            var browser = new WinForms.FolderBrowserDialog
-            {
-                SelectedPath = initialFolder,
-                ShowNewFolderButton = false
-            };
-
-            if (browser.ShowDialog() == WinForms.DialogResult.OK)
-                return browser.SelectedPath;
 
             return null;
         }

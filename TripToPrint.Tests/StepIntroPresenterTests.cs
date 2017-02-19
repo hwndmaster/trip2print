@@ -16,12 +16,16 @@ namespace TripToPrint.Tests
         private readonly Mock<IStepIntroView> _viewMock = new Mock<IStepIntroView>();
         private readonly Mock<IDialogService> _dialogServiceMock = new Mock<IDialogService>();
         private readonly Mock<IFileService> _fileServiceMock = new Mock<IFileService>();
+        private readonly Mock<IGoogleMyMapAdapter> _googleMyMapAdapterMock = new Mock<IGoogleMyMapAdapter>();
+
         private Mock<StepIntroPresenter> _presenter;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _presenter = new Mock<StepIntroPresenter>(_dialogServiceMock.Object, _fileServiceMock.Object) {
+            _presenter = new Mock<StepIntroPresenter>(_dialogServiceMock.Object,
+                _fileServiceMock.Object,
+                _googleMyMapAdapterMock.Object) {
                 CallBase = true
             };
         }

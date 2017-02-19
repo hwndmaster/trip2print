@@ -55,21 +55,21 @@ namespace TripToPrint.Presenters
             return true;
         }
 
-        public Task<bool> BeforeGoNext()
+        public async Task<bool> BeforeGoNext()
         {
             var outputFileName = GetDesiredOutputFileName();
             outputFileName = _dialogService.AskUserToSaveFile("Save output to a file",
                 $"{outputFileName}.pdf", new[] { "PDF files (*.pdf)|*.pdf" });
             if (outputFileName == null)
             {
-                return Task.FromResult(false);
+                return false;
             }
 
-            _reportGenerator.SaveHtmlReportAsPdf(ViewModel.TempPath, outputFileName);
+            await _reportGenerator.SaveHtmlReportAsPdf(ViewModel.TempPath, outputFileName);
 
             ViewModel.OutputFilePath = outputFileName;
 
-            return Task.FromResult(false);
+            return false;
         }
 
         public void GetBackNextTitles(ref string back, ref string next)

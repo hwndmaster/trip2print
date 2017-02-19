@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-
 using TripToPrint.Core;
 using TripToPrint.Services;
 using TripToPrint.ViewModels;
@@ -17,11 +16,13 @@ namespace TripToPrint.Presenters
     {
         private readonly IDialogService _dialogService;
         private readonly IFileService _fileService;
+        private readonly IGoogleMyMapAdapter _googleMyMapAdapter;
 
-        public StepIntroPresenter(IDialogService dialogService, IFileService fileService)
+        public StepIntroPresenter(IDialogService dialogService, IFileService fileService, IGoogleMyMapAdapter googleMyMapAdapter)
         {
             _dialogService = dialogService;
             _fileService = fileService;
+            _googleMyMapAdapter = googleMyMapAdapter;
         }
 
 
@@ -62,7 +63,10 @@ namespace TripToPrint.Presenters
         {
             if (string.IsNullOrEmpty(ViewModel.InputUri))
             {
-                await _dialogService.InvalidOperationMessage("You have not selected an input KMZ file");
+                var message = ViewModel.InputSource == InputSource.LocalFile
+                    ? "You have not selected an input KMZ file"
+                    : "Please input a correct Google MyMaps URL";
+                await _dialogService.InvalidOperationMessage(message);
                 return false;
             }
 
@@ -70,6 +74,13 @@ namespace TripToPrint.Presenters
                 && !_fileService.Exists(ViewModel.InputUri))
             {
                 await _dialogService.InvalidOperationMessage("The selected file was not found");
+                return false;
+            }
+
+            if (ViewModel.InputSource == InputSource.GoogleMyMapsUrl
+                && !_googleMyMapAdapter.DoesLookLikeMyMapsUrl(ViewModel.InputUri))
+            {
+                await _dialogService.InvalidOperationMessage("The provided Google MyMaps URL doesn't look like a valid one. Ensure that the URL looks like this:\r\nhttps://www.google.com/maps/d/viewer?mid=xxx");
                 return false;
             }
 
