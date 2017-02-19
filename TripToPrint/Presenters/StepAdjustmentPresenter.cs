@@ -69,7 +69,11 @@ namespace TripToPrint.Presenters
                 return false;
             }
 
-            await _reportGenerator.SaveHtmlReportAsPdf(ViewModel.TempPath, outputFileName);
+            if (!await _reportGenerator.SaveHtmlReportAsPdf(ViewModel.TempPath, outputFileName))
+            {
+                await _dialogService.InvalidOperationMessage("An error occurred during report create. Try to save a file to another folder or using another name (For example, with Latin symbols only).");
+                return false;
+            }
 
             ViewModel.OutputFilePath = outputFileName;
 

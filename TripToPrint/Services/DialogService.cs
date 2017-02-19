@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
@@ -24,10 +25,17 @@ namespace TripToPrint.Services
             using (new NormalCursor())
             {
                 var window = Application.Current.Windows.OfType<MetroWindow>().SingleOrDefault(x => x.IsActive);
+
+                // Have to temporarily hide visible WebBrowser controls since the message box appears under them
+                var webBrowsers = window.FindChildren<WebBrowser>().Where(x => x.Visibility == Visibility.Visible).ToList();
+                webBrowsers.ForEach(x => x.Visibility = Visibility.Hidden);
+
                 await window.ShowMessageAsync("Invalid operation", message, MessageDialogStyle.Affirmative, new MetroDialogSettings {
                     AnimateShow = true,
                     ColorScheme = MetroDialogColorScheme.Accented
                 });
+
+                webBrowsers.ForEach(x => x.Visibility = Visibility.Visible);
             }
         }
 

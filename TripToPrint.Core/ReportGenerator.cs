@@ -15,7 +15,7 @@ namespace TripToPrint.Core
     {
         Task<string> Generate(string inputFileName, IProgressTracker progress);
 
-        Task SaveHtmlReportAsPdf(string tempPath, string pdfFilePath);
+        Task<bool> SaveHtmlReportAsPdf(string tempPath, string pdfFilePath);
     }
 
     public class ReportGenerator : IReportGenerator
@@ -59,7 +59,7 @@ namespace TripToPrint.Core
             throw new NotSupportedException();
         }
 
-        public Task SaveHtmlReportAsPdf(string tempPath, string pdfFilePath)
+        public Task<bool> SaveHtmlReportAsPdf(string tempPath, string pdfFilePath)
         {
             return Task.Run(() => {
                 var environment = new PdfConvertEnvironment {
@@ -67,9 +67,19 @@ namespace TripToPrint.Core
                     Timeout = 60000
                 };
 
-                PdfConvert.ConvertHtmlToPdf(new PdfDocument {
-                    Url = Path.Combine(tempPath, _resourceName.GetDefaultHtmlReportName())
-                }, environment, new PdfOutput { OutputFilePath = pdfFilePath });
+                try
+                {
+                    PdfConvert.ConvertHtmlToPdf(new PdfDocument
+                    {
+                        Url = Path.Combine(tempPath, _resourceName.GetDefaultHtmlReportName())
+                    }, environment, new PdfOutput { OutputFilePath = pdfFilePath });
+
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
             });
         }
 

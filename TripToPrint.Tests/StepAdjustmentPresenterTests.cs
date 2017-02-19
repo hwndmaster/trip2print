@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Threading.Tasks;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TripToPrint.Core;
 using TripToPrint.Presenters;
@@ -15,6 +17,7 @@ namespace TripToPrint.Tests
         private readonly Mock<IDialogService> _dialogServiceMock = new Mock<IDialogService>();
         private readonly Mock<IResourceNameProvider> _resourceNameMock = new Mock<IResourceNameProvider>();
         private readonly Mock<IReportGenerator> _reportGeneratorMock = new Mock<IReportGenerator>();
+        private readonly Mock<IFileService> _fileServiceMock = new Mock<IFileService>();
 
         private Mock<StepAdjustmentPresenter> _presenter;
 
@@ -24,7 +27,8 @@ namespace TripToPrint.Tests
             _presenter = new Mock<StepAdjustmentPresenter>(
                 _dialogServiceMock.Object,
                 _resourceNameMock.Object,
-                _reportGeneratorMock.Object) {
+                _reportGeneratorMock.Object,
+                _fileServiceMock.Object) {
                 CallBase = true
             };
         }
@@ -70,6 +74,7 @@ namespace TripToPrint.Tests
             _presenter.SetupGet(x => x.ViewModel).Returns(vm);
             _dialogServiceMock.Setup(x => x.AskUserToSaveFile(It.IsAny<string>(), "input.pdf", It.IsAny<string[]>()))
                 .Returns("output-filename.pdf");
+            _reportGeneratorMock.Setup(x => x.SaveHtmlReportAsPdf("temp-path", "output-filename.pdf")).Returns(Task.FromResult(true));
 
             // Act
             var result = _presenter.Object.BeforeGoNext().GetAwaiter().GetResult();
