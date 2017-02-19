@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using TripToPrint.Core.Models;
@@ -13,6 +14,8 @@ namespace TripToPrint.Core
 
     public class HereAdapter : IHereAdapter
     {
+        private readonly CultureInfo _cultureForFormattingFloatingNumbers = new CultureInfo("en-US");
+
         private const string ROOT_URL = "https://image.maps.api.here.com/mia/1.6";
         private const string MAPVIEW_URL = ROOT_URL + "/mapview?";
         private const string ROUTE_URL = ROOT_URL + "/route?";
@@ -82,7 +85,7 @@ namespace TripToPrint.Core
             var format = precision == null ? string.Empty : "0." + new string('0', precision.Value);
             return string.Join(",", placemarks
                 .SelectMany(x => x.Coordinates)
-                .Select(x => $"{x.Latitude.ToString(format)},{x.Longitude.ToString(format)}")
+                .Select(x => $"{x.Latitude.ToString(format, _cultureForFormattingFloatingNumbers)},{x.Longitude.ToString(format, _cultureForFormattingFloatingNumbers)}")
                 .Distinct());
         }
 
