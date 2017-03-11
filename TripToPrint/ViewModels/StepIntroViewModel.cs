@@ -37,6 +37,8 @@ namespace TripToPrint.ViewModels
 
                 OnPropertyChanged();
                 InputSourceChanged?.Invoke(this, value);
+
+                InputUri = null;
             }
         }
 

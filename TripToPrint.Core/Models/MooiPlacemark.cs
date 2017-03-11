@@ -5,13 +5,18 @@ using System.Text.RegularExpressions;
 
 namespace TripToPrint.Core.Models
 {
+    public interface IHaveCoordinates
+    {
+        GeoCoordinate[] Coordinates { get; set; }
+    }
+
     public enum PlacemarkType
     {
         Point,
         Route
     }
 
-    public class MooiPlacemark
+    public class MooiPlacemark : IHaveCoordinates
     {
         public MooiGroup Group { get; set; }
         public string Name { get; set; }

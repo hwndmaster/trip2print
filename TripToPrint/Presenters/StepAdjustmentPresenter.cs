@@ -61,6 +61,8 @@ namespace TripToPrint.Presenters
 
         public async Task<bool> BeforeGoNext()
         {
+            ViewModel.OutputFilePath = null;
+
             var outputFileName = GetDesiredOutputFileName();
             outputFileName = _dialogService.AskUserToSaveFile("Save output to a file",
                 $"{outputFileName}.pdf", new[] { "PDF files (*.pdf)|*.pdf" });
@@ -93,18 +95,6 @@ namespace TripToPrint.Presenters
             }
         }
 
-        private bool ValidateReportToOpen()
-        {
-            if (_file.Exists(ViewModel.OutputFilePath))
-            {
-                return true;
-            }
-
-            ViewModel.OutputFilePath = null;
-            _dialogService.InvalidOperationMessage("A report no longer exists on the local disk. Please re-create it again.");
-            return false;
-        }
-
         public void OpenReportContainingFolder()
         {
             if (ValidateReportToOpen())
@@ -128,6 +118,18 @@ namespace TripToPrint.Presenters
                 return Path.GetFileNameWithoutExtension(ViewModel.InputUri);
 
             return null;
+        }
+
+        private bool ValidateReportToOpen()
+        {
+            if (_file.Exists(ViewModel.OutputFilePath))
+            {
+                return true;
+            }
+
+            ViewModel.OutputFilePath = null;
+            _dialogService.InvalidOperationMessage("A report no longer exists on the local disk. Please re-create it again.");
+            return false;
         }
     }
 }

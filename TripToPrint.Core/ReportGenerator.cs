@@ -163,7 +163,7 @@ namespace TripToPrint.Core
 
             if (placemark.Type == PlacemarkType.Point)
             {
-                imageBytes = await _hereAdapter.FetchImage(placemark);
+                imageBytes = await _hereAdapter.FetchThumbnail(placemark);
                 filePath = Path.Combine(tempPath, _resourceName.CreateFileNameForPlacemarkThumbnail(placemark));
                 await _file.WriteBytesAsync(filePath, imageBytes);
             }

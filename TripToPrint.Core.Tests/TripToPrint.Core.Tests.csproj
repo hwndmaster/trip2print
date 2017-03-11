@@ -87,6 +87,7 @@
       <DependentUpon>GroupsGeneration.feature</DependentUpon>
     </Compile>
     <Compile Include="UnitTests\ProgressTrackerTests.cs" />
+    <Compile Include="UnitTests\HereAdapterTests.cs" />
     <Compile Include="UnitTests\ReportGeneratorTests.cs" />
     <Compile Include="UnitTests\MooiGroupFactoryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

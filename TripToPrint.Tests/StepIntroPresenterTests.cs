@@ -1,4 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Threading.Tasks;
+using System.Windows;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
@@ -110,6 +113,83 @@ namespace TripToPrint.Tests
 
             // Verify
             Assert.AreEqual(false, result);
+        }
+
+        [TestMethod]
+        public async Task When_dropping_proper_file_the_viewmodel_is_updated()
+        {
+            // Arrange
+            var vm = new StepIntroViewModel { InputUri = "old-uri", InputSource = InputSource.GoogleMyMapsUrl };
+            _presenter.SetupGet(x => x.ViewModel).Returns(vm);
+            var dataObjectMock = new Mock<IDataObject>();
+            dataObjectMock.Setup(x => x.GetDataPresent(DataFormats.FileDrop)).Returns(true);
+            dataObjectMock.Setup(x => x.GetData(DataFormats.FileDrop)).Returns(new[] { "file-path.kmz" });
+            _fileServiceMock.Setup(x => x.Exists("file-path.kmz")).Returns(true);
+
+            // Act
+            await _presenter.Object.HandleInputUriDrop(dataObjectMock.Object);
+
+            // Verify
+            Assert.AreEqual(InputSource.LocalFile, vm.InputSource);
+            Assert.AreEqual("file-path.kmz", vm.InputUri);
+        }
+
+        [TestMethod]
+        public async Task When_dropping_unsupported_file_an_error_message_is_shown()
+        {
+            // Arrange
+            var vm = new StepIntroViewModel { InputSource = InputSource.GoogleMyMapsUrl, InputUri = "old-uri" };
+            _presenter.SetupGet(x => x.ViewModel).Returns(vm);
+            var dataObjectMock = new Mock<IDataObject>();
+            dataObjectMock.Setup(x => x.GetDataPresent(DataFormats.FileDrop)).Returns(true);
+            dataObjectMock.Setup(x => x.GetData(DataFormats.FileDrop)).Returns(new[] { "file-path.bad" });
+            _fileServiceMock.Setup(x => x.Exists("file-path.bad")).Returns(true);
+
+            // Act
+            await _presenter.Object.HandleInputUriDrop(dataObjectMock.Object);
+
+            // Verify
+            _dialogServiceMock.Verify(x => x.InvalidOperationMessage(It.IsAny<string>()), Times.Once);
+            Assert.AreEqual(InputSource.GoogleMyMapsUrl, vm.InputSource);
+            Assert.AreEqual("old-uri", vm.InputUri);
+        }
+
+        [TestMethod]
+        public async Task When_dropping_proper_mymaps_link_the_viewmodel_is_updated()
+        {
+            // Arrange
+            var vm = new StepIntroViewModel { InputUri = "old-uri", InputSource = InputSource.LocalFile };
+            _presenter.SetupGet(x => x.ViewModel).Returns(vm);
+            var dataObjectMock = new Mock<IDataObject>();
+            dataObjectMock.Setup(x => x.GetDataPresent(DataFormats.Text)).Returns(true);
+            dataObjectMock.Setup(x => x.GetData(DataFormats.Text)).Returns("new-uri");
+            _googleMyMapAdapterMock.Setup(x => x.DoesLookLikeMyMapsUrl("new-uri")).Returns(true);
+
+            // Act
+            await _presenter.Object.HandleInputUriDrop(dataObjectMock.Object);
+
+            // Verify
+            Assert.AreEqual(InputSource.GoogleMyMapsUrl, vm.InputSource);
+            Assert.AreEqual("new-uri", vm.InputUri);
+        }
+
+        [TestMethod]
+        public async Task When_dropping_inproper_mymaps_link_an_error_message_is_shown()
+        {
+            // Arrange
+            var vm = new StepIntroViewModel { InputUri = "old-uri", InputSource = InputSource.LocalFile };
+            _presenter.SetupGet(x => x.ViewModel).Returns(vm);
+            var dataObjectMock = new Mock<IDataObject>();
+            dataObjectMock.Setup(x => x.GetDataPresent(DataFormats.Text)).Returns(true);
+            dataObjectMock.Setup(x => x.GetData(DataFormats.Text)).Returns("bad-uri");
+            _googleMyMapAdapterMock.Setup(x => x.DoesLookLikeMyMapsUrl("bad-uri")).Returns(false);
+
+            // Act
+            await _presenter.Object.HandleInputUriDrop(dataObjectMock.Object);
+
+            // Verify
+            Assert.AreEqual(InputSource.LocalFile, vm.InputSource);
+            Assert.AreEqual("old-uri", vm.InputUri);
         }
     }
 }

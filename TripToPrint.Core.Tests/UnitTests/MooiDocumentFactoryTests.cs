@@ -28,7 +28,10 @@ namespace TripToPrint.Core.Tests.UnitTests
                 Description = "kml-desc",
                 Folders = new List<KmlFolder> {
                     new KmlFolder {
-                        Name = "folder-1"
+                        Name = "folder-1",
+                        Placemarks = new List<KmlPlacemark> {
+                            new KmlPlacemark()
+                        }
                     }
                 }
             };

@@ -24,7 +24,7 @@ namespace TripToPrint.ValueConverters
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             string parameterString = parameter as string;
-            if (parameterString == null)
+            if (parameterString == null || value.Equals(false))
                 return DependencyProperty.UnsetValue;
 
             return Enum.Parse(targetType, parameterString);

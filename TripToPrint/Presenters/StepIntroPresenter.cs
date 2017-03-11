@@ -1,5 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
+using System.Windows;
+
 using TripToPrint.Core;
 using TripToPrint.Services;
 using TripToPrint.ViewModels;
@@ -10,19 +13,20 @@ namespace TripToPrint.Presenters
     public interface IStepIntroPresenter : IPresenter<StepIntroViewModel, IStepIntroView>, IStepPresenter
     {
         void AskUserToSelectKmzFile();
+        Task HandleInputUriDrop(IDataObject dataObject);
     }
 
     public class StepIntroPresenter : IStepIntroPresenter
     {
-        private readonly IDialogService _dialogService;
-        private readonly IFileService _fileService;
-        private readonly IGoogleMyMapAdapter _googleMyMapAdapter;
+        private readonly IDialogService _dialog;
+        private readonly IFileService _file;
+        private readonly IGoogleMyMapAdapter _googleMyMap;
 
-        public StepIntroPresenter(IDialogService dialogService, IFileService fileService, IGoogleMyMapAdapter googleMyMapAdapter)
+        public StepIntroPresenter(IDialogService dialog, IFileService file, IGoogleMyMapAdapter googleMyMap)
         {
-            _dialogService = dialogService;
-            _fileService = fileService;
-            _googleMyMapAdapter = googleMyMapAdapter;
+            _dialog = dialog;
+            _file = file;
+            _googleMyMap = googleMyMap;
         }
 
 
@@ -40,13 +44,49 @@ namespace TripToPrint.Presenters
 
         public void AskUserToSelectKmzFile()
         {
-            var fileName = _dialogService.AskUserToSelectFile("Select a KMZ/KML file", filter: new[] {
+            var fileName = _dialog.AskUserToSelectFile("Select a KMZ/KML file", filter: new[] {
                 "KMZ/KML files (*.kmz, *.kml)|*.kmz;*.kml"
             });
             if (fileName == null)
                 return;
 
             ViewModel.InputUri = fileName;
+        }
+
+        public async Task HandleInputUriDrop(IDataObject dataObject)
+        {
+            var errorMessage = "You may drop only KMZ/KML files or proper Google MyMaps URLs.";
+
+            if (dataObject.GetDataPresent(DataFormats.FileDrop))
+            {
+                var files = (string[]) dataObject.GetData(DataFormats.FileDrop);
+                var filePath = files[0];
+
+                if (_file.Exists(filePath))
+                {
+                    var fileExt = Path.GetExtension(filePath);
+                    if (fileExt?.Equals(".kmz") == false && fileExt.Equals(".kml") == false)
+                    {
+                        await _dialog.InvalidOperationMessage("Cannot accept your file. " + errorMessage);
+                        return;
+                    }
+
+                    ViewModel.InputSource = InputSource.LocalFile;
+                    ViewModel.InputUri = filePath;
+                }
+            }
+            else if (dataObject.GetDataPresent(DataFormats.Text))
+            {
+                var uri = (string)dataObject.GetData(DataFormats.Text);
+                if (!_googleMyMap.DoesLookLikeMyMapsUrl(uri))
+                {
+                    await _dialog.InvalidOperationMessage("Cannot accept your URL. " + errorMessage);
+                    return;
+                }
+
+                ViewModel.InputSource = InputSource.GoogleMyMapsUrl;
+                ViewModel.InputUri = uri;
+            }
         }
 
         public Task Activated()
@@ -64,23 +104,23 @@ namespace TripToPrint.Presenters
             if (string.IsNullOrEmpty(ViewModel.InputUri))
             {
                 var message = ViewModel.InputSource == InputSource.LocalFile
-                    ? "You have not selected an input KMZ file"
+                    ? "You have not selected an input KMZ/KML file"
                     : "Please input a correct Google MyMaps URL";
-                await _dialogService.InvalidOperationMessage(message);
+                await _dialog.InvalidOperationMessage(message);
                 return false;
             }
 
             if (ViewModel.InputSource == InputSource.LocalFile
-                && !_fileService.Exists(ViewModel.InputUri))
+                && !_file.Exists(ViewModel.InputUri))
             {
-                await _dialogService.InvalidOperationMessage("The selected file was not found");
+                await _dialog.InvalidOperationMessage("The selected file was not found");
                 return false;
             }
 
             if (ViewModel.InputSource == InputSource.GoogleMyMapsUrl
-                && !_googleMyMapAdapter.DoesLookLikeMyMapsUrl(ViewModel.InputUri))
+                && !_googleMyMap.DoesLookLikeMyMapsUrl(ViewModel.InputUri))
             {
-                await _dialogService.InvalidOperationMessage("The provided Google MyMaps URL doesn't look like a valid one. Ensure that the URL looks like this:\r\nhttps://www.google.com/maps/d/viewer?mid=xxx");
+                await _dialog.InvalidOperationMessage("The provided Google MyMaps URL doesn't look like a valid one. Ensure that the URL looks like this:\r\nhttps://www.google.com/maps/d/viewer?mid=xxx");
                 return false;
             }
 
