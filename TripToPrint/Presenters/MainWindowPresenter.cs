@@ -15,16 +15,17 @@ namespace TripToPrint.Presenters
     public class MainWindowPresenter : IMainWindowPresenter
     {
         private readonly IStepIntroPresenter _stepIntroPresenter;
+        private readonly IStepSettingPresenter _stepSettingPresenter;
         private readonly IStepGenerationPresenter _stepGenerationPresenter;
         private readonly IStepAdjustmentPresenter _stepAdjustmentPresenter;
-        private readonly ILogger _logger;
 
-        public MainWindowPresenter(ILogger logger, IStepIntroPresenter stepIntroPresenter, IStepGenerationPresenter stepGenerationPresenter, IStepAdjustmentPresenter stepAdjustmentPresenter)
+        public MainWindowPresenter(IStepIntroPresenter stepIntroPresenter, IStepSettingPresenter stepSettingPresenter,
+            IStepGenerationPresenter stepGenerationPresenter, IStepAdjustmentPresenter stepAdjustmentPresenter)
         {
-            _logger = logger;
             _stepIntroPresenter = stepIntroPresenter;
             _stepGenerationPresenter = stepGenerationPresenter;
             _stepAdjustmentPresenter = stepAdjustmentPresenter;
+            _stepSettingPresenter = stepSettingPresenter;
         }
 
 
@@ -39,24 +40,9 @@ namespace TripToPrint.Presenters
             View.Presenter = this;
 
             _stepIntroPresenter.InitializePresenter(View.StepIntroView, ViewModel.StepIntro);
+            _stepSettingPresenter.InitializePresenter(View.StepSettingView, ViewModel.StepSetting);
             _stepGenerationPresenter.InitializePresenter(View.StepGenerationView, ViewModel.StepGeneration);
             _stepAdjustmentPresenter.InitializePresenter(View.StepAdjustmentView, ViewModel.StepAdjustment);
-
-            ViewModel.StepIntro.InputUriChanged += (sender, inputUri) => {
-                _logger.Info($"Input file selected: {inputUri}");
-                ViewModel.StepGeneration.InputUri = inputUri;
-                ViewModel.StepAdjustment.InputUri = inputUri;
-            };
-            ViewModel.StepIntro.InputSourceChanged += (sender, inputSource) => {
-                _logger.Info($"Input source selected: {inputSource}");
-                ViewModel.StepGeneration.InputSource = inputSource;
-                ViewModel.StepAdjustment.InputSource = inputSource;
-            };
-            ViewModel.StepGeneration.TempPathChanged += (sender, tempPath) => {
-                ViewModel.StepAdjustment.TempPath = tempPath;
-            };
-
-            _stepGenerationPresenter.GoNextRequested += async (sender, args) => { await GoNext(); };
 
             GetWizardStepPresenter(ViewModel.WizardStepIndex).Activated().GetAwaiter().GetResult();
         }
@@ -64,7 +50,7 @@ namespace TripToPrint.Presenters
         public async Task GoBack()
         {
             var currentStepPresenter = GetWizardStepPresenter(ViewModel.WizardStepIndex);
-            if (currentStepPresenter.BeforeToGoBack())
+            if (await currentStepPresenter.BeforeGoBack())
             {
                 ViewModel.WizardStepIndex = 0;
 
@@ -102,8 +88,10 @@ namespace TripToPrint.Presenters
                 case 0:
                     return _stepIntroPresenter;
                 case 1:
-                    return _stepGenerationPresenter;
+                    return _stepSettingPresenter;
                 case 2:
+                    return _stepGenerationPresenter;
+                case 3:
                     return _stepAdjustmentPresenter;
                 default:
                     return null;

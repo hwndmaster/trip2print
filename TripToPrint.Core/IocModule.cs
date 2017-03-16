@@ -13,6 +13,7 @@ namespace TripToPrint.Core
             builder.RegisterType<HereAdapter>().As<IHereAdapter>();
             builder.RegisterType<GoogleMyMapAdapter>().As<IGoogleMyMapAdapter>();
             builder.RegisterType<ReportGenerator>().As<IReportGenerator>();
+            builder.RegisterType<KmlFileReader>().As<IKmlFileReader>();
             builder.RegisterType<ReportWriter>().As<IReportWriter>();
             builder.RegisterType<FileService>().As<IFileService>();
             builder.RegisterType<ZipService>().As<IZipService>();

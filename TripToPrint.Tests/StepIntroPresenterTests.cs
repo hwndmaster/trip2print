@@ -1,10 +1,7 @@
 ﻿using System.Threading.Tasks;
 using System.Windows;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using Moq;
-
 using TripToPrint.Core;
 using TripToPrint.Presenters;
 using TripToPrint.Services;
@@ -20,15 +17,18 @@ namespace TripToPrint.Tests
         private readonly Mock<IDialogService> _dialogServiceMock = new Mock<IDialogService>();
         private readonly Mock<IFileService> _fileServiceMock = new Mock<IFileService>();
         private readonly Mock<IGoogleMyMapAdapter> _googleMyMapAdapterMock = new Mock<IGoogleMyMapAdapter>();
+        private readonly Mock<IUserSession> _userSessionMock = new Mock<IUserSession>();
 
         private Mock<StepIntroPresenter> _presenter;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _presenter = new Mock<StepIntroPresenter>(_dialogServiceMock.Object,
+            _presenter = new Mock<StepIntroPresenter>(
+                _dialogServiceMock.Object,
                 _fileServiceMock.Object,
-                _googleMyMapAdapterMock.Object) {
+                _googleMyMapAdapterMock.Object,
+                _userSessionMock.Object) {
                 CallBase = true
             };
         }
@@ -75,7 +75,7 @@ namespace TripToPrint.Tests
         }
 
         [TestMethod]
-        public void When_input_parameters_are_ready_the_validation_to_go_next_is_passing()
+        public async Task When_input_parameters_are_ready_the_validation_to_go_next_is_passing()
         {
             // Arrange
             _presenter.SetupGet(x => x.ViewModel)
@@ -83,36 +83,53 @@ namespace TripToPrint.Tests
             _fileServiceMock.Setup(x => x.Exists("input-uri")).Returns(true);
 
             // Act
-            var result = _presenter.Object.BeforeGoNext().GetAwaiter().GetResult();
+            var result = await _presenter.Object.BeforeGoNext();
 
             // Verify
             Assert.AreEqual(true, result);
         }
 
         [TestMethod]
-        public void When_input_uri_is_not_provided_the_validation_to_go_next_is_not_passing()
+        public async Task When_input_uri_is_not_provided_the_validation_to_go_next_is_not_passing()
         {
             // Arrange
             _presenter.SetupGet(x => x.ViewModel).Returns(new StepIntroViewModel { InputUri = null });
 
             // Act
-            var result = _presenter.Object.BeforeGoNext().GetAwaiter().GetResult();
+            var result = await _presenter.Object.BeforeGoNext();
 
             // Verify
             Assert.AreEqual(false, result);
         }
 
         [TestMethod]
-        public void When_input_file_is_not_found_the_validation_to_go_next_is_not_passing()
+        public async Task When_input_file_is_not_found_the_validation_to_go_next_is_not_passing()
         {
             // Arrange
             _presenter.SetupGet(x => x.ViewModel).Returns(new StepIntroViewModel { InputUri = "absent-file" });
 
             // Act
-            var result = _presenter.Object.BeforeGoNext().GetAwaiter().GetResult();
+            var result = await _presenter.Object.BeforeGoNext();
 
             // Verify
             Assert.AreEqual(false, result);
+        }
+
+        [TestMethod]
+        public async Task When_input_uri_is_invalid_the_validation_to_go_next_is_not_passing()
+        {
+            // Arrange
+            _presenter.SetupGet(x => x.ViewModel).Returns(new StepIntroViewModel {
+                InputUri = "bad-url", InputSource = InputSource.GoogleMyMapsUrl
+            });
+            _googleMyMapAdapterMock.Setup(x => x.DoesLookLikeMyMapsUrl("bad-url")).Returns(false);
+
+            // Act
+            var result = await _presenter.Object.BeforeGoNext();
+
+            // Verify
+            Assert.AreEqual(false, result);
+            _dialogServiceMock.Verify(x => x.InvalidOperationMessage(It.IsAny<string>()));
         }
 
         [TestMethod]
@@ -190,6 +207,37 @@ namespace TripToPrint.Tests
             // Verify
             Assert.AreEqual(InputSource.LocalFile, vm.InputSource);
             Assert.AreEqual("old-uri", vm.InputUri);
+        }
+
+        [TestMethod]
+        public void When_input_source_has_changed_the_input_uri_is_emptied()
+        {
+            // Arrange
+            _presenter.Object.InitializePresenter(_viewMock.Object);
+            _presenter.Object.ViewModel.InputSource = InputSource.LocalFile;
+            _presenter.Object.ViewModel.InputUri = "input-uri";
+
+            // Act
+            _presenter.Object.ViewModel.InputSource = InputSource.GoogleMyMapsUrl;
+
+            // Verify
+            Assert.AreEqual(null, _presenter.Object.ViewModel.InputUri);
+        }
+
+        [TestMethod]
+        public void When_input_source_or_uri_has_changed_the_usersession_is_updated()
+        {
+            // Arrange
+            _presenter.Object.InitializePresenter(_viewMock.Object);
+            _presenter.Object.ViewModel.InputSource = InputSource.LocalFile;
+            _presenter.Object.ViewModel.InputUri = "input-uri";
+
+            // Act / Verify
+            _presenter.Object.ViewModel.InputSource = InputSource.GoogleMyMapsUrl;
+            _userSessionMock.VerifySet(x => x.InputSource = InputSource.GoogleMyMapsUrl, Times.Once);
+
+            _presenter.Object.ViewModel.InputUri = "uri-updated";
+            _userSessionMock.VerifySet(x => x.InputUri = "uri-updated", Times.Once);
         }
     }
 }

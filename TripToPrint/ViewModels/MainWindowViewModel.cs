@@ -7,11 +7,13 @@
         public MainWindowViewModel()
         {
             StepIntro = new StepIntroViewModel();
+            StepSetting = new StepSettingViewModel();
             StepGeneration = new StepGenerationViewModel();
             StepAdjustment = new StepAdjustmentViewModel();
         }
 
         public StepIntroViewModel StepIntro { get; private set; }
+        public StepSettingViewModel StepSetting { get; private set; }
         public StepGenerationViewModel StepGeneration { get; private set; }
         public StepAdjustmentViewModel StepAdjustment { get; private set; }
 

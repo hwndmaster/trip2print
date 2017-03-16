@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -21,18 +20,18 @@ namespace TripToPrint.Presenters
         private readonly IDialogService _dialog;
         private readonly IFileService _file;
         private readonly IGoogleMyMapAdapter _googleMyMap;
+        private readonly IUserSession _userSession;
 
-        public StepIntroPresenter(IDialogService dialog, IFileService file, IGoogleMyMapAdapter googleMyMap)
+        public StepIntroPresenter(IDialogService dialog, IFileService file, IGoogleMyMapAdapter googleMyMap, IUserSession userSession)
         {
             _dialog = dialog;
             _file = file;
             _googleMyMap = googleMyMap;
+            _userSession = userSession;
         }
-
 
         public IStepIntroView View { get; private set; }
         public virtual StepIntroViewModel ViewModel { get; private set; }
-        public event EventHandler GoNextRequested;
 
         public void InitializePresenter(IStepIntroView view, StepIntroViewModel viewModel = null)
         {
@@ -40,6 +39,14 @@ namespace TripToPrint.Presenters
             View = view;
             View.DataContext = ViewModel;
             View.Presenter = this;
+
+            ViewModel.InputSourceChanged += (sender, inputSource) => {
+                _userSession.InputSource = inputSource;
+                ViewModel.InputUri = null;
+            };
+            ViewModel.InputUriChanged += (sender, inputUri) => {
+                _userSession.InputUri = inputUri;
+            };
         }
 
         public void AskUserToSelectKmzFile()
@@ -94,9 +101,9 @@ namespace TripToPrint.Presenters
             return Task.CompletedTask;
         }
 
-        public bool BeforeToGoBack()
+        public Task<bool> BeforeGoBack()
         {
-            return false;
+            return Task.FromResult(false);
         }
 
         public async Task<bool> BeforeGoNext()
@@ -129,7 +136,6 @@ namespace TripToPrint.Presenters
 
         public void GetBackNextTitles(ref string back, ref string next)
         {
-            next = "Generate";
         }
     }
 }

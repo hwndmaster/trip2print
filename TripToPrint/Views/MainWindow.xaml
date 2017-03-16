@@ -24,6 +24,11 @@
             </TabItem>
             <TabItem Height="0">
                 <Grid>
+                    <local:StepSettingView x:Name="stepSetting" />
+                </Grid>
+            </TabItem>
+            <TabItem Height="0">
+                <Grid>
                     <local:StepGenerationView x:Name="stepGeneration" />
                 </Grid>
             </TabItem>
@@ -40,7 +45,7 @@
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,0,0,2">
-                <Label Content="Made by Dmytro Kravtsov 'Genius'" Foreground="DimGray" />
+                <Label Content="Made by Dmytro Kravtsov aka GeniU$" Foreground="DimGray" />
                 <Label>
                     <Hyperlink Name="linkGithub" NavigateUri="https://github.com/hwndmaster/trip2print" Foreground="DarkSlateGray" RequestNavigate="LinkGithub_OnRequestNavigate">
                         Github link

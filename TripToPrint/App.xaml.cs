@@ -30,6 +30,8 @@ namespace TripToPrint
         {
             CleanupTemporaryFiles();
 
+            _container.Dispose();
+
             base.OnExit(e);
         }
 

@@ -4,10 +4,6 @@
     {
         private string _outputFilePath;
 
-        public string InputUri;
-        public InputSource InputSource;
-        public string TempPath;
-
         public string OutputFilePath
         {
             get { return _outputFilePath; }

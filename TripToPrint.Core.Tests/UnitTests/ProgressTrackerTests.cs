@@ -18,15 +18,6 @@ namespace TripToPrint.Core.Tests.UnitTests
         }
 
         [TestMethod]
-        public void When_source_download_is_reported_the_progress_is_calculated_properly()
-        {
-            var value = _tracker.GetProgressStageWeights()[ProgressStages.SourceDownload];
-            _tracker.ReportSourceDownloaded();
-
-            _progressMock.Verify(x => x.Report(value));
-        }
-
-        [TestMethod]
         public void When_resource_entries_process_is_reported_the_progress_is_calculated_properly()
         {
             var value = _tracker.GetProgressStageWeights()[ProgressStages.ResourceEntriesExtract];
@@ -79,52 +70,31 @@ namespace TripToPrint.Core.Tests.UnitTests
         [TestMethod]
         public void When_step_2_is_reported_the_progress_is_calculated_properly()
         {
-            var value1 = _tracker.GetProgressStageWeights()[ProgressStages.SourceDownload];
-            var value2 = _tracker.GetProgressStageWeights()[ProgressStages.ResourceEntriesExtract];
-
-            _tracker.ReportSourceDownloaded();
-            _progressMock.Verify(x => x.Report(value1), Times.Once);
+            var value1 = _tracker.GetProgressStageWeights()[ProgressStages.ResourceEntriesExtract];
+            var value2 = _tracker.GetProgressStageWeights()[ProgressStages.ReportGeneration];
 
             _tracker.ReportResourceEntriesProcessed();
+            _progressMock.Verify(x => x.Report(value1), Times.Once);
+
+            _tracker.ReportContentGenerationDone();
             _progressMock.Verify(x => x.Report(value1 + value2), Times.Once);
         }
 
         [TestMethod]
         public void When_step_3_is_reported_the_progress_is_calculated_properly()
         {
-            var value1 = _tracker.GetProgressStageWeights()[ProgressStages.SourceDownload];
-            var value2 = _tracker.GetProgressStageWeights()[ProgressStages.ResourceEntriesExtract];
-            var value3 = _tracker.GetProgressStageWeights()[ProgressStages.ReportGeneration];
-
-            _tracker.ReportSourceDownloaded();
-            _progressMock.Verify(x => x.Report(value1), Times.Once);
+            var value1 = _tracker.GetProgressStageWeights()[ProgressStages.ResourceEntriesExtract];
+            var value2 = _tracker.GetProgressStageWeights()[ProgressStages.ReportGeneration];
+            var value3 = _tracker.GetProgressStageWeights()[ProgressStages.FetchMapImages];
 
             _tracker.ReportResourceEntriesProcessed();
-            _progressMock.Verify(x => x.Report(value1 + value2), Times.Once);
-
-            _tracker.ReportContentGenerationDone();
-            _progressMock.Verify(x => x.Report(value1 + value2 + value3), Times.Once);
-        }
-
-        [TestMethod]
-        public void When_step_4_is_reported_the_progress_is_calculated_properly()
-        {
-            var value1 = _tracker.GetProgressStageWeights()[ProgressStages.SourceDownload];
-            var value2 = _tracker.GetProgressStageWeights()[ProgressStages.ResourceEntriesExtract];
-            var value3 = _tracker.GetProgressStageWeights()[ProgressStages.ReportGeneration];
-            var value4 = _tracker.GetProgressStageWeights()[ProgressStages.FetchMapImages];
-
-            _tracker.ReportSourceDownloaded();
             _progressMock.Verify(x => x.Report(value1), Times.Once);
 
-            _tracker.ReportResourceEntriesProcessed();
-            _progressMock.Verify(x => x.Report(value1 + value2), Times.Once);
-
             _tracker.ReportContentGenerationDone();
-            _progressMock.Verify(x => x.Report(value1 + value2 + value3), Times.Once);
+            _progressMock.Verify(x => x.Report(value1 + value2), Times.Once);
 
             _tracker.ReportFetchImagesCount(0);
-            _progressMock.Verify(x => x.Report(value1 + value2 + value3 + value4), Times.Once);
+            _progressMock.Verify(x => x.Report(value1 + value2 + value3), Times.Once);
         }
     }
 }

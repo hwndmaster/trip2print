@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="TripToPrint.Views.StepSettingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TripToPrint.Views"
+             xmlns:viewModels="clr-namespace:TripToPrint.ViewModels"
+             mc:Ignorable="d"
+             d:DesignHeight="400" d:DesignWidth="600"
+             Background="WhiteSmoke">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" Content="Set up preferences for your report" Style="{DynamicResource StepHeader}" />
+        <DockPanel Grid.Row="1" HorizontalAlignment="Stretch" LastChildFill="True">
+            <Label Content="Select which folders, points, and directions you want to include:" DockPanel.Dock="Top" />
+            <TreeView ItemsSource="{Binding FoldersToInclude}">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsExpanded" Value="True"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="Margin" Value="0,2" />
+                    </Style>
+                </TreeView.ItemContainerStyle>
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate 
+                        DataType="{x:Type viewModels:KmlFolderNodeViewModel}"
+                        ItemsSource="{Binding Children}">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding Enabled}"/>
+                            <Image Width="20" Height="20" Margin="0,0,4,0" Source="/TripToPrint;component/Resources/KmlFolder.png" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate 
+                        DataType="{x:Type viewModels:KmlPlacemarkNodeViewModel}">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding Enabled}"/>
+                            <Image Width="20" Height="20" Margin="0,0,4,0" Source="/TripToPrint;component/Resources/KmlPlacemark.png" />
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                </TreeView.Resources>
+            </TreeView>
+        </DockPanel>
+    </Grid>
+</UserControl>

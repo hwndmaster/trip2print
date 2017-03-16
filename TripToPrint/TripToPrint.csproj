@@ -36,8 +36,8 @@
     <ProjectConfigFileName>App.config</ProjectConfigFileName>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac, Version=4.3.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autofac.4.3.0\lib\net45\Autofac.dll</HintPath>
+    <Reference Include="Autofac, Version=4.4.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.4.0\lib\net45\Autofac.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
@@ -74,7 +74,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserSession.cs" />
     <Compile Include="NormalCursor.cs" />
+    <Compile Include="Presenters\StepSettingPresenter.cs" />
     <Compile Include="ValueConverters\EnumBooleanConverter.cs" />
     <Compile Include="EventFocusAttachment.cs" />
     <Compile Include="Presenters\IPresenter.cs" />
@@ -85,7 +87,9 @@
     <Compile Include="Presenters\MainWindowPresenter.cs" />
     <Compile Include="InputSource.cs" />
     <Compile Include="ValueConverters\StringNullOrEmptyToVisibilityConverter.cs" />
+    <Compile Include="ViewModels\KmlObjectTreeNodeViewModel.cs" />
     <Compile Include="ViewModels\StepAdjustmentViewModel.cs" />
+    <Compile Include="ViewModels\StepSettingViewModel.cs" />
     <Compile Include="ViewModels\StepGenerationViewModel.cs" />
     <Compile Include="ViewModels\StepIntroViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
@@ -106,6 +110,9 @@
     </Compile>
     <Compile Include="Views\StepIntroView.xaml.cs">
       <DependentUpon>StepIntroView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StepSettingView.xaml.cs">
+      <DependentUpon>StepSettingView.xaml</DependentUpon>
     </Compile>
     <Compile Include="WaitCursor.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -164,9 +171,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\StepSettingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Logo.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\KmlFolder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\KmlPlacemark.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.targets" />

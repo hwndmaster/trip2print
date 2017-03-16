@@ -138,7 +138,7 @@ namespace TripToPrint.Core
             var coordinate = _formatter.Format(placemark.PrimaryCoordinate.Latitude, COORDINATE_VALUE_PRECISION) + ","
                 + _formatter.Format(placemark.PrimaryCoordinate.Longitude, COORDINATE_VALUE_PRECISION);
             var iconPath = placemark.IconPathIsOnWeb
-                ? StringHelper.MakeStringSafeForFileName(placemark.IconPath)
+                ? StringHelper.MakeUrlStringSafeForFileName(placemark.IconPath)
                 : $"{placemark.IconPath}";
             sb.Append("<div class='pm'>");
             sb.Append($"<img class='icon' src='{iconPath}' />");

@@ -5,20 +5,20 @@ namespace TripToPrint.Core
 {
     public static class StringHelper
     {
-        public static string MakeStringSafeForFileName(string value, bool preserveExtension = true)
+        public static string MakeUrlStringSafeForFileName(string url, bool preserveExtension = true)
         {
-            value = Regex.Replace(value, "https?://", string.Empty);
+            url = Regex.Replace(url, "https?://", string.Empty);
 
             var extension = string.Empty;
             if (preserveExtension)
             {
-                extension = Path.GetExtension(value);
-                value = value.Substring(0, value.Length - extension.Length);
+                extension = Path.GetExtension(url);
+                url = url.Substring(0, url.Length - extension.Length);
             }
 
-            value = Regex.Replace(value, @"[^\w]", string.Empty) + extension;
+            url = Regex.Replace(url, @"[^\w]", string.Empty) + extension;
 
-            return value;
+            return url;
         }
     }
 }

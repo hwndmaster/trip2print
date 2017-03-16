@@ -1,5 +1,5 @@
 # Trip to Print
-A WPF application which converts KMZ/KML files to a handy HTML report
+A WPF application which converts KMZ/KML files to handy easy-to-print PDF reports
 
 # Usage
 1. Open your [Google MyMap](https://www.google.com/maps/d/) in browser<br/>

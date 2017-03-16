@@ -1,6 +1,6 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -23,19 +23,21 @@ namespace TripToPrint.Presenters
         private readonly IDialogService _dialogService;
         private readonly IResourceNameProvider _resourceName;
         private readonly IReportGenerator _reportGenerator;
+        private readonly IUserSession _userSession;
         private readonly IFileService _file;
 
-        public StepAdjustmentPresenter(IDialogService dialogService, IResourceNameProvider resourceName, IReportGenerator reportGenerator, IFileService file)
+        public StepAdjustmentPresenter(IDialogService dialogService, IResourceNameProvider resourceName,
+            IReportGenerator reportGenerator, IFileService file, IUserSession userSession)
         {
             _dialogService = dialogService;
             _resourceName = resourceName;
             _reportGenerator = reportGenerator;
             _file = file;
+            _userSession = userSession;
         }
 
         public virtual IStepAdjustmentView View { get; private set; }
         public virtual StepAdjustmentViewModel ViewModel { get; private set; }
-        public event EventHandler GoNextRequested;
 
         public void InitializePresenter(IStepAdjustmentView view, StepAdjustmentViewModel viewModel = null)
         {
@@ -47,16 +49,16 @@ namespace TripToPrint.Presenters
 
         public Task Activated()
         {
-            View.SetAddress(Path.Combine(ViewModel.TempPath, _resourceName.GetDefaultHtmlReportName()));
+            View.SetAddress(Path.Combine(_userSession.GeneratedReportTempPath, _resourceName.GetDefaultHtmlReportName()));
 
             return Task.CompletedTask;
         }
 
-        public bool BeforeToGoBack()
+        public Task<bool> BeforeGoBack()
         {
             ViewModel.OutputFilePath = null;
 
-            return true;
+            return Task.FromResult(true);
         }
 
         public async Task<bool> BeforeGoNext()
@@ -71,7 +73,7 @@ namespace TripToPrint.Presenters
                 return false;
             }
 
-            if (!await _reportGenerator.SaveHtmlReportAsPdf(ViewModel.TempPath, outputFileName))
+            if (!await _reportGenerator.SaveHtmlReportAsPdf(_userSession.GeneratedReportTempPath, outputFileName))
             {
                 await _dialogService.InvalidOperationMessage("An error occurred during report create. Try to save a file to another folder or using another name (For example, with Latin symbols only).");
                 return false;
@@ -114,8 +116,14 @@ namespace TripToPrint.Presenters
 
         private string GetDesiredOutputFileName()
         {
-            if (ViewModel.InputSource == InputSource.LocalFile)
-                return Path.GetFileNameWithoutExtension(ViewModel.InputUri);
+            if (_userSession.InputSource == InputSource.LocalFile)
+                return Path.GetFileNameWithoutExtension(_userSession.InputUri);
+
+            // TODO: cover with unit tests
+            string fileName = _userSession.Document.Title ?? "";
+            Path.GetInvalidFileNameChars().ToList().ForEach(c => fileName = fileName.Replace(c.ToString(), ""));
+            if (fileName.Length > 0)
+                return fileName;
 
             return null;
         }

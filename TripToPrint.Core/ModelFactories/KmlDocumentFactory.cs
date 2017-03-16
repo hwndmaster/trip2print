@@ -24,8 +24,7 @@ namespace TripToPrint.Core.ModelFactories
 
             var model = new KmlDocument {
                 Title = xroot.ElementByLocalName("name").Value,
-                Description = xroot.ElementByLocalName("description")?.Value,
-                Folders = new List<KmlFolder>()
+                Description = xroot.ElementByLocalName("description")?.Value
             };
 
             foreach (var xfolder in xroot.ElementsByLocalName("Folder"))

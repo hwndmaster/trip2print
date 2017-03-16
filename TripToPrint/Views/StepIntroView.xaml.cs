@@ -1,8 +1,5 @@
 ﻿using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-
 using TripToPrint.Presenters;
 
 namespace TripToPrint.Views
@@ -11,7 +8,7 @@ namespace TripToPrint.Views
     {
     }
 
-    public partial class StepIntro : UserControl, IStepIntroView
+    public partial class StepIntro : IStepIntroView
     {
         public StepIntro()
         {

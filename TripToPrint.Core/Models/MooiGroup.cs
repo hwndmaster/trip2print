@@ -11,13 +11,8 @@ namespace TripToPrint.Core.Models
 
     public class MooiGroup
     {
-        public MooiGroup()
-        {
-            Placemarks = new List<MooiPlacemark>();
-        }
-
         public MooiSection Section { get; set; }
-        public List<MooiPlacemark> Placemarks { get; set; }
+        public List<MooiPlacemark> Placemarks { get; } = new List<MooiPlacemark>();
 
         public string Id => Placemarks[0].Id;
         public GroupType Type => Placemarks?.Any(x => x.Type == PlacemarkType.Route) == true

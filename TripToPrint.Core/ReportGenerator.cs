@@ -2,9 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Codaxy.WkHtmlToPdf;
-
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.ModelFactories;
 using TripToPrint.Core.Models;
@@ -13,50 +11,55 @@ namespace TripToPrint.Core
 {
     public interface IReportGenerator
     {
-        Task<string> Generate(string inputFileName, IProgressTracker progress);
+        Task<string> Generate(KmlDocument document, IProgressTracker progress);
 
         Task<bool> SaveHtmlReportAsPdf(string tempPath, string pdfFilePath);
     }
 
     public class ReportGenerator : IReportGenerator
     {
-        private readonly IKmlDocumentFactory _kmlDocumentFactory;
         private readonly IMooiDocumentFactory _mooiDocumentFactory;
         private readonly IHereAdapter _hereAdapter;
         private readonly IReportWriter _reportWriter;
         private readonly ILogger _logger;
         private readonly IFileService _file;
-        private readonly IZipService _zipService;
         private readonly IResourceNameProvider _resourceName;
         private readonly IWebClientService _webClient;
 
-        public ReportGenerator(IKmlDocumentFactory kmlDocumentFactory, IMooiDocumentFactory mooiDocumentFactory, IHereAdapter hereAdapter, IReportWriter reportWriter, ILogger logger, IFileService file, IZipService zipService, IResourceNameProvider resourceName, IWebClientService webClient)
+        public ReportGenerator(IMooiDocumentFactory mooiDocumentFactory, IHereAdapter hereAdapter,
+            IReportWriter reportWriter, ILogger logger, IFileService file, IResourceNameProvider resourceName,
+            IWebClientService webClient)
         {
-            _kmlDocumentFactory = kmlDocumentFactory;
             _mooiDocumentFactory = mooiDocumentFactory;
             _hereAdapter = hereAdapter;
             _reportWriter = reportWriter;
             _logger = logger;
             _file = file;
-            _zipService = zipService;
             _resourceName = resourceName;
             _webClient = webClient;
         }
 
-        public async Task<string> Generate(string inputFileName, IProgressTracker progress)
+        public async Task<string> Generate(KmlDocument document, IProgressTracker progress)
         {
-            var ext = Path.GetExtension(inputFileName);
+            var tempPath = CreateAndGetTempPath();
 
-            if (ext.Equals(".kmz", StringComparison.OrdinalIgnoreCase))
+            foreach (var resource in document.Resources)
             {
-                return await GenerateForKmz(inputFileName, progress);
+                await _file.WriteBytesAsync(Path.Combine(tempPath, resource.FileName), resource.Blob);
             }
-            if (ext.Equals(".kml", StringComparison.OrdinalIgnoreCase))
-            {
-                return await GenerateForKml(inputFileName, progress);
-            }
+            progress.ReportResourceEntriesProcessed();
 
-            throw new NotSupportedException();
+            var mooiDocument = _mooiDocumentFactory.Create(document);
+            var content = await _reportWriter.WriteReportAsync(mooiDocument);
+
+            progress.ReportContentGenerationDone();
+
+            await FetchMapImages(mooiDocument, tempPath, progress);
+
+            await _file.WriteStringAsync(Path.Combine(tempPath, _resourceName.GetDefaultHtmlReportName()), content);
+            progress.ReportDone();
+
+            return tempPath;
         }
 
         public Task<bool> SaveHtmlReportAsPdf(string tempPath, string pdfFilePath)
@@ -81,49 +84,6 @@ namespace TripToPrint.Core
                     return false;
                 }
             });
-        }
-
-        public virtual Task<string> GenerateForKml(string inputFileName, IProgressTracker progress)
-        {
-            throw new NotImplementedException("Sorry, KML files are not supported at the moment");
-        }
-
-        public virtual async Task<string> GenerateForKmz(string kmzFileName, IProgressTracker progress)
-        {
-            var tempPath = CreateAndGetTempPath();
-
-            _logger.Info($"Reading '{kmzFileName}'");
-            using (var zip = _zipService.Open(kmzFileName))
-            {
-                var resourceEntries = zip.GetFileNames().Where(x => x.StartsWith("images/")).ToList();
-                foreach (var filename in resourceEntries)
-                {
-                    zip.SaveToFolder(filename, tempPath);
-                }
-                progress.ReportResourceEntriesProcessed();
-
-                var kmlFileName = zip.GetFileNames().FirstOrDefault(x => Path.GetExtension(x).Equals(".kml"));
-                if (kmlFileName == null)
-                {
-                    throw new InvalidOperationException("Provided KMZ file is invalid. An entry for KML was not found");
-                }
-                var kmlContent = await zip.GetFileContent(kmlFileName);
-
-                var kmlDocument = _kmlDocumentFactory.Create(kmlContent);
-                var mooiDocument = _mooiDocumentFactory.Create(kmlDocument);
-
-                var content = await _reportWriter.WriteReportAsync(mooiDocument);
-
-                progress.ReportContentGenerationDone();
-
-                await FetchMapImages(mooiDocument, tempPath, progress);
-
-                await _file.WriteStringAsync(Path.Combine(tempPath, _resourceName.GetDefaultHtmlReportName()), content);
-
-                progress.ReportDone();
-            }
-
-            return tempPath;
         }
 
         public virtual async Task FetchMapImages(MooiDocument document, string tempPath, IProgressTracker progress)
@@ -170,7 +130,7 @@ namespace TripToPrint.Core
 
             if (placemark.IconPathIsOnWeb)
             {
-                filePath = Path.Combine(tempPath, StringHelper.MakeStringSafeForFileName(placemark.IconPath));
+                filePath = Path.Combine(tempPath, StringHelper.MakeUrlStringSafeForFileName(placemark.IconPath));
                 if (!_file.Exists(filePath))
                 {
                     imageBytes = await _webClient.GetAsync(new Uri(placemark.IconPath));
