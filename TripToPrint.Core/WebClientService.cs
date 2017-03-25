@@ -7,12 +7,21 @@ namespace TripToPrint.Core
 {
     public interface IWebClientService
     {
+        Task<string> GetStringAsync(Uri url);
         Task<byte[]> GetAsync(Uri url);
         Task<byte[]> PostAsync(Uri url, string parameters);
     }
 
     public class WebClientService : IWebClientService
     {
+        public async Task<string> GetStringAsync(Uri url)
+        {
+            using (var webClient = new WebClient())
+            {
+                return await webClient.DownloadStringTaskAsync(url);
+            }
+        }
+
         public async Task<byte[]> GetAsync(Uri url)
         {
             using (var webClient = new WebClient())

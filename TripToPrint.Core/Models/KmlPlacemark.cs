@@ -2,7 +2,7 @@
 
 namespace TripToPrint.Core.Models
 {
-    public class KmlPlacemark : IKmlElement
+    public class KmlPlacemark : IKmlElement, IHaveCoordinates
     {
         public string Name { get; set; }
         public string Description { get; set; }

@@ -1,6 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Device.Location;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
+
+using Newtonsoft.Json;
+
 using TripToPrint.Core.Models;
 
 namespace TripToPrint.Core
@@ -13,13 +19,18 @@ namespace TripToPrint.Core
 
     public class HereAdapter : IHereAdapter
     {
-        private const string ROOT_URL = "https://image.maps.api.here.com/mia/1.6";
-        internal const string MAPVIEW_URL = ROOT_URL + "/mapview?";
-        internal const string ROUTE_URL = ROOT_URL + "/route?";
-        internal const string ROUTE_ROUTE_PARAM_NAME = "r0";
-        internal const string ROUTE_POINT_PARAM_NAME = "m0";
+        private const string IMAGES_ROOT_URL = "https://image.maps.api.here.com/mia/1.6";
+        internal const string IMAGES_MAPVIEW_URL = IMAGES_ROOT_URL + "/mapview?";
+        internal const string IMAGES_ROUTE_URL = IMAGES_ROOT_URL + "/route?";
+        internal const string IMAGES_ROUTE_ROUTE_PARAM_NAME = "r0";
+        internal const string IMAGES_ROUTE_POINT_PARAM_NAME = "m0";
+
+        private const string PLACES_ROOT_URL = "https://places.demo.api.here.com/places/v1";
+        internal const string PLACES_DISCOVER_URL = PLACES_ROOT_URL + "/discover/search?";
+
         internal const string APP_ID_PARAM_NAME = "app_id";
         internal const string APP_CODE_PARAM_NAME = "app_code";
+
         internal const int TOO_MUCH_OF_COORDINATE_POINTS = 400;
         private const int MAX_COORDINATE_VALUE_PRECISION = 8;
         private const int COORDINATE_PRECISION_ON_POINTS = 6;
@@ -46,12 +57,12 @@ namespace TripToPrint.Core
 
             var url = $"c={CreateStringForCoordinates(null, placemark)}&z={THUMBNAIL_MAP_ZOOM}";
 
-            return await DownloadData(MAPVIEW_URL, url);
+            return await DownloadData(IMAGES_MAPVIEW_URL, url);
         }
 
         public async Task<byte[]> FetchOverviewMap(MooiGroup group)
         {
-            var baseUrl = group.Type == GroupType.Routes ? ROUTE_URL : MAPVIEW_URL;
+            var baseUrl = group.Type == GroupType.Routes ? IMAGES_ROUTE_URL : IMAGES_MAPVIEW_URL;
             baseUrl = $"{baseUrl}w={OVERVIEW_MAP_WIDTH}&h={OVERVIEW_MAP_HEIGHT}&sb=k";
 
             var parameters = string.Empty;
@@ -60,8 +71,8 @@ namespace TripToPrint.Core
                 var route = GetAndTrimRouteCoordinates(group);
                 var routeCoords = CreateStringForCoordinates(COORDINATE_PRECISION_ON_ROUTES, route);
 
-                parameters += $"&{ROUTE_ROUTE_PARAM_NAME}={routeCoords}";
-                parameters += $"&{ROUTE_POINT_PARAM_NAME}=" + CreateStringForCoordinates(COORDINATE_PRECISION_ON_POINTS, group.Placemarks
+                parameters += $"&{IMAGES_ROUTE_ROUTE_PARAM_NAME}={routeCoords}";
+                parameters += $"&{IMAGES_ROUTE_POINT_PARAM_NAME}=" + CreateStringForCoordinates(COORDINATE_PRECISION_ON_POINTS, group.Placemarks
                                   .Where(x => x.Type == PlacemarkType.Point)
                                   .Cast<IHaveCoordinates>()
                                   .ToArray());
@@ -74,6 +85,37 @@ namespace TripToPrint.Core
             }
 
             return await DownloadData(baseUrl, parameters);
+        }
+
+        public async Task<List<DiscoveredPlace>> LookupPlaces(KmlPlacemark placemark)
+        {
+            var coord = CreateStringForCoordinates(null, placemark);
+            var url = $"{PLACES_DISCOVER_URL}at={coord}&refinements=true&size=4&q=" + Uri.EscapeUriString(placemark.Name);
+
+            // Refer to: https://developer.here.com/rest-apis/documentation/places/topics_api/resource-search.html
+            var jsonValue = await DownloadString(url);
+            dynamic json = JsonConvert.DeserializeObject(jsonValue);
+
+            var discoveredPlaces = new List<DiscoveredPlace>();
+            foreach (var place in json.results.items)
+            {
+                discoveredPlaces.Add(new DiscoveredPlace {
+                    Title = (string)place.title,
+                    Coordinate = new GeoCoordinate(Convert.ToDouble(place.position[0]), Convert.ToDouble(place.position[1])),
+                    Address = (string)place.vicinity,
+                    AverageRating = Convert.ToDouble(place.averageRating),
+                    IconUrl = new Uri((string)place.icon),
+                    // TODO: ContactPhone = ???,
+                    // TODO: Website = ???,
+                });
+            }
+
+            return discoveredPlaces;
+        }
+
+        internal async Task<string> DownloadString(string url)
+        {
+            return await _webClient.GetStringAsync(new Uri(url + GetAppCodeUrlPart()));
         }
 
         internal async Task<byte[]> DownloadData(string url, string parameters)

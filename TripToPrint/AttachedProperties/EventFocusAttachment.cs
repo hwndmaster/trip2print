@@ -2,10 +2,14 @@
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
-namespace TripToPrint
+namespace TripToPrint.AttachedProperties
 {
     public class EventFocusAttachment
     {
+        public static readonly DependencyProperty ElementToFocusProperty =
+            DependencyProperty.RegisterAttached("ElementToFocus", typeof(Control),
+            typeof(EventFocusAttachment), new UIPropertyMetadata(null, ElementToFocusPropertyChanged));
+
         public static Control GetElementToFocus(ButtonBase button)
         {
             return (Control)button.GetValue(ElementToFocusProperty);
@@ -15,10 +19,6 @@ namespace TripToPrint
         {
             button.SetValue(ElementToFocusProperty, value);
         }
-
-        public static readonly DependencyProperty ElementToFocusProperty =
-            DependencyProperty.RegisterAttached("ElementToFocus", typeof(Control),
-            typeof(EventFocusAttachment), new UIPropertyMetadata(null, ElementToFocusPropertyChanged));
 
         public static void ElementToFocusPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {

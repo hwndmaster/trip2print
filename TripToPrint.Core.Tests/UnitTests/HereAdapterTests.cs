@@ -27,7 +27,7 @@ namespace TripToPrint.Core.Tests.UnitTests
         {
             // Arrange
             var placemark = new MooiPlacemark { Coordinates = new [] { new GeoCoordinate(1.11, 2.22) } };
-            var bytesToMatch = SetupWebClient(uri => uri.AbsoluteUri.StartsWith(HereAdapter.MAPVIEW_URL),
+            var bytesToMatch = SetupWebClient(uri => uri.AbsoluteUri.StartsWith(HereAdapter.IMAGES_MAPVIEW_URL),
                 p => p.Contains("1.11,2.22") && p.Contains("z=17"));
 
             // Act
@@ -63,7 +63,7 @@ namespace TripToPrint.Core.Tests.UnitTests
                     new MooiPlacemark { Coordinates = new [] { new GeoCoordinate(4.22, 3.11) } }
                 }
             };
-            var bytesToMatch = SetupWebClient(uri => uri.AbsoluteUri.StartsWith(HereAdapter.MAPVIEW_URL),
+            var bytesToMatch = SetupWebClient(uri => uri.AbsoluteUri.StartsWith(HereAdapter.IMAGES_MAPVIEW_URL),
                 p => p.Contains("1.11,2.22,4.22,3.11") && p.Contains("poitxs=12"));
 
             // Act
@@ -88,9 +88,9 @@ namespace TripToPrint.Core.Tests.UnitTests
                     } }
                 }
             };
-            var bytesToMatch = SetupWebClient(uri => uri.AbsoluteUri.StartsWith(HereAdapter.ROUTE_URL),
-                p => p.Contains($"&{HereAdapter.ROUTE_ROUTE_PARAM_NAME}=1.11,2.22,4.22,3.11")
-                     && p.Contains($"&{HereAdapter.ROUTE_POINT_PARAM_NAME}=5.66,6.55"));
+            var bytesToMatch = SetupWebClient(uri => uri.AbsoluteUri.StartsWith(HereAdapter.IMAGES_ROUTE_URL),
+                p => p.Contains($"&{HereAdapter.IMAGES_ROUTE_ROUTE_PARAM_NAME}=1.11,2.22,4.22,3.11")
+                     && p.Contains($"&{HereAdapter.IMAGES_ROUTE_POINT_PARAM_NAME}=5.66,6.55"));
 
             // Act
             var bytes = await _here.Object.FetchOverviewMap(group);

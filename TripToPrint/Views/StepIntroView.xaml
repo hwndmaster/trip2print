@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:l="clr-namespace:TripToPrint"
              xmlns:valueConverters="clr-namespace:TripToPrint.ValueConverters"
+             xmlns:attachedProperties="clr-namespace:TripToPrint.AttachedProperties"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="600"
              Background="WhiteSmoke">
@@ -34,7 +35,7 @@
             <RadioButton Name="radioInputSourceLocalFile" GroupName="InputSource" Content="Local file" Margin="0,5"
                          IsChecked="{Binding Path=InputSource, Converter={StaticResource EnumBooleanConverter}, ConverterParameter=LocalFile, UpdateSourceTrigger=PropertyChanged}" />
             <RadioButton Name="radioInputSourceMyMapUrl" GroupName="InputSource" Content="Google MyMap URL"
-                         l:EventFocusAttachment.ElementToFocus="{Binding ElementName=textBox}"
+                         attachedProperties:EventFocusAttachment.ElementToFocus="{Binding ElementName=textBox}"
                          IsChecked="{Binding Path=InputSource, Converter={StaticResource EnumBooleanConverter}, ConverterParameter=GoogleMyMapsUrl, UpdateSourceTrigger=PropertyChanged}" />
             <Separator Margin="0,10,0,10" />
             <DockPanel LastChildFill="True" Margin="-4,0,0,0" Visibility="{Binding Path=IsChecked, ElementName=radioInputSourceLocalFile, Converter={StaticResource BoolToVis}}">

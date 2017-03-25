@@ -74,11 +74,12 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AttachedProperties\VirtualToggleButton.cs" />
     <Compile Include="UserSession.cs" />
     <Compile Include="NormalCursor.cs" />
     <Compile Include="Presenters\StepSettingPresenter.cs" />
     <Compile Include="ValueConverters\EnumBooleanConverter.cs" />
-    <Compile Include="EventFocusAttachment.cs" />
+    <Compile Include="AttachedProperties\EventFocusAttachment.cs" />
     <Compile Include="Presenters\IPresenter.cs" />
     <Compile Include="Presenters\IStepPresenter.cs" />
     <Compile Include="Presenters\StepGenerationPresenter.cs" />
