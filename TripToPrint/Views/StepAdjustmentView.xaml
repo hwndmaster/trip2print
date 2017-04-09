@@ -3,17 +3,46 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:valueConverters="clr-namespace:TripToPrint.ValueConverters"
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600"
              Background="WhiteSmoke">
+    <UserControl.Resources>
+        <Style x:Key="ReportButtonsAppear" TargetType="{x:Type StackPanel}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=IsVisible}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                             From="0.1" To="1" Duration="0:0:1" />
+                                <DoubleAnimation Storyboard.TargetProperty="Height"
+                                             From="0" To="31" Duration="0:0:1" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Label Grid.Row="0" Content="Got it! Preview and adjust your report" Style="{DynamicResource StepHeader}" />
         <Grid Grid.Row="1">
             <WebBrowser x:Name="browser" />
+        </Grid>
+        <Grid Grid.Row="2">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0"
+                        Style="{StaticResource ReportButtonsAppear}"
+                        Visibility="{Binding OutputFilePath, Converter={valueConverters:StringNullOrEmptyToVisibilityConverter}}">
+                <Button Content="Open Report" Click="OpenReport_OnClick" />
+                <Button Content="Open containing folder" Click="OpenContainingFolder_OnClick" />
+                <Button Content="Copy report path to clipboard" Click="CopyPath_OnClick" />
+            </StackPanel>
         </Grid>
     </Grid>
 </UserControl>

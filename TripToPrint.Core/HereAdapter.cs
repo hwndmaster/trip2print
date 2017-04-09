@@ -1,99 +1,160 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Device.Location;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
+
+using Newtonsoft.Json;
+
 using TripToPrint.Core.Models;
 
 namespace TripToPrint.Core
 {
     public interface IHereAdapter
     {
-        Task<byte[]> FetchImage(MooiPlacemark placemark);
+        Task<byte[]> FetchThumbnail(MooiPlacemark placemark);
         Task<byte[]> FetchOverviewMap(MooiGroup group);
     }
 
     public class HereAdapter : IHereAdapter
     {
-        private const string ROOT_URL = "https://image.maps.api.here.com/mia/1.6";
-        private const string MAPVIEW_URL = ROOT_URL + "/mapview?";
-        private const string ROUTE_URL = ROOT_URL + "/route?";
-        private const int TOO_MUCH_OF_COORDINATE_POINTS = 400;
+        private const string IMAGES_ROOT_URL = "https://image.maps.api.here.com/mia/1.6";
+        internal const string IMAGES_MAPVIEW_URL = IMAGES_ROOT_URL + "/mapview?";
+        internal const string IMAGES_ROUTE_URL = IMAGES_ROOT_URL + "/route?";
+        internal const string IMAGES_ROUTE_ROUTE_PARAM_NAME = "r0";
+        internal const string IMAGES_ROUTE_POINT_PARAM_NAME = "m0";
+
+        private const string PLACES_ROOT_URL = "https://places.demo.api.here.com/places/v1";
+        internal const string PLACES_DISCOVER_URL = PLACES_ROOT_URL + "/discover/search?";
+
+        internal const string APP_ID_PARAM_NAME = "app_id";
+        internal const string APP_CODE_PARAM_NAME = "app_code";
+
+        internal const int TOO_MUCH_OF_COORDINATE_POINTS = 400;
+        private const int MAX_COORDINATE_VALUE_PRECISION = 8;
+        private const int COORDINATE_PRECISION_ON_POINTS = 6;
+        private const int COORDINATE_PRECISION_ON_ROUTES = 4;
+        private const int OVERVIEW_MAP_WIDTH = 800;
+        private const int OVERVIEW_MAP_HEIGHT = 420;
+        private const int THUMBNAIL_MAP_ZOOM = 17;
 
         private readonly IWebClientService _webClient;
+        private readonly CultureAgnosticFormatter _formatter;
 
         public HereAdapter(IWebClientService webClient)
         {
             _webClient = webClient;
+            _formatter = new CultureAgnosticFormatter();
         }
 
-        public async Task<byte[]> FetchImage(MooiPlacemark placemark)
+        public async Task<byte[]> FetchThumbnail(MooiPlacemark placemark)
         {
             if (placemark.Type == PlacemarkType.Route)
             {
                 throw new NotSupportedException("Routes are not supported");
             }
 
-            var url = $"c={CreateStringForCoordinates(null, placemark)}&z=17";
+            var url = $"c={CreateStringForCoordinates(null, placemark)}&z={THUMBNAIL_MAP_ZOOM}";
 
-            return await DownloadData(MAPVIEW_URL, url);
+            return await DownloadData(IMAGES_MAPVIEW_URL, url);
         }
 
         public async Task<byte[]> FetchOverviewMap(MooiGroup group)
         {
-            var baseUrl = group.Type == GroupType.Routes ? ROUTE_URL : MAPVIEW_URL;
-            baseUrl = $"{baseUrl}w=800&h=420&sb=k";
+            var baseUrl = group.Type == GroupType.Routes ? IMAGES_ROUTE_URL : IMAGES_MAPVIEW_URL;
+            baseUrl = $"{baseUrl}w={OVERVIEW_MAP_WIDTH}&h={OVERVIEW_MAP_HEIGHT}&sb=k";
 
             var parameters = string.Empty;
             if (group.Type == GroupType.Routes)
             {
-                var route = group.Placemarks.Single(x => x.Type == PlacemarkType.Route);
+                var route = GetAndTrimRouteCoordinates(group);
+                var routeCoords = CreateStringForCoordinates(COORDINATE_PRECISION_ON_ROUTES, route);
 
-                string routeCoords;
-                if (route.Coordinates.Length > TOO_MUCH_OF_COORDINATE_POINTS)
-                {
-                    var factor = (double)route.Coordinates.Length / TOO_MUCH_OF_COORDINATE_POINTS;
-                    var coords = route.Coordinates
-                        .Select((coord, i) => new { rank = Math.Floor(i / factor), coord })
-                        .GroupBy(x => x.rank)
-                        .Select(x => x.First().coord);
-
-                    routeCoords = CreateStringForCoordinates(3, new MooiPlacemark { Coordinates = coords.ToArray() });
-                }
-                else
-                {
-                    routeCoords = CreateStringForCoordinates(4, route);
-                }
-                parameters += "&r0=" + routeCoords;
-
-                parameters += "&m0=" + CreateStringForCoordinates(6, group.Placemarks.Where(x => x.Type == PlacemarkType.Point).ToArray());
-
+                parameters += $"&{IMAGES_ROUTE_ROUTE_PARAM_NAME}={routeCoords}";
+                parameters += $"&{IMAGES_ROUTE_POINT_PARAM_NAME}=" + CreateStringForCoordinates(COORDINATE_PRECISION_ON_POINTS, group.Placemarks
+                                  .Where(x => x.Type == PlacemarkType.Point)
+                                  .Cast<IHaveCoordinates>()
+                                  .ToArray());
                 parameters += "&lc0=yellow&sc0=888888";
             }
             else
             {
-                var poi = CreateStringForCoordinates(null, group.Placemarks.ToArray());
+                var poi = CreateStringForCoordinates(null, group.Placemarks.Cast<IHaveCoordinates>().ToArray());
                 parameters += $"&poi={poi}&poitxc=black&poifc=yellow&poitxs=12";
             }
 
             return await DownloadData(baseUrl, parameters);
         }
 
-        private string CreateStringForCoordinates(int? precision, params MooiPlacemark[] placemarks)
+        public async Task<List<DiscoveredPlace>> LookupPlaces(KmlPlacemark placemark)
         {
-            var format = precision == null ? string.Empty : "0." + new string('0', precision.Value);
-            return string.Join(",", placemarks
-                .SelectMany(x => x.Coordinates)
-                .Select(x => $"{x.Latitude.ToString(format)},{x.Longitude.ToString(format)}")
-                .Distinct());
+            var coord = CreateStringForCoordinates(null, placemark);
+            var url = $"{PLACES_DISCOVER_URL}at={coord}&refinements=true&size=4&q=" + Uri.EscapeUriString(placemark.Name);
+
+            // Refer to: https://developer.here.com/rest-apis/documentation/places/topics_api/resource-search.html
+            var jsonValue = await DownloadString(url);
+            dynamic json = JsonConvert.DeserializeObject(jsonValue);
+
+            var discoveredPlaces = new List<DiscoveredPlace>();
+            foreach (var place in json.results.items)
+            {
+                discoveredPlaces.Add(new DiscoveredPlace {
+                    Title = (string)place.title,
+                    Coordinate = new GeoCoordinate(Convert.ToDouble(place.position[0]), Convert.ToDouble(place.position[1])),
+                    Address = (string)place.vicinity,
+                    AverageRating = Convert.ToDouble(place.averageRating),
+                    IconUrl = new Uri((string)place.icon),
+                    // TODO: ContactPhone = ???,
+                    // TODO: Website = ???,
+                });
+            }
+
+            return discoveredPlaces;
         }
 
-        private async Task<byte[]> DownloadData(string url, string parameters)
+        internal async Task<string> DownloadString(string url)
+        {
+            return await _webClient.GetStringAsync(new Uri(url + GetAppCodeUrlPart()));
+        }
+
+        internal async Task<byte[]> DownloadData(string url, string parameters)
         {
             return await _webClient.PostAsync(new Uri(url + GetAppCodeUrlPart()), parameters);
         }
 
+        internal IHaveCoordinates GetAndTrimRouteCoordinates(MooiGroup group)
+        {
+            var route = group.Placemarks.Single(x => x.Type == PlacemarkType.Route);
+
+            if (route.Coordinates.Length > TOO_MUCH_OF_COORDINATE_POINTS)
+            {
+                var factor = (double)route.Coordinates.Length / TOO_MUCH_OF_COORDINATE_POINTS;
+                var coords = route.Coordinates
+                    .Select((coord, i) => new { rank = Math.Floor(i / factor), coord })
+                    .GroupBy(x => x.rank)
+                    .Select(x => x.First().coord);
+
+                return new MooiPlacemark { Coordinates = coords.ToArray() };
+            }
+
+            return route;
+        }
+
+        private string CreateStringForCoordinates(int? precision, params IHaveCoordinates[] placemarks)
+        {
+            precision = precision ?? MAX_COORDINATE_VALUE_PRECISION;
+            return string.Join(",", placemarks
+                .SelectMany(x => x.Coordinates)
+                .Select(x => $"{_formatter.Format(x.Latitude, precision.Value)},{_formatter.Format(x.Longitude, precision.Value)}")
+                .Distinct());
+        }
+
         private string GetAppCodeUrlPart()
         {
-            return $"&app_id={Properties.Settings.Default.HereApiAppId}&app_code={Properties.Settings.Default.HereApiAppCode}";
+            var appId = Properties.Settings.Default.HereApiAppId;
+            var appCode = Properties.Settings.Default.HereApiAppCode;
+            return $"&{APP_ID_PARAM_NAME}={appId}&{APP_CODE_PARAM_NAME}={appCode}";
         }
     }
 }

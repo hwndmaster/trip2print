@@ -6,6 +6,6 @@ namespace TripToPrint.Core.Models
     {
         public string Title { get; set; }
         public string Description { get; set; }
-        public List<MooiSection> Sections { get; set; }
+        public List<MooiSection> Sections { get; } = new List<MooiSection>();
     }
 }

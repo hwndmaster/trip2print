@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace TripToPrint
+namespace TripToPrint.ValueConverters
 {
     public class EnumBooleanConverter : IValueConverter
     {
@@ -24,7 +24,7 @@ namespace TripToPrint
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             string parameterString = parameter as string;
-            if (parameterString == null)
+            if (parameterString == null || value.Equals(false))
                 return DependencyProperty.UnsetValue;
 
             return Enum.Parse(targetType, parameterString);

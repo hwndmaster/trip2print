@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Linq;
 using TripToPrint.Core.Models;
 
 namespace TripToPrint.Core.ModelFactories
@@ -21,16 +21,16 @@ namespace TripToPrint.Core.ModelFactories
         {
             var model = new MooiDocument {
                 Title = kmlDocument.Title,
-                Description = kmlDocument.Description,
-                Sections = new List<MooiSection>()
+                Description = kmlDocument.Description
             };
 
-            foreach (var folder in kmlDocument.Folders)
+            var foldersWithPlacemarks = kmlDocument.Folders.Where(x => x.Placemarks.Any());
+
+            foreach (var folder in foldersWithPlacemarks)
             {
                 var section = new MooiSection {
                     Document = model,
-                    Name = folder.Name,
-                    Groups = new List<MooiGroup>()
+                    Name = folder.Name
                 };
                 model.Sections.Add(section);
 

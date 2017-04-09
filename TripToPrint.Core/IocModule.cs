@@ -13,6 +13,7 @@ namespace TripToPrint.Core
             builder.RegisterType<HereAdapter>().As<IHereAdapter>();
             builder.RegisterType<GoogleMyMapAdapter>().As<IGoogleMyMapAdapter>();
             builder.RegisterType<ReportGenerator>().As<IReportGenerator>();
+            builder.RegisterType<KmlFileReader>().As<IKmlFileReader>();
             builder.RegisterType<ReportWriter>().As<IReportWriter>();
             builder.RegisterType<FileService>().As<IFileService>();
             builder.RegisterType<ZipService>().As<IZipService>();
@@ -23,7 +24,10 @@ namespace TripToPrint.Core
             builder.RegisterType<LogStorage>().As<ILogStorage>().SingleInstance();
             builder.RegisterType<Logger>().As<ILogger>();
 
-            // Module Factories
+            // Class Factories
+            builder.RegisterType<ProgressTrackerFactory>().As<IProgressTrackerFactory>();
+
+            // Model Factories
             builder.RegisterType<KmlDocumentFactory>().As<IKmlDocumentFactory>();
             builder.RegisterType<MooiDocumentFactory>().As<IMooiDocumentFactory>();
             builder.RegisterType<MooiGroupFactory>().As<IMooiGroupFactory>();

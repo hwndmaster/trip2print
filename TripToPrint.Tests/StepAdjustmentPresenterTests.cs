@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Threading.Tasks;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TripToPrint.Core;
 using TripToPrint.Presenters;
@@ -15,6 +17,8 @@ namespace TripToPrint.Tests
         private readonly Mock<IDialogService> _dialogServiceMock = new Mock<IDialogService>();
         private readonly Mock<IResourceNameProvider> _resourceNameMock = new Mock<IResourceNameProvider>();
         private readonly Mock<IReportGenerator> _reportGeneratorMock = new Mock<IReportGenerator>();
+        private readonly Mock<IFileService> _fileServiceMock = new Mock<IFileService>();
+        private readonly Mock<IUserSession> _userSessionMock = new Mock<IUserSession>();
 
         private Mock<StepAdjustmentPresenter> _presenter;
 
@@ -24,7 +28,9 @@ namespace TripToPrint.Tests
             _presenter = new Mock<StepAdjustmentPresenter>(
                 _dialogServiceMock.Object,
                 _resourceNameMock.Object,
-                _reportGeneratorMock.Object) {
+                _reportGeneratorMock.Object,
+                _fileServiceMock.Object,
+                _userSessionMock.Object) {
                 CallBase = true
             };
         }
@@ -43,39 +49,105 @@ namespace TripToPrint.Tests
         }
 
         [TestMethod]
-        public void When_step_is_activated_the_report_preview_is_set()
+        public async Task When_step_is_activated_the_report_preview_is_set()
         {
             // Arrange
+            CreateViewModel();
+            _userSessionMock.SetupGet(x => x.GeneratedReportTempPath).Returns("temp-path");
             _presenter.SetupGet(x => x.View).Returns(_viewMock.Object);
-            _presenter.SetupGet(x => x.ViewModel).Returns(new StepAdjustmentViewModel {
-                TempPath = "temp-path"
-            });
             _resourceNameMock.Setup(x => x.GetDefaultHtmlReportName()).Returns("default");
 
             // Act
-            _presenter.Object.Activated().GetAwaiter().GetResult();
+            await _presenter.Object.Activated();
 
             // Verify
             _viewMock.Verify(x => x.SetAddress(@"temp-path\default"), Times.Once);
         }
 
         [TestMethod]
-        public void When_going_next_the_user_is_asked_to_select_output_file_and_pdf_is_generated()
+        public async Task When_going_next_the_user_is_asked_to_select_output_file_and_pdf_is_generated()
         {
             // Arrange
-            _presenter.SetupGet(x => x.ViewModel).Returns(new StepAdjustmentViewModel {
-                InputUri = "input.kmz",
-                TempPath = "temp-path"
-            });
-            _dialogServiceMock.Setup(x => x.AskUserToSaveFile(It.IsAny<string>(), "input.pdf", It.IsAny<string[]>()))
-                .Returns("output-filename.pdf");
+            var vm = CreateViewModel();
+            _userSessionMock.SetupGet(x => x.InputUri).Returns("input.kmz");
+            _userSessionMock.SetupGet(x => x.GeneratedReportTempPath).Returns("temp-path");
+            SetupDialogServiceAskUserToSaveFile("input.pdf", "output-filename.pdf");
+            _reportGeneratorMock.Setup(x => x.SaveHtmlReportAsPdf("temp-path", "output-filename.pdf"))
+                .Returns(Task.FromResult(true));
 
             // Act
-            var result = _presenter.Object.BeforeGoNext().GetAwaiter().GetResult();
+            var result = await _presenter.Object.BeforeGoNext();
 
             // Verify
             Assert.AreEqual(false, result);
             _reportGeneratorMock.Verify(x => x.SaveHtmlReportAsPdf("temp-path", "output-filename.pdf"));
+            Assert.AreEqual("output-filename.pdf", vm.OutputFilePath);
+        }
+
+        [TestMethod]
+        public async Task When_going_next_and_user_is_asked_to_select_output_file_but_cancelled_the_report_isnt_generated()
+        {
+            // Arrange
+            var vm = CreateViewModel(outputFilePath: "output-filepath");
+            _userSessionMock.SetupGet(x => x.InputUri).Returns("input.kmz");
+            _userSessionMock.SetupGet(x => x.GeneratedReportTempPath).Returns("temp-path");
+            SetupDialogServiceAskUserToSaveFile("input.pdf", null);
+
+            // Act
+            var result = await _presenter.Object.BeforeGoNext();
+
+            // Verify
+            Assert.AreEqual(false, result);
+            _reportGeneratorMock.Verify(x => x.SaveHtmlReportAsPdf("temp-path", "output-filename.pdf"), Times.Never);
+            Assert.AreEqual(null, vm.OutputFilePath);
+        }
+
+        [TestMethod]
+        public async Task When_going_next_and_saving_to_pdf_has_failed_an_error_message_is_displayed()
+        {
+            // Arrange
+            var vm = CreateViewModel();
+            _userSessionMock.SetupGet(x => x.InputUri).Returns("input.kmz");
+            _userSessionMock.SetupGet(x => x.GeneratedReportTempPath).Returns("temp-path");
+            SetupDialogServiceAskUserToSaveFile("input.pdf", "output-filename.pdf");
+            _reportGeneratorMock.Setup(x => x.SaveHtmlReportAsPdf("temp-path", "output-filename.pdf"))
+                .Returns(Task.FromResult(false));
+
+            // Act
+            var result = await _presenter.Object.BeforeGoNext();
+
+            // Verify
+            Assert.AreEqual(false, result);
+            _dialogServiceMock.Verify(x => x.InvalidOperationMessage(It.IsAny<string>()));
+            Assert.AreEqual(null, vm.OutputFilePath);
+        }
+
+        [TestMethod]
+        public async Task When_going_back_the_output_filepath_is_cleared()
+        {
+            // Arrange
+            var vm = CreateViewModel(outputFilePath: "something");
+
+            // Act
+            await _presenter.Object.BeforeGoBack();
+
+            // Verify
+            Assert.AreEqual(null, vm.OutputFilePath);
+        }
+
+        private StepAdjustmentViewModel CreateViewModel(string outputFilePath = null)
+        {
+            var vm = new StepAdjustmentViewModel {
+                OutputFilePath = outputFilePath
+            };
+            _presenter.SetupGet(x => x.ViewModel).Returns(vm);
+            return vm;
+        }
+
+        private void SetupDialogServiceAskUserToSaveFile(string fileName, string outputFilename)
+        {
+            _dialogServiceMock.Setup(x => x.AskUserToSaveFile(It.IsAny<string>(), fileName, It.IsAny<string[]>()))
+                .Returns(outputFilename);
         }
     }
 }

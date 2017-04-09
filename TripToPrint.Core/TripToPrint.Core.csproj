@@ -30,12 +30,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac, Version=4.3.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autofac.4.3.0\lib\net45\Autofac.dll</HintPath>
+    <Reference Include="Autofac, Version=4.4.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.4.0\lib\net45\Autofac.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -52,10 +56,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CultureAgnosticFormatter.cs" />
     <Compile Include="FileService.cs" />
     <Compile Include="GoogleMyMapAdapter.cs" />
     <Compile Include="HereAdapter.cs" />
     <Compile Include="IocModule.cs" />
+    <Compile Include="KmlFileReader.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Logging\LogItem.cs" />
     <Compile Include="Logging\LogSeverity.cs" />
@@ -63,16 +69,20 @@
     <Compile Include="ModelFactories\KmlDocumentFactory.cs" />
     <Compile Include="ModelFactories\MooiDocumentFactory.cs" />
     <Compile Include="ModelFactories\MooiGroupFactory.cs" />
+    <Compile Include="Models\DiscoveredPlace.cs" />
+    <Compile Include="Models\IKmlElement.cs" />
     <Compile Include="Models\KmlExtendedData.cs" />
     <Compile Include="Models\KmlDocument.cs" />
     <Compile Include="Models\KmlFolder.cs" />
     <Compile Include="Models\KmlPlacemark.cs" />
+    <Compile Include="Models\KmlResource.cs" />
     <Compile Include="Models\MooiDocument.cs" />
     <Compile Include="Models\MooiGroup.cs" />
     <Compile Include="Models\MooiPlacemark.cs" />
     <Compile Include="Models\MooiSection.cs" />
     <Compile Include="PdfConvert.cs" />
     <Compile Include="ProgressTracker.cs" />
+    <Compile Include="ProgressTrackerFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>

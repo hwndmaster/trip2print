@@ -1,6 +1,8 @@
-﻿using System;
+﻿using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 
 using TripToPrint.Core;
 using TripToPrint.Services;
@@ -11,6 +13,9 @@ namespace TripToPrint.Presenters
 {
     public interface IStepAdjustmentPresenter : IPresenter<StepAdjustmentViewModel, IStepAdjustmentView>, IStepPresenter
     {
+        void OpenReport();
+        void OpenReportContainingFolder();
+        void CopyReportPathToClipboard();
     }
 
     public class StepAdjustmentPresenter : IStepAdjustmentPresenter
@@ -18,17 +23,21 @@ namespace TripToPrint.Presenters
         private readonly IDialogService _dialogService;
         private readonly IResourceNameProvider _resourceName;
         private readonly IReportGenerator _reportGenerator;
+        private readonly IUserSession _userSession;
+        private readonly IFileService _file;
 
-        public StepAdjustmentPresenter(IDialogService dialogService, IResourceNameProvider resourceName, IReportGenerator reportGenerator)
+        public StepAdjustmentPresenter(IDialogService dialogService, IResourceNameProvider resourceName,
+            IReportGenerator reportGenerator, IFileService file, IUserSession userSession)
         {
             _dialogService = dialogService;
             _resourceName = resourceName;
             _reportGenerator = reportGenerator;
+            _file = file;
+            _userSession = userSession;
         }
 
         public virtual IStepAdjustmentView View { get; private set; }
         public virtual StepAdjustmentViewModel ViewModel { get; private set; }
-        public event EventHandler GoNextRequested;
 
         public void InitializePresenter(IStepAdjustmentView view, StepAdjustmentViewModel viewModel = null)
         {
@@ -40,29 +49,39 @@ namespace TripToPrint.Presenters
 
         public Task Activated()
         {
-            View.SetAddress(Path.Combine(ViewModel.TempPath, _resourceName.GetDefaultHtmlReportName()));
+            View.SetAddress(Path.Combine(_userSession.GeneratedReportTempPath, _resourceName.GetDefaultHtmlReportName()));
 
             return Task.CompletedTask;
         }
 
-        public bool BeforeToGoBack()
+        public Task<bool> BeforeGoBack()
         {
-            return true;
+            ViewModel.OutputFilePath = null;
+
+            return Task.FromResult(true);
         }
 
-        public Task<bool> BeforeGoNext()
+        public async Task<bool> BeforeGoNext()
         {
+            ViewModel.OutputFilePath = null;
+
             var outputFileName = GetDesiredOutputFileName();
             outputFileName = _dialogService.AskUserToSaveFile("Save output to a file",
                 $"{outputFileName}.pdf", new[] { "PDF files (*.pdf)|*.pdf" });
             if (outputFileName == null)
             {
-                return Task.FromResult(false);
+                return false;
             }
 
-            _reportGenerator.SaveHtmlReportAsPdf(ViewModel.TempPath, outputFileName);
+            if (!await _reportGenerator.SaveHtmlReportAsPdf(_userSession.GeneratedReportTempPath, outputFileName))
+            {
+                await _dialogService.InvalidOperationMessage("An error occurred during report create. Try to save a file to another folder or using another name (For example, with Latin symbols only).");
+                return false;
+            }
 
-            return Task.FromResult(false);
+            ViewModel.OutputFilePath = outputFileName;
+
+            return false;
         }
 
         public void GetBackNextTitles(ref string back, ref string next)
@@ -70,25 +89,55 @@ namespace TripToPrint.Presenters
             next = "Create report";
         }
 
-        // TODO: Use this method on the last wizard step
-        /*public void OpenReport()
+        public void OpenReport()
         {
-            Process.Start(ViewModel.OutputFileName);
-        }*/
+            if (ValidateReportToOpen())
+            {
+                Process.Start(ViewModel.OutputFilePath);
+            }
+        }
 
-        // TODO: Use this method on the last wizard step
-        /*public void OpenReportContainingFolder()
+        public void OpenReportContainingFolder()
         {
-            string argument = "/select, \"" + ViewModel.OutputFileName + "\"";
-            Process.Start("explorer.exe", argument);
-        }*/
+            if (ValidateReportToOpen())
+            {
+                string argument = "/select, \"" + ViewModel.OutputFilePath + "\"";
+                Process.Start("explorer.exe", argument);
+            }
+        }
+
+        public void CopyReportPathToClipboard()
+        {
+            if (ValidateReportToOpen())
+            {
+                Clipboard.SetText(ViewModel.OutputFilePath, TextDataFormat.UnicodeText);
+            }
+        }
 
         private string GetDesiredOutputFileName()
         {
-            if (ViewModel.InputSource == InputSource.LocalFile)
-                return Path.GetFileNameWithoutExtension(ViewModel.InputUri);
+            if (_userSession.InputSource == InputSource.LocalFile)
+                return Path.GetFileNameWithoutExtension(_userSession.InputUri);
+
+            // TODO: cover with unit tests
+            string fileName = _userSession.Document.Title ?? "";
+            Path.GetInvalidFileNameChars().ToList().ForEach(c => fileName = fileName.Replace(c.ToString(), ""));
+            if (fileName.Length > 0)
+                return fileName;
 
             return null;
+        }
+
+        private bool ValidateReportToOpen()
+        {
+            if (_file.Exists(ViewModel.OutputFilePath))
+            {
+                return true;
+            }
+
+            ViewModel.OutputFilePath = null;
+            _dialogService.InvalidOperationMessage("A report no longer exists on the local disk. Please re-create it again.");
+            return false;
         }
     }
 }

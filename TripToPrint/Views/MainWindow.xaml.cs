@@ -10,6 +10,7 @@ namespace TripToPrint.Views
     public interface IMainWindowView : IView<IMainWindowPresenter>
     {
         IStepIntroView StepIntroView { get; }
+        IStepSettingView StepSettingView { get; }
         IStepGenerationView StepGenerationView { get; }
         IStepAdjustmentView StepAdjustmentView { get; }
 
@@ -25,6 +26,7 @@ namespace TripToPrint.Views
 
         public IMainWindowPresenter Presenter { get; set; }
         public IStepIntroView StepIntroView => stepIntro;
+        public IStepSettingView StepSettingView => stepSetting;
         public IStepGenerationView StepGenerationView => stepGeneration;
         public IStepAdjustmentView StepAdjustmentView => stepAdjustment;
 
