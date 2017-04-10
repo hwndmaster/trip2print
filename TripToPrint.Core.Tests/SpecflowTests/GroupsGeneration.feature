@@ -47,7 +47,7 @@ Scenario: For two groups: 4 + 3 placemarks
         | 1           | Restaurante El Chamo @ La Escalona   |
         | 1           | Tandem Paragliding @ Adeje           |
 
-@unclear		
+# https://www.google.com/maps/d/edit?mid=1i0u_BVrVmpGs7fcLZvUQLuVN1mk	
 Scenario: For two groups: 8 + 1 placemarks
 	Given I have these placemarks in my folder:
          | Longitude | Latitude  | Name |
@@ -62,27 +62,18 @@ Scenario: For two groups: 8 + 1 placemarks
          | 28.54533  | -16.22867 | 9    |
 	Then these placemarks will be assigned to the following groups:
          | Group Index | Name |
-         | 1           | 1    |
-         | 1           | 2    |
-         | 1           | 3    |
+		 | 0           | 1    |
+         | 0           | 2    |
+         | 0           | 3    |
          | 0           | 4    |
          | 0           | 5    |
          | 0           | 6    |
          | 0           | 7    |
          | 0           | 8    |
-         | 0           | 9    |
-		 #| 0           | 1    |
-         #| 0           | 2    |
-         #| 0           | 3    |
-         #| 0           | 4    |
-         #| 0           | 5    |
-         #| 0           | 6    |
-         #| 0           | 7    |
-         #| 0           | 8    |
-         #| 1           | 9    |
+         | 1           | 9    |
 
-@unclear
-Scenario: For three group: 4 + 5 + 1
+# https://www.google.com/maps/d/edit?mid=1kN2tOqZTnGJJuB98R0LjRrqeclw
+Scenario: For three groups: 4 + 5 + 1
 	Given I have these placemarks in my folder:
          | Longitude | Latitude  | Name |
 		 | 28.47526  | -16.41868 | 1    |
@@ -97,7 +88,7 @@ Scenario: For three group: 4 + 5 + 1
 		 | 28.49947  | -16.40842 | 10   |
 	Then these placemarks will be assigned to the following groups:
          | Group Index | Name |
-         | 1           | 1    |
+	     | 1           | 1    |
          | 1           | 2    |
          | 1           | 3    |
          | 0           | 4    |
@@ -105,15 +96,5 @@ Scenario: For three group: 4 + 5 + 1
          | 0           | 6    |
          | 0           | 7    |
          | 0           | 8    |
-         | 0           | 9    |
+         | 2           | 9    |
          | 1           | 10   |
-	     #| 1           | 1    |
-         #| 1           | 2    |
-         #| 1           | 3    |
-         #| 0           | 4    |
-         #| 0           | 5    |
-         #| 0           | 6    |
-         #| 0           | 7    |
-         #| 0           | 8    |
-         #| 2           | 9    |
-         #| 1           | 10   |

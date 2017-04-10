@@ -243,11 +243,9 @@ this.ScenarioSetup(scenarioInfo);
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
         [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("For two groups: 8 + 1 placemarks")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Groups Generation")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("unclear")]
         public virtual void ForTwoGroups81Placemarks()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("For two groups: 8 + 1 placemarks", new string[] {
-                        "unclear"});
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("For two groups: 8 + 1 placemarks", ((string[])(null)));
 #line 51
 this.ScenarioSetup(scenarioInfo);
 #line hidden
@@ -298,13 +296,13 @@ this.ScenarioSetup(scenarioInfo);
                         "Group Index",
                         "Name"});
             table8.AddRow(new string[] {
-                        "1",
+                        "0",
                         "1"});
             table8.AddRow(new string[] {
-                        "1",
+                        "0",
                         "2"});
             table8.AddRow(new string[] {
-                        "1",
+                        "0",
                         "3"});
             table8.AddRow(new string[] {
                         "0",
@@ -322,7 +320,7 @@ this.ScenarioSetup(scenarioInfo);
                         "0",
                         "8"});
             table8.AddRow(new string[] {
-                        "0",
+                        "1",
                         "9"});
 #line 63
  testRunner.Then("these placemarks will be assigned to the following groups:", ((string)(null)), table8, "Then ");
@@ -331,14 +329,12 @@ this.ScenarioSetup(scenarioInfo);
         }
         
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("For three group: 4 + 5 + 1")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("For three groups: 4 + 5 + 1")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Groups Generation")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute("unclear")]
-        public virtual void ForThreeGroup451()
+        public virtual void ForThreeGroups451()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("For three group: 4 + 5 + 1", new string[] {
-                        "unclear"});
-#line 85
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("For three groups: 4 + 5 + 1", ((string[])(null)));
+#line 76
 this.ScenarioSetup(scenarioInfo);
 #line hidden
             TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
@@ -385,7 +381,7 @@ this.ScenarioSetup(scenarioInfo);
                         "28.49947",
                         "-16.40842",
                         "10"});
-#line 86
+#line 77
  testRunner.Given("I have these placemarks in my folder:", ((string)(null)), table9, "Given ");
 #line hidden
             TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
@@ -416,12 +412,12 @@ this.ScenarioSetup(scenarioInfo);
                         "0",
                         "8"});
             table10.AddRow(new string[] {
-                        "0",
+                        "2",
                         "9"});
             table10.AddRow(new string[] {
                         "1",
                         "10"});
-#line 98
+#line 89
  testRunner.Then("these placemarks will be assigned to the following groups:", ((string)(null)), table10, "Then ");
 #line hidden
             this.ScenarioCleanup();
