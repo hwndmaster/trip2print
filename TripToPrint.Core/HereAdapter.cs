@@ -91,7 +91,12 @@ namespace TripToPrint.Core
             else
             {
                 var poi = CreateStringForCoordinates(null, group.Placemarks.Cast<IHaveCoordinates>().ToArray());
-                parameters += $"&poi={poi}&poitxc=black&poifc=yellow&poitxs=12";
+                parameters += $"&poi={poi}&poitxc=black&poifc=yellow&poitxs=15";
+
+                if (group.Placemarks.Count == 1)
+                {
+                    parameters += "&z=14";
+                }
             }
 
             return await DownloadData(baseUrl, parameters);

@@ -31,7 +31,7 @@ namespace TripToPrint.Core.ModelFactories
 
             var placemarksConverted = folder.Placemarks
                 .Select(x => ConvertKmlPlacemarkToMooiPlacemark(x,
-                discoveredPlacePerPlacemark?.ContainsKey(x) == true ? discoveredPlacePerPlacemark[x] : null))
+                    discoveredPlacePerPlacemark?.ContainsKey(x) == true ? discoveredPlacePerPlacemark[x] : null))
                 .ToList();
 
             if (placemarksConverted.Count <= MIN_GROUP_COUNT)
@@ -76,7 +76,10 @@ namespace TripToPrint.Core.ModelFactories
 
                 foreach (var pm in placemarksToProcess.Skip(1).ToList())
                 {
-                    if (currentGroup.Placemarks.Any(x => x == pm.Placemark || x == pm.NeighborWithMinDistance.Placemark))
+                    if (currentGroup.Placemarks.Any(x => x == pm.Placemark
+                        || x == pm.NeighborWithMinDistance.Placemark
+                        || pm.Neighbors.Any(n => n.Placemark == x && pm.NeighborWithMinDistance.AllowedDistance > n.Distance)
+                        ))
                     {
                         if (currentGroup.Placemarks.Count >= MIN_GROUP_COUNT)
                         {
@@ -196,8 +199,8 @@ namespace TripToPrint.Core.ModelFactories
                     break;
                 }
 
-                if (groupToMerge.Placemarks.Count == MIN_GROUP_COUNT - 1
-                    && groupForMerge.group.Placemarks.Count >= MIN_GROUP_COUNT)
+                if (groupForMerge.group.Placemarks.Count >= MIN_GROUP_COUNT)
+                    //&& groupToMerge.Placemarks.Count == MIN_GROUP_COUNT - 1)
                 {
                     var dist1 = CalculateDistances(groupForMerge.group, groupForMerge.group).Max();
 
