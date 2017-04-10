@@ -68,11 +68,11 @@ namespace TripToPrint.Core.Tests.SpecflowTests
         }
         
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Scenario for two groups: 4 + 3 placemarks")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("A single group: 1 placemark")]
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Groups Generation")]
-        public virtual void ScenarioForTwoGroups43Placemarks()
+        public virtual void ASingleGroup1Placemark()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Scenario for two groups: 4 + 3 placemarks", ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A single group: 1 placemark", ((string[])(null)));
 #line 4
 this.ScenarioSetup(scenarioInfo);
 #line hidden
@@ -81,33 +81,9 @@ this.ScenarioSetup(scenarioInfo);
                         "Latitude",
                         "Name"});
             table1.AddRow(new string[] {
-                        "28.0552",
-                        "-16.73494",
-                        "Restaurante La Gula @ Los Cristianos"});
-            table1.AddRow(new string[] {
-                        "28.05622",
-                        "-16.72488",
-                        "El Aderno @ Los Cristianos"});
-            table1.AddRow(new string[] {
-                        "28.05273",
-                        "-16.71508",
-                        "Panaria @ Los Cristianos"});
-            table1.AddRow(new string[] {
-                        "28.05145",
-                        "-16.72196",
-                        "El Pincho @ Los Cristianos"});
-            table1.AddRow(new string[] {
-                        "28.03397",
-                        "-16.6412",
-                        "La Dulce Emilia @ Guargacho"});
-            table1.AddRow(new string[] {
-                        "28.11924",
-                        "-16.67092",
-                        "Restaurante El Chamo @ La Escalona"});
-            table1.AddRow(new string[] {
-                        "28.12183",
-                        "-16.7406",
-                        "Tandem Paragliding @ Adeje"});
+                        "45.91142",
+                        "10.8345",
+                        "1"});
 #line 5
  testRunner.Given("I have these placemarks in my folder:", ((string)(null)), table1, "Given ");
 #line hidden
@@ -116,27 +92,333 @@ this.ScenarioSetup(scenarioInfo);
                         "Name"});
             table2.AddRow(new string[] {
                         "0",
+                        "1"});
+#line 8
+ testRunner.Then("these placemarks will be assigned to the following groups:", ((string)(null)), table2, "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("A single group: 6 placemark")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Groups Generation")]
+        public virtual void ASingleGroup6Placemark()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A single group: 6 placemark", ((string[])(null)));
+#line 12
+this.ScenarioSetup(scenarioInfo);
+#line hidden
+            TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Longitude",
+                        "Latitude",
+                        "Name"});
+            table3.AddRow(new string[] {
+                        "28.55633",
+                        "-16.3357",
+                        "1"});
+            table3.AddRow(new string[] {
+                        "28.54533",
+                        "-16.22867",
+                        "2"});
+            table3.AddRow(new string[] {
+                        "28.50945",
+                        "-16.18511",
+                        "3"});
+            table3.AddRow(new string[] {
+                        "28.48714",
+                        "-16.31343",
+                        "4"});
+            table3.AddRow(new string[] {
+                        "28.48649",
+                        "-16.31535",
+                        "5"});
+            table3.AddRow(new string[] {
+                        "28.49828",
+                        "-16.37672",
+                        "6"});
+#line 13
+ testRunner.Given("I have these placemarks in my folder:", ((string)(null)), table3, "Given ");
+#line hidden
+            TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Group Index",
+                        "Name"});
+            table4.AddRow(new string[] {
+                        "0",
+                        "1"});
+            table4.AddRow(new string[] {
+                        "0",
+                        "2"});
+            table4.AddRow(new string[] {
+                        "0",
+                        "3"});
+            table4.AddRow(new string[] {
+                        "0",
+                        "4"});
+            table4.AddRow(new string[] {
+                        "0",
+                        "5"});
+            table4.AddRow(new string[] {
+                        "0",
+                        "6"});
+#line 21
+ testRunner.Then("these placemarks will be assigned to the following groups:", ((string)(null)), table4, "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("For two groups: 4 + 3 placemarks")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Groups Generation")]
+        public virtual void ForTwoGroups43Placemarks()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("For two groups: 4 + 3 placemarks", ((string[])(null)));
+#line 30
+this.ScenarioSetup(scenarioInfo);
+#line hidden
+            TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Longitude",
+                        "Latitude",
+                        "Name"});
+            table5.AddRow(new string[] {
+                        "28.0552",
+                        "-16.73494",
                         "Restaurante La Gula @ Los Cristianos"});
-            table2.AddRow(new string[] {
+            table5.AddRow(new string[] {
+                        "28.05622",
+                        "-16.72488",
+                        "El Aderno @ Los Cristianos"});
+            table5.AddRow(new string[] {
+                        "28.05273",
+                        "-16.71508",
+                        "Panaria @ Los Cristianos"});
+            table5.AddRow(new string[] {
+                        "28.05145",
+                        "-16.72196",
+                        "El Pincho @ Los Cristianos"});
+            table5.AddRow(new string[] {
+                        "28.03397",
+                        "-16.6412",
+                        "La Dulce Emilia @ Guargacho"});
+            table5.AddRow(new string[] {
+                        "28.11924",
+                        "-16.67092",
+                        "Restaurante El Chamo @ La Escalona"});
+            table5.AddRow(new string[] {
+                        "28.12183",
+                        "-16.7406",
+                        "Tandem Paragliding @ Adeje"});
+#line 31
+ testRunner.Given("I have these placemarks in my folder:", ((string)(null)), table5, "Given ");
+#line hidden
+            TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Group Index",
+                        "Name"});
+            table6.AddRow(new string[] {
+                        "0",
+                        "Restaurante La Gula @ Los Cristianos"});
+            table6.AddRow(new string[] {
                         "0",
                         "El Aderno @ Los Cristianos"});
-            table2.AddRow(new string[] {
+            table6.AddRow(new string[] {
                         "0",
                         "Panaria @ Los Cristianos"});
-            table2.AddRow(new string[] {
+            table6.AddRow(new string[] {
                         "0",
                         "El Pincho @ Los Cristianos"});
-            table2.AddRow(new string[] {
+            table6.AddRow(new string[] {
                         "1",
                         "La Dulce Emilia @ Guargacho"});
-            table2.AddRow(new string[] {
+            table6.AddRow(new string[] {
                         "1",
                         "Restaurante El Chamo @ La Escalona"});
-            table2.AddRow(new string[] {
+            table6.AddRow(new string[] {
                         "1",
                         "Tandem Paragliding @ Adeje"});
-#line 14
- testRunner.Then("these placemarks will be assigned to the following groups:", ((string)(null)), table2, "Then ");
+#line 40
+ testRunner.Then("these placemarks will be assigned to the following groups:", ((string)(null)), table6, "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("For two groups: 8 + 1 placemarks")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Groups Generation")]
+        public virtual void ForTwoGroups81Placemarks()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("For two groups: 8 + 1 placemarks", ((string[])(null)));
+#line 51
+this.ScenarioSetup(scenarioInfo);
+#line hidden
+            TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Longitude",
+                        "Latitude",
+                        "Name"});
+            table7.AddRow(new string[] {
+                        "28.47526",
+                        "-16.41868",
+                        "1"});
+            table7.AddRow(new string[] {
+                        "28.46999",
+                        "-16.38628",
+                        "2"});
+            table7.AddRow(new string[] {
+                        "28.49828",
+                        "-16.37672",
+                        "3"});
+            table7.AddRow(new string[] {
+                        "28.48451",
+                        "-16.34342",
+                        "4"});
+            table7.AddRow(new string[] {
+                        "28.48649",
+                        "-16.31535",
+                        "5"});
+            table7.AddRow(new string[] {
+                        "28.48714",
+                        "-16.31343",
+                        "6"});
+            table7.AddRow(new string[] {
+                        "28.46661",
+                        "-16.31083",
+                        "7"});
+            table7.AddRow(new string[] {
+                        "28.46139",
+                        "-16.30462",
+                        "8"});
+            table7.AddRow(new string[] {
+                        "28.54533",
+                        "-16.22867",
+                        "9"});
+#line 52
+ testRunner.Given("I have these placemarks in my folder:", ((string)(null)), table7, "Given ");
+#line hidden
+            TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Group Index",
+                        "Name"});
+            table8.AddRow(new string[] {
+                        "0",
+                        "1"});
+            table8.AddRow(new string[] {
+                        "0",
+                        "2"});
+            table8.AddRow(new string[] {
+                        "0",
+                        "3"});
+            table8.AddRow(new string[] {
+                        "0",
+                        "4"});
+            table8.AddRow(new string[] {
+                        "0",
+                        "5"});
+            table8.AddRow(new string[] {
+                        "0",
+                        "6"});
+            table8.AddRow(new string[] {
+                        "0",
+                        "7"});
+            table8.AddRow(new string[] {
+                        "0",
+                        "8"});
+            table8.AddRow(new string[] {
+                        "1",
+                        "9"});
+#line 63
+ testRunner.Then("these placemarks will be assigned to the following groups:", ((string)(null)), table8, "Then ");
+#line hidden
+            this.ScenarioCleanup();
+        }
+        
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("For three groups: 4 + 5 + 1")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Groups Generation")]
+        public virtual void ForThreeGroups451()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("For three groups: 4 + 5 + 1", ((string[])(null)));
+#line 76
+this.ScenarioSetup(scenarioInfo);
+#line hidden
+            TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Longitude",
+                        "Latitude",
+                        "Name"});
+            table9.AddRow(new string[] {
+                        "28.47526",
+                        "-16.41868",
+                        "1"});
+            table9.AddRow(new string[] {
+                        "28.46999",
+                        "-16.38628",
+                        "2"});
+            table9.AddRow(new string[] {
+                        "28.49828",
+                        "-16.37672",
+                        "3"});
+            table9.AddRow(new string[] {
+                        "28.48451",
+                        "-16.34342",
+                        "4"});
+            table9.AddRow(new string[] {
+                        "28.48649",
+                        "-16.31535",
+                        "5"});
+            table9.AddRow(new string[] {
+                        "28.48714",
+                        "-16.31343",
+                        "6"});
+            table9.AddRow(new string[] {
+                        "28.46661",
+                        "-16.31083",
+                        "7"});
+            table9.AddRow(new string[] {
+                        "28.46139",
+                        "-16.30462",
+                        "8"});
+            table9.AddRow(new string[] {
+                        "28.54533",
+                        "-16.22867",
+                        "9"});
+            table9.AddRow(new string[] {
+                        "28.49947",
+                        "-16.40842",
+                        "10"});
+#line 77
+ testRunner.Given("I have these placemarks in my folder:", ((string)(null)), table9, "Given ");
+#line hidden
+            TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
+                        "Group Index",
+                        "Name"});
+            table10.AddRow(new string[] {
+                        "1",
+                        "1"});
+            table10.AddRow(new string[] {
+                        "1",
+                        "2"});
+            table10.AddRow(new string[] {
+                        "1",
+                        "3"});
+            table10.AddRow(new string[] {
+                        "0",
+                        "4"});
+            table10.AddRow(new string[] {
+                        "0",
+                        "5"});
+            table10.AddRow(new string[] {
+                        "0",
+                        "6"});
+            table10.AddRow(new string[] {
+                        "0",
+                        "7"});
+            table10.AddRow(new string[] {
+                        "0",
+                        "8"});
+            table10.AddRow(new string[] {
+                        "2",
+                        "9"});
+            table10.AddRow(new string[] {
+                        "1",
+                        "10"});
+#line 89
+ testRunner.Then("these placemarks will be assigned to the following groups:", ((string)(null)), table10, "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
