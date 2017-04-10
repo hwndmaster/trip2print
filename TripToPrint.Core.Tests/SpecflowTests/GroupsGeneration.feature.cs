@@ -77,8 +77,8 @@ namespace TripToPrint.Core.Tests.SpecflowTests
 this.ScenarioSetup(scenarioInfo);
 #line hidden
             TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Longitude",
                         "Latitude",
+                        "Longitude",
                         "Name"});
             table1.AddRow(new string[] {
                         "45.91142",
@@ -109,8 +109,8 @@ this.ScenarioSetup(scenarioInfo);
 this.ScenarioSetup(scenarioInfo);
 #line hidden
             TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Longitude",
                         "Latitude",
+                        "Longitude",
                         "Name"});
             table3.AddRow(new string[] {
                         "28.55633",
@@ -176,8 +176,8 @@ this.ScenarioSetup(scenarioInfo);
 this.ScenarioSetup(scenarioInfo);
 #line hidden
             TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Longitude",
                         "Latitude",
+                        "Longitude",
                         "Name"});
             table5.AddRow(new string[] {
                         "28.0552",
@@ -250,8 +250,8 @@ this.ScenarioSetup(scenarioInfo);
 this.ScenarioSetup(scenarioInfo);
 #line hidden
             TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Longitude",
                         "Latitude",
+                        "Longitude",
                         "Name"});
             table7.AddRow(new string[] {
                         "28.47526",
@@ -338,8 +338,8 @@ this.ScenarioSetup(scenarioInfo);
 this.ScenarioSetup(scenarioInfo);
 #line hidden
             TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Longitude",
                         "Latitude",
+                        "Longitude",
                         "Name"});
             table9.AddRow(new string[] {
                         "28.47526",
@@ -391,10 +391,10 @@ this.ScenarioSetup(scenarioInfo);
                         "1",
                         "1"});
             table10.AddRow(new string[] {
-                        "1",
+                        "0",
                         "2"});
             table10.AddRow(new string[] {
-                        "1",
+                        "0",
                         "3"});
             table10.AddRow(new string[] {
                         "0",
@@ -412,7 +412,7 @@ this.ScenarioSetup(scenarioInfo);
                         "0",
                         "8"});
             table10.AddRow(new string[] {
-                        "2",
+                        "1",
                         "9"});
             table10.AddRow(new string[] {
                         "1",
