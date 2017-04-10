@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -17,6 +18,7 @@ namespace TripToPrint.Views
         void Show();
     }
 
+    [ExcludeFromCodeCoverage]
     public partial class MainWindow : IMainWindowView
     {
         public MainWindow()

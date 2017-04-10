@@ -5,6 +5,8 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+
+using TripToPrint.Core.Logging;
 using TripToPrint.Core.Models;
 
 namespace TripToPrint.Core.Tests.UnitTests
@@ -12,6 +14,8 @@ namespace TripToPrint.Core.Tests.UnitTests
     [TestClass]
     public class HereAdapterTests
     {
+        private readonly Mock<ILogger> _loggerMock = new Mock<ILogger>();
+        private readonly Mock<IKmlCalculator> _kmlCalculatorMock = new Mock<IKmlCalculator>();
         private readonly Mock<IWebClientService> _webClientMock = new Mock<IWebClientService>();
 
         private Mock<HereAdapter> _here;
@@ -19,7 +23,12 @@ namespace TripToPrint.Core.Tests.UnitTests
         [TestInitialize]
         public void TestInitialize()
         {
-            _here = new Mock<HereAdapter>(_webClientMock.Object) { CallBase = true };
+            _here = new Mock<HereAdapter>(
+                _loggerMock.Object
+                , _kmlCalculatorMock.Object
+                , _webClientMock.Object) {
+                CallBase = true
+            };
         }
 
         [TestMethod]
@@ -28,7 +37,7 @@ namespace TripToPrint.Core.Tests.UnitTests
             // Arrange
             var placemark = new MooiPlacemark { Coordinates = new [] { new GeoCoordinate(1.11, 2.22) } };
             var bytesToMatch = SetupWebClient(uri => uri.AbsoluteUri.StartsWith(HereAdapter.IMAGES_MAPVIEW_URL),
-                p => p.Contains("1.11,2.22") && p.Contains("z=17"));
+                p => p.Contains("1.11,2.22") && p.Contains("z=18"));
 
             // Act
             var bytes = await _here.Object.FetchThumbnail(placemark);

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using TripToPrint.Core.Models;
 
@@ -5,7 +6,7 @@ namespace TripToPrint.Core.ModelFactories
 {
     public interface IMooiDocumentFactory
     {
-        MooiDocument Create(KmlDocument kmlDocument);
+        MooiDocument Create(KmlDocument kmlDocument, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark);
     }
 
     public class MooiDocumentFactory : IMooiDocumentFactory
@@ -17,7 +18,7 @@ namespace TripToPrint.Core.ModelFactories
             _mooiGroupFactory = mooiGroupFactory;
         }
 
-        public MooiDocument Create(KmlDocument kmlDocument)
+        public MooiDocument Create(KmlDocument kmlDocument, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark)
         {
             var model = new MooiDocument {
                 Title = kmlDocument.Title,
@@ -34,15 +35,15 @@ namespace TripToPrint.Core.ModelFactories
                 };
                 model.Sections.Add(section);
 
-                ExtractGroupsFromFolderIntoSection(folder, section);
+                ExtractGroupsFromFolderIntoSection(folder, section, discoveredPlacePerPlacemark);
             }
 
             return model;
         }
 
-        private void ExtractGroupsFromFolderIntoSection(KmlFolder folder, MooiSection section)
+        private void ExtractGroupsFromFolderIntoSection(KmlFolder folder, MooiSection section, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark)
         {
-            var groups = _mooiGroupFactory.CreateList(folder);
+            var groups = _mooiGroupFactory.CreateList(folder, discoveredPlacePerPlacemark);
             groups.ForEach(x => x.Section = section);
             section.Groups.AddRange(groups);
         }

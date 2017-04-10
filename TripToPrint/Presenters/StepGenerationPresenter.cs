@@ -31,7 +31,6 @@ namespace TripToPrint.Presenters
             _userSession = userSession;
         }
 
-
         public IStepGenerationView View { get; private set; }
         public virtual StepGenerationViewModel ViewModel { get; private set; }
         public virtual IMainWindowPresenter MainWindow { get; set; }
@@ -87,7 +86,9 @@ namespace TripToPrint.Presenters
             {
                 var progressTracker = _progressTrackerFactory.Create(value => ViewModel.ProgressInPercentage = value);
 
-                _userSession.GeneratedReportTempPath = await _reportGenerator.Generate(_userSession.Document, progressTracker);
+                _userSession.GeneratedReportTempPath = await _reportGenerator.Generate(_userSession.Document
+                    , _userSession.DiscoveredPlacePerPlacemark
+                    , progressTracker);
 
                 _logger.Info("Generation process complete");
 

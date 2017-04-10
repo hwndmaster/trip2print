@@ -5,51 +5,19 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TripToPrint.Views"
              xmlns:viewModels="clr-namespace:TripToPrint.ViewModels"
-             xmlns:attachedProperties="clr-namespace:TripToPrint.AttachedProperties"
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600"
+             d:DataContext="{d:DesignInstance {x:Type viewModels:StepSettingViewModel}, IsDesignTimeCreatable=True}"
              Background="WhiteSmoke">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid.InputBindings>
-            
-        </Grid.InputBindings>
         <Label Grid.Row="0" Content="Set up preferences for your report" Style="{DynamicResource StepHeader}" />
         <DockPanel Grid.Row="1" HorizontalAlignment="Stretch" LastChildFill="True">
             <Label Content="Select which folders, points, and directions you want to include:" DockPanel.Dock="Top" />
-            <TreeView ItemsSource="{Binding Path=FoldersToInclude, Mode=OneTime}" Name="kmlObjectsToIncludeTree">
-                <TreeView.ItemContainerStyle>
-                    <Style TargetType="{x:Type TreeViewItem}">
-                        <Setter Property="IsExpanded" Value="True"/>
-                        <Setter Property="FontSize" Value="14"/>
-                        <Setter Property="Margin" Value="0,2" />
-                        <Setter Property="attachedProperties:VirtualToggleButton.IsVirtualToggleButton" Value="True" />
-                        <Setter Property="attachedProperties:VirtualToggleButton.IsChecked" Value="{Binding Enabled}" />
-                    </Style>
-                </TreeView.ItemContainerStyle>
-                <TreeView.Resources>
-                    <HierarchicalDataTemplate 
-                        DataType="{x:Type viewModels:KmlFolderNodeViewModel}"
-                        ItemsSource="{Binding Children}">
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox IsChecked="{Binding Enabled}" IsTabStop="False" Focusable="False"/>
-                            <Image Width="20" Height="20" Margin="0,0,4,0" Source="/TripToPrint;component/Resources/KmlFolder.png" />
-                            <TextBlock Text="{Binding Name}" />
-                        </StackPanel>
-                    </HierarchicalDataTemplate>
-                    <HierarchicalDataTemplate 
-                        DataType="{x:Type viewModels:KmlPlacemarkNodeViewModel}">
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox IsChecked="{Binding Enabled}" IsTabStop="False" Focusable="False"/>
-                            <Image Width="20" Height="20" Margin="0,0,4,0" Source="/TripToPrint;component/Resources/KmlPlacemark.png" />
-                            <TextBlock Text="{Binding Name}" />
-                        </StackPanel>
-                    </HierarchicalDataTemplate>
-                </TreeView.Resources>
-            </TreeView>
+            <local:KmlObjectsTreeView x:Name="kmlObjectsTreeViewCtrl" DataContext="{Binding KmlObjectsTree}" />
         </DockPanel>
     </Grid>
 </UserControl>

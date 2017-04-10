@@ -61,7 +61,7 @@ namespace TripToPrint.Core.Tests.UnitTests
             _reportWriterMock.Setup(x => x.WriteReportAsync(It.IsAny<MooiDocument>())).Returns(Task.FromResult("content"));
 
             // Act
-            var result = await _reportGenerator.Object.Generate(document, _progressTrackerMock.Object);
+            var result = await _reportGenerator.Object.Generate(document, null, _progressTrackerMock.Object);
 
             // Verify
             Assert.IsTrue(result.StartsWith(Path.Combine(Path.GetTempPath(), _tempFolderName)));
@@ -79,7 +79,7 @@ namespace TripToPrint.Core.Tests.UnitTests
                 .Returns(Task.CompletedTask);
 
             // Act
-            await _reportGenerator.Object.Generate(document, _progressTrackerMock.Object);
+            await _reportGenerator.Object.Generate(document, null, _progressTrackerMock.Object);
 
             // Verify
             _progressTrackerMock.Verify(x => x.ReportResourceEntriesProcessed(), Times.Once);

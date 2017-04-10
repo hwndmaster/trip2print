@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
@@ -7,6 +8,7 @@ namespace TripToPrint.AttachedProperties
     /// <summary>
     /// Originally taken from https://www.codeproject.com/Articles/28306/Working-with-Checkboxes-in-the-WPF-TreeView
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class VirtualToggleButton
     {
         /// <summary>

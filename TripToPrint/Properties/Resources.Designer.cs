@@ -59,5 +59,14 @@ namespace TripToPrint.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load document.
+        /// </summary>
+        internal static string Error_FailedToLoadDocument {
+            get {
+                return ResourceManager.GetString("Error_FailedToLoadDocument", resourceCulture);
+            }
+        }
     }
 }

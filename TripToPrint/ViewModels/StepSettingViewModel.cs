@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 
 namespace TripToPrint.ViewModels
 {
@@ -21,7 +20,7 @@ namespace TripToPrint.ViewModels
             }
         }
 
-        public ObservableCollection<KmlObjectTreeNodeViewModel> FoldersToInclude { get; } = new ObservableCollection<KmlObjectTreeNodeViewModel>();
+        public KmlObjectsTreeViewModel KmlObjectsTree { get; } = new KmlObjectsTreeViewModel();
 
         public event EventHandler<string> InputFileNameChanged;
     }

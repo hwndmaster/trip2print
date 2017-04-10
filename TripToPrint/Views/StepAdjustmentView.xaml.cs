@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using TripToPrint.Presenters;
 
@@ -9,11 +10,14 @@ namespace TripToPrint.Views
         void SetAddress(string address);
     }
 
+    [ExcludeFromCodeCoverage]
     public partial class StepAdjustmentView : IStepAdjustmentView
     {
         public StepAdjustmentView()
         {
             InitializeComponent();
+
+            browser.Navigating += Browser_Navigating;
         }
 
         public IStepAdjustmentPresenter Presenter { get; set; }
@@ -36,6 +40,14 @@ namespace TripToPrint.Views
         private void CopyPath_OnClick(object sender, RoutedEventArgs e)
         {
             Presenter.CopyReportPathToClipboard();
+        }
+
+        private void Browser_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
+        {
+            if (!e.Uri.IsFile)
+            {
+                e.Cancel = true;
+            }
         }
     }
 }

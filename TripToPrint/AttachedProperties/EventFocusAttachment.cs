@@ -1,9 +1,11 @@
-﻿using System.Windows;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
 namespace TripToPrint.AttachedProperties
 {
+    [ExcludeFromCodeCoverage]
     public class EventFocusAttachment
     {
         public static readonly DependencyProperty ElementToFocusProperty =

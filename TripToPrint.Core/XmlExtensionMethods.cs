@@ -20,7 +20,7 @@ namespace TripToPrint.Core
             // If no namespace has been added, use default namespace anyway
             if (string.IsNullOrEmpty(name.NamespaceName))
             {
-                name = xObj.Document.Root.GetDefaultNamespace() + name.LocalName;
+                name = xObj.Document?.Root?.GetDefaultNamespace() + name.LocalName;
             }
             return name;
         }

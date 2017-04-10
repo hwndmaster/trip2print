@@ -35,10 +35,10 @@ namespace TripToPrint.Core.Tests.UnitTests
                     }
                 }
             };
-            _mooiGroupFactoryMock.Setup(x => x.CreateList(kmlDocument.Folders[0])).Returns(new List<MooiGroup>());
+            _mooiGroupFactoryMock.Setup(x => x.CreateList(kmlDocument.Folders[0], null)).Returns(new List<MooiGroup>());
 
             // Act
-            var result = _factory.Create(kmlDocument);
+            var result = _factory.Create(kmlDocument, null);
 
             // Verify
             Assert.AreEqual(kmlDocument.Title, result.Title);

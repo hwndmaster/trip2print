@@ -15,13 +15,16 @@ namespace TripToPrint.Core
 
     public class ReportWriter : IReportWriter
     {
+        private readonly IKmlCalculator _kmlCalculator;
         private readonly IResourceNameProvider _resourceName;
         private readonly CultureAgnosticFormatter _formatter = new CultureAgnosticFormatter();
 
         private const int COORDINATE_VALUE_PRECISION = 6;
+        private const int DISTANCE_IN_METERS_THRESHOLD = 2000;
 
-        public ReportWriter(IResourceNameProvider resourceName)
+        public ReportWriter(IKmlCalculator kmlCalculator, IResourceNameProvider resourceName)
         {
+            _kmlCalculator = kmlCalculator;
             _resourceName = resourceName;
         }
 
@@ -52,6 +55,8 @@ namespace TripToPrint.Core
                 .pm .header { font-family: 'Calibri Light'; }
                 .pm .ix { position: relative; float: left; top: 126px; margin-left: -30px; background: #4189b3; border-radius: 10px; padding: 1px 6px; color: white; font-family: 'Consolas' }
                 .pm-desc { font-size: 9.5pt; }
+                .pm-xtra { font-size: 9pt; color: #444444; overflow: hidden; min-width: 90px; }
+                .pm-xtra hr { margin: 5px 0; border: 0; border-top: 1px solid gray; }
                 .pm-img img { max-width: 200px; max-height: 150px; float: left; margin-right: 4px; }
                 .icon { position: relative; z-index: 5; float: left; }
                 .pm-col .icon { width: 30px; }
@@ -149,7 +154,24 @@ namespace TripToPrint.Core
                 sb.Append($"<div class='ix'>{group.Placemarks.IndexOf(placemark) + 1}</div>");
             }
 
-            sb.Append($"<div class='header'><span class='coord'>(<a href='http://maps.google.com/?ll={coordinate}'>{coordinate}</a>)</span> <span class='title'>{placemark.Name}</span></div>");
+            sb.Append($"<div class='header'>");
+            sb.Append($"<span class='coord'>(<a href='http://maps.google.com/?ll={coordinate}'>{coordinate}</a>)</span> <span class='title'>{placemark.Name}</span>");
+            if (_kmlCalculator.PlacemarkIsShape(placemark))
+            {
+                var distanceInMeters = _kmlCalculator.CalculateRouteDistanceInMeters(placemark);
+                sb.Append(" <span class='dist'>(");
+                if (distanceInMeters < DISTANCE_IN_METERS_THRESHOLD)
+                {
+                    sb.Append($"{distanceInMeters:#,##0} m");
+                }
+                else
+                {
+                    var distanceInKm = distanceInMeters / 1000;
+                    sb.Append($"{distanceInKm:#,##0} km");
+                }
+                sb.Append(")</span>");
+            }
+            sb.Append($"</div>");
 
             if (!string.IsNullOrEmpty(placemark.ImagesContent))
             {
@@ -158,6 +180,39 @@ namespace TripToPrint.Core
             if (!string.IsNullOrEmpty(placemark.Description))
             {
                 sb.Append($"<div class='pm-desc'>{placemark.Description}</div>");
+            }
+            if (placemark.DiscoveredData != null && !placemark.DiscoveredData.IsUseless())
+            {
+                string sep = null;
+                sb.Append("<div class='pm-xtra'><hr />");
+                if (!string.IsNullOrEmpty(placemark.DiscoveredData.Address))
+                {
+                    sb.Append($"Address: {placemark.DiscoveredData.Address}");
+                    sep = " | ";
+                }
+                if (!string.IsNullOrEmpty(placemark.DiscoveredData.ContactPhone))
+                {
+                    sb.Append($"{sep}{placemark.DiscoveredData.ContactPhone}");
+                    sep = " | ";
+                }
+                if (!string.IsNullOrEmpty(placemark.DiscoveredData.Website))
+                {
+                    sb.Append($"{sep}{placemark.DiscoveredData.Website}");
+                }
+                if (!string.IsNullOrEmpty(placemark.DiscoveredData.OpeningHours))
+                {
+                    // TODO: Here уже даёт строку "Opening Hours" на нужном языке.
+                    sb.Append($"{(sep == null ? null : "<br/>")}Opening hours: {placemark.DiscoveredData.OpeningHours}");
+                }
+                if (sep != null)
+                {
+                    sb.Append("<br/>");
+                }
+                if (!string.IsNullOrEmpty(placemark.DiscoveredData.WikipediaContent))
+                {
+                    sb.Append($"Wikipedia: {placemark.DiscoveredData.WikipediaContent}");
+                }
+                sb.Append("</div>");
             }
 
             sb.AppendLine("</div>");

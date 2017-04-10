@@ -28,11 +28,11 @@ namespace TripToPrint.Core
         {
             var ext = Path.GetExtension(inputFilePath);
 
-            if (ext.Equals(".kmz", StringComparison.OrdinalIgnoreCase))
+            if (ext?.Equals(".kmz", StringComparison.OrdinalIgnoreCase) == true)
             {
                 return await ReadFromKmzFile(inputFilePath);
             }
-            if (ext.Equals(".kml", StringComparison.OrdinalIgnoreCase))
+            if (ext?.Equals(".kml", StringComparison.OrdinalIgnoreCase) == true)
             {
                 return ReadFromKmlFile(inputFilePath);
             }
@@ -44,7 +44,7 @@ namespace TripToPrint.Core
         {
             using (var zip = _zipService.Open(inputFilePath))
             {
-                var kmlFileName = zip.GetFileNames().FirstOrDefault(x => Path.GetExtension(x).Equals(".kml"));
+                var kmlFileName = zip.GetFileNames().FirstOrDefault(x => Path.GetExtension(x)?.Equals(".kml") == true);
                 if (kmlFileName == null)
                 {
                     throw new InvalidOperationException("Provided KMZ file is invalid. An entry for KML was not found");

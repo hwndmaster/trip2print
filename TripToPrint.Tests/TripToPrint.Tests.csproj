@@ -60,6 +60,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="StepAdjustmentPresenterTests.cs" />
+    <Compile Include="KmlObjectsTreePresenterTests.cs" />
     <Compile Include="StepSettingPresenterTests.cs" />
     <Compile Include="StepGenerationPresenterTests.cs" />
     <Compile Include="StepIntroPresenterTests.cs" />

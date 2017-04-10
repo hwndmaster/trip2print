@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,6 +19,7 @@ namespace TripToPrint.Services
         string AskUserToSaveFile(string title, string fileName, string[] filter = null);
     }
 
+    [ExcludeFromCodeCoverage]
     public class DialogService : IDialogService
     {
         public async Task InvalidOperationMessage(string message)

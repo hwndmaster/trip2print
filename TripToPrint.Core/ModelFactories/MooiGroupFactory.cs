@@ -8,7 +8,7 @@ namespace TripToPrint.Core.ModelFactories
 {
     public interface IMooiGroupFactory
     {
-        List<MooiGroup> CreateList(KmlFolder folder);
+        List<MooiGroup> CreateList(KmlFolder folder, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark);
     }
 
     public class MooiGroupFactory : IMooiGroupFactory
@@ -18,18 +18,28 @@ namespace TripToPrint.Core.ModelFactories
         private const double MIN_DIST_TO_NEIGHBOR_IN_KM = 0.75d;
         private const double COEF_ROOM_OVER_MAX_DISTANCE = 1.5; // 50%
 
-        public List<MooiGroup> CreateList(KmlFolder folder)
+        private readonly IKmlCalculator _kmlCalculator;
+
+        public MooiGroupFactory(IKmlCalculator kmlCalculator)
+        {
+            _kmlCalculator = kmlCalculator;
+        }
+
+        public List<MooiGroup> CreateList(KmlFolder folder, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark)
         {
             var groups = new List<MooiGroup>();
 
-            var placemarksConverted = folder.Placemarks.Select(ConvertKmlPlacemarkToMooiPlacemark).ToList();
+            var placemarksConverted = folder.Placemarks
+                .Select(x => ConvertKmlPlacemarkToMooiPlacemark(x,
+                discoveredPlacePerPlacemark?.ContainsKey(x) == true ? discoveredPlacePerPlacemark[x] : null))
+                .ToList();
 
             if (placemarksConverted.Count <= MIN_GROUP_COUNT)
             {
                 return CreateSingleGroup(placemarksConverted);
             }
 
-            if (folder.ContainsRoute && CompleteFolderIsRoute(folder))
+            if (folder.ContainsRoute && _kmlCalculator.CompleteFolderIsRoute(folder))
             {
                 return CreateSingleGroup(placemarksConverted);
             }
@@ -107,28 +117,7 @@ namespace TripToPrint.Core.ModelFactories
             return groups;
         }
 
-        private bool CompleteFolderIsRoute(KmlFolder folder)
-        {
-            var routes = folder.Placemarks.Where(x => x.Coordinates.Length > 1).ToList();
-
-            if (routes.Count > 1)
-            {
-                return false;
-            }
-
-            Func<double, int> rounder = (d) => (int)Math.Round(d * 1000);
-
-            var points = folder.Placemarks.Where(x => x.Coordinates.Length == 1)
-                .Select(x => new[] { rounder(x.Coordinates[0].Latitude), rounder(x.Coordinates[0].Longitude) })
-                .ToList();
-            var routeCoords = routes[0].Coordinates.Select(x => new[] { rounder(x.Latitude), rounder(x.Longitude) }).ToList();
-
-            var pointsOutsideRoute = points.Any(x => !routeCoords.Any(y => y[0] == x[0] && y[1] == x[1]));
-
-            return pointsOutsideRoute != true;
-        }
-
-        public MooiPlacemark ConvertKmlPlacemarkToMooiPlacemark(KmlPlacemark kmlPlacemark)
+        public MooiPlacemark ConvertKmlPlacemarkToMooiPlacemark(KmlPlacemark kmlPlacemark, DiscoveredPlace discoveredPlace)
         {
             string imagesContent;
             var description = ExtractImagesFromContent(kmlPlacemark.Description, out imagesContent);
@@ -138,6 +127,7 @@ namespace TripToPrint.Core.ModelFactories
             {
                 Name = kmlPlacemark.Name,
                 Description = description,
+                DiscoveredData = discoveredPlace,
                 ImagesContent = imagesContent,
                 Coordinates = kmlPlacemark.Coordinates,
                 IconPath = kmlPlacemark.IconPath
@@ -241,8 +231,12 @@ namespace TripToPrint.Core.ModelFactories
             if (string.IsNullOrEmpty(content))
                 return content;
 
+            // Trim <br>'s at the beginning and at the end
+            content = Regex.Replace(content, @"^(<br\s*/?>)+", string.Empty);
+            content = Regex.Replace(content, @"(<br\s*/?>)+$", string.Empty);
+
             // Strip consecutive br's
-            content = Regex.Replace(content, @"(<br>){2,}", "<br>");
+            content = Regex.Replace(content, @"(<br\s*/?>){2,}", "<br>");
 
             // Remove br's which go after images
             //content = Regex.Replace(content, @"/><br>", "/>");

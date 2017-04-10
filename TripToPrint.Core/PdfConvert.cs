@@ -1,23 +1,26 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.IO;
-using System.Web;
 using System.Threading;
 using System.Collections.Generic;
 
 namespace Codaxy.WkHtmlToPdf
 {
+    [ExcludeFromCodeCoverage]
     public class PdfConvertException : Exception
     {
         public PdfConvertException(String msg) : base(msg) { }
     }
 
+    [ExcludeFromCodeCoverage]
     public class PdfConvertTimeoutException : PdfConvertException
     {
         public PdfConvertTimeoutException() : base("HTML to PDF conversion process has not finished in the given period.") { }
     }
 
+    [ExcludeFromCodeCoverage]
 	public class PdfOutput
 	{
 		public String OutputFilePath { get; set; }
@@ -25,6 +28,7 @@ namespace Codaxy.WkHtmlToPdf
 		public Action<PdfDocument, byte[]> OutputCallback { get; set; }
 	}
 
+    [ExcludeFromCodeCoverage]
 	public class PdfDocument
 	{
 		public String Url { get; set; }
@@ -42,6 +46,7 @@ namespace Codaxy.WkHtmlToPdf
         public Dictionary<String, String> ExtraParams { get; set; }
     }
 
+    [ExcludeFromCodeCoverage]
 	public class PdfConvertEnvironment
 	{
 		public String TempFolderPath { get; set; }
@@ -50,6 +55,7 @@ namespace Codaxy.WkHtmlToPdf
 		public bool Debug { get; set; }
 	}
 
+    [ExcludeFromCodeCoverage]
     public class PdfConvert
     {
 		static PdfConvertEnvironment _e;
@@ -163,7 +169,7 @@ namespace Codaxy.WkHtmlToPdf
                 foreach (var cookie in document.Cookies)
                     paramsBuilder.AppendFormat("--cookie {0} {1} ", cookie.Key, cookie.Value);
 
-			paramsBuilder.AppendFormat("\"{0}\" \"{1}\"", document.Url, outputPdfFilePath);
+            paramsBuilder.AppendFormat("\"{0}\" \"{1}\"", document.Url, outputPdfFilePath);
             
             try
             {

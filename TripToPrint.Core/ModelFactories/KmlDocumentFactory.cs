@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Device.Location;
 using System.Linq;
 using System.Xml.Linq;
@@ -38,8 +37,7 @@ namespace TripToPrint.Core.ModelFactories
         public KmlFolder CreateKmlFolder(XElement xfolder)
         {
             var model = new KmlFolder {
-                Name = xfolder.ElementByLocalName("name").Value,
-                Placemarks = new List<KmlPlacemark>()
+                Name = xfolder.ElementByLocalName("name").Value
             };
 
             foreach (var xplacemark in xfolder.ElementsByLocalName("Placemark"))
@@ -79,7 +77,7 @@ namespace TripToPrint.Core.ModelFactories
             {
                 model.ExtendedData = xextendeddata.ElementsByLocalName("Data")
                     .Select(xdata => new KmlExtendedData {
-                        Name = xdata.Attribute("name").Value,
+                        Name = xdata.Attribute("name")?.Value,
                         Value = xdata.ElementByLocalName("value").Value
                     })
                     .ToArray();
@@ -101,13 +99,13 @@ namespace TripToPrint.Core.ModelFactories
 
         private string ExtractIconPath(XElement xstyleurl)
         {
-            var xdoc = xstyleurl.Document.Root.ElementByLocalName("Document");
+            var xdoc = xstyleurl.Document?.Root.ElementByLocalName("Document");
 
             var stylemapurl = xstyleurl.Value.TrimStart('#');
-            var xstylemap = xdoc.ElementsByLocalName("StyleMap").First(x => x.Attribute("id").Value == stylemapurl);
+            var xstylemap = xdoc.ElementsByLocalName("StyleMap").First(x => x.Attribute("id")?.Value == stylemapurl);
             var xpairnormal = xstylemap.ElementsByLocalName("Pair").First();
             var endstyleurl = xpairnormal.ElementByLocalName("styleUrl").Value.TrimStart('#');
-            var xstyle = xdoc.ElementsByLocalName("Style").First(x => x.Attribute("id").Value == endstyleurl);
+            var xstyle = xdoc.ElementsByLocalName("Style").First(x => x.Attribute("id")?.Value == endstyleurl);
             return xstyle.ElementByLocalName("IconStyle")?.ElementByLocalName("Icon")?.ElementByLocalName("href")?.Value;
         }
     }

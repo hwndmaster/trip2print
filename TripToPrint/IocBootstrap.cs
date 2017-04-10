@@ -1,4 +1,6 @@
-﻿using Autofac;
+﻿using System.Diagnostics.CodeAnalysis;
+
+using Autofac;
 
 using TripToPrint.Core;
 using TripToPrint.Presenters;
@@ -7,6 +9,7 @@ using TripToPrint.Views;
 
 namespace TripToPrint
 {
+    [ExcludeFromCodeCoverage]
     public class IocBootstrap
     {
         public static IContainer Init()
@@ -31,12 +34,14 @@ namespace TripToPrint
             builder.RegisterType<StepGenerationPresenter>().As<IStepGenerationPresenter>()
                 .InstancePerLifetimeScope()
                 .PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies);
+            builder.RegisterType<KmlObjectsTreePresenter>().As<IKmlObjectsTreePresenter>();
             builder.RegisterType<StepAdjustmentPresenter>().As<IStepAdjustmentPresenter>();
             builder.RegisterType<MainWindow>().As<IMainWindowView>();
             builder.RegisterType<StepIntro>().As<IStepIntroView>();
             builder.RegisterType<StepSettingView>().As<IStepSettingView>();
             builder.RegisterType<StepGenerationView>().As<IStepGenerationView>();
             builder.RegisterType<StepAdjustmentView>().As<IStepAdjustmentView>();
+            builder.RegisterType<KmlObjectsTreeView>().As<IKmlObjectsTreeView>();
 
             return builder.Build();
         }

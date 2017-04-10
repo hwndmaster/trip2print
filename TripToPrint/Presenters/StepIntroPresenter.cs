@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -40,12 +41,17 @@ namespace TripToPrint.Presenters
             View.DataContext = ViewModel;
             View.Presenter = this;
 
+            ViewModel.UserLanguage = _userSession.UserLanguage;
+
             ViewModel.InputSourceChanged += (sender, inputSource) => {
                 _userSession.InputSource = inputSource;
                 ViewModel.InputUri = null;
             };
             ViewModel.InputUriChanged += (sender, inputUri) => {
                 _userSession.InputUri = inputUri;
+            };
+            ViewModel.UserLanguageChanged += (sender, userLanguage) => {
+                _userSession.UserLanguage = userLanguage;
             };
         }
 
@@ -66,8 +72,7 @@ namespace TripToPrint.Presenters
 
             if (dataObject.GetDataPresent(DataFormats.FileDrop))
             {
-                var files = (string[]) dataObject.GetData(DataFormats.FileDrop);
-                var filePath = files[0];
+                var filePath = ((string[]) dataObject.GetData(DataFormats.FileDrop))?.FirstOrDefault();
 
                 if (_file.Exists(filePath))
                 {

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Input;
 
 namespace TripToPrint
 {
+    [ExcludeFromCodeCoverage]
     public class NormalCursor : IDisposable
     {
         private readonly Cursor _previousCursor;

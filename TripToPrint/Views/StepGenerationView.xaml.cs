@@ -1,4 +1,4 @@
-﻿using System.Windows.Controls;
+﻿using System.Diagnostics.CodeAnalysis;
 
 using TripToPrint.Core.Logging;
 using TripToPrint.Presenters;
@@ -12,7 +12,8 @@ namespace TripToPrint.Views
         void ClearLogItems();
     }
 
-    public partial class StepGenerationView : UserControl, IStepGenerationView
+    [ExcludeFromCodeCoverage]
+    public partial class StepGenerationView : IStepGenerationView
     {
         public StepGenerationView()
         {

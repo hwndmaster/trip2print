@@ -36,12 +36,16 @@ namespace TripToPrint.Tests
         [TestMethod]
         public void When_initializing_presenter_the_properties_are_set_correctly()
         {
+            // Arrange
+            _userSessionMock.SetupGet(x => x.UserLanguage).Returns("language");
+
             // Act
             _presenter.Object.InitializePresenter(_viewMock.Object);
 
             // Verify
             Assert.AreEqual(_viewMock.Object, _presenter.Object.View);
             Assert.IsNotNull(_presenter.Object.ViewModel);
+            Assert.AreEqual(_presenter.Object.ViewModel.UserLanguage, "language");
             _viewMock.VerifySet(x => x.Presenter = _presenter.Object);
             _viewMock.VerifySet(x => x.DataContext = _presenter.Object.ViewModel);
         }
@@ -238,6 +242,20 @@ namespace TripToPrint.Tests
 
             _presenter.Object.ViewModel.InputUri = "uri-updated";
             _userSessionMock.VerifySet(x => x.InputUri = "uri-updated", Times.Once);
+        }
+
+        [TestMethod]
+        public void When_user_language_has_changed_the_usersession_is_updated()
+        {
+            // Arrange
+            _userSessionMock.SetupGet(x => x.UserLanguage).Returns("user-language");
+            _presenter.Object.InitializePresenter(_viewMock.Object);
+
+            // Act
+            _presenter.Object.ViewModel.UserLanguage = "another-language";
+
+            // Verify
+            _userSessionMock.VerifySet(x => x.UserLanguage = "another-language", Times.Once);
         }
     }
 }

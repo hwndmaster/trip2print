@@ -21,6 +21,7 @@ namespace TripToPrint.Core.Models
         public MooiGroup Group { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public DiscoveredPlace DiscoveredData { get; set; }
         public string ImagesContent { get; set; }
         public string IconPath { get; set; }
         public GeoCoordinate[] Coordinates { get; set; } = new GeoCoordinate[0];

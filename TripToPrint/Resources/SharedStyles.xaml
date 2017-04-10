@@ -1,0 +1,26 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style x:Key="StepHeader" TargetType="Label">
+        <Setter Property="Foreground" Value="#2E74B5" />
+        <Setter Property="FontSize" Value="19"/>
+        <Setter Property="FontFamily" Value="Calibri Light"/>
+    </Style>
+
+    <Style x:Key="ReportButtonsAppear" TargetType="{x:Type StackPanel}">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=IsVisible}" Value="True">
+                <DataTrigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                             From="0.1" To="1" Duration="0:0:1" />
+                            <DoubleAnimation Storyboard.TargetProperty="Height"
+                                             From="0" To="31" Duration="0:0:1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </DataTrigger.EnterActions>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

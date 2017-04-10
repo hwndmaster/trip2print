@@ -37,3 +37,7 @@ A WPF application which converts KMZ/KML files to handy easy-to-print PDF report
 * Sometimes not a beautiful output of placemarks
 * Sometimes not a smart division of placemarks into groups
 * KML's polygons are not supported
+
+# Licenses
+
+Icons for Settings Step are made by [Nick Roach](https://www.iconfinder.com/iconsets/circle-icons-1)

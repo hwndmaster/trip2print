@@ -7,24 +7,6 @@
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600"
              Background="WhiteSmoke">
-    <UserControl.Resources>
-        <Style x:Key="ReportButtonsAppear" TargetType="{x:Type StackPanel}">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=IsVisible}" Value="True">
-                    <DataTrigger.EnterActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                             From="0.1" To="1" Duration="0:0:1" />
-                                <DoubleAnimation Storyboard.TargetProperty="Height"
-                                             From="0" To="31" Duration="0:0:1" />
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </DataTrigger.EnterActions>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

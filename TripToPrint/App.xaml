@@ -11,13 +11,10 @@
                 <!-- Accent and AppTheme setting -->
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
-            </ResourceDictionary.MergedDictionaries>
 
-            <Style x:Key="StepHeader" TargetType="Label">
-                <Setter Property="Foreground" Value="#2E74B5" />
-                <Setter Property="FontSize" Value="19"/>
-                <Setter Property="FontFamily" Value="Calibri Light"/>
-            </Style>
+                <ResourceDictionary Source="ValueConverters/SharedConverters.xaml" />
+                <ResourceDictionary Source="Resources/SharedStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

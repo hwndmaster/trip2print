@@ -68,7 +68,7 @@ namespace TripToPrint.Tests
             await _presenter.Object.Activated();
 
             // Verify
-            _reportGeneratorMock.Verify(x => x.Generate(document, It.IsAny<IProgressTracker>()), Times.Once);
+            _reportGeneratorMock.Verify(x => x.Generate(document, null, It.IsAny<IProgressTracker>()), Times.Once);
         }
 
         [TestMethod]
@@ -83,7 +83,7 @@ namespace TripToPrint.Tests
             await _presenter.Object.Activated();
 
             // Verify
-            _reportGeneratorMock.Verify(x => x.Generate(document, It.IsAny<IProgressTracker>()), Times.Once);
+            _reportGeneratorMock.Verify(x => x.Generate(document, null, It.IsAny<IProgressTracker>()), Times.Once);
         }
 
         [TestMethod]
@@ -91,7 +91,7 @@ namespace TripToPrint.Tests
         {
             // Arrange
             _presenter.SetupGet(x => x.ViewModel).Returns(new StepGenerationViewModel());
-            _reportGeneratorMock.Setup(x => x.Generate(It.IsAny<KmlDocument>(), It.IsAny<IProgressTracker>()))
+            _reportGeneratorMock.Setup(x => x.Generate(It.IsAny<KmlDocument>(), null, It.IsAny<IProgressTracker>()))
                 .Throws(new Exception("exception-message"));
 
             // Act

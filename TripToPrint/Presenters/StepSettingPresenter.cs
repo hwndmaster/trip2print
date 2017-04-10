@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using TripToPrint.Core;
 using TripToPrint.Core.Models;
+using TripToPrint.Properties;
 using TripToPrint.Services;
 using TripToPrint.ViewModels;
 using TripToPrint.Views;
@@ -25,12 +27,15 @@ namespace TripToPrint.Presenters
         private readonly IUserSession _userSession;
         private readonly IFileService _file;
         private readonly IKmlFileReader _kmlFileReader;
+        private readonly IKmlObjectsTreePresenter _kmlObjectsTreePresenter;
 
         private readonly List<string> _tempFilesCreated = new List<string>();
         private KmlDocument _kmlDocument;
+        private CancellationTokenSource _cancellationTokenSource;
 
         public StepSettingPresenter(IGoogleMyMapAdapter googleMyMapAdapter, IWebClientService webClient,
-            IFileService file, IResourceNameProvider resourceName, IDialogService dialog, IUserSession userSession, IKmlFileReader kmlFileReader)
+            IFileService file, IResourceNameProvider resourceName, IDialogService dialog, IUserSession userSession,
+            IKmlFileReader kmlFileReader, IKmlObjectsTreePresenter kmlObjectsTreePresenter)
         {
             _googleMyMapAdapter = googleMyMapAdapter;
             _webClient = webClient;
@@ -39,6 +44,7 @@ namespace TripToPrint.Presenters
             _dialog = dialog;
             _userSession = userSession;
             _kmlFileReader = kmlFileReader;
+            _kmlObjectsTreePresenter = kmlObjectsTreePresenter;
         }
 
         public IStepSettingView View { get; private set; }
@@ -54,11 +60,15 @@ namespace TripToPrint.Presenters
             View.Presenter = this;
 
             ViewModel.InputFileNameChanged += (sender, inputFileName) => _userSession.InputFileName = inputFileName;
+
+            _kmlObjectsTreePresenter.InitializePresenter(View.KmlObjectsTreeView, ViewModel.KmlObjectsTree);
         }
 
         public async Task Activated()
         {
             _userSession.Document = null;
+            SetDocument(null);
+            _cancellationTokenSource = new CancellationTokenSource();
 
             if (!await PrepareAndReadInputFile())
             {
@@ -66,25 +76,28 @@ namespace TripToPrint.Presenters
                 return;
             }
 
-            _kmlDocument = await _kmlFileReader.ReadFromFile(ViewModel.InputFileName);
-            if (_kmlDocument == null)
+            var kmlDocument = await _kmlFileReader.ReadFromFile(ViewModel.InputFileName);
+            if (kmlDocument == null)
             {
-                await _dialog.InvalidOperationMessage("Failed to load document");
+                await _dialog.InvalidOperationMessage(Resources.Error_FailedToLoadDocument);
                 await MainWindow.GoBack();
                 return;
             }
+            SetDocument(kmlDocument);
 
-            // TODO: Cover with unit test
-            ReadKmlDocumentIntoViewModel(_kmlDocument);
+            _kmlObjectsTreePresenter.HandleActivated(kmlDocument, _cancellationTokenSource.Token);
         }
 
         public Task<bool> BeforeGoBack()
         {
+            _cancellationTokenSource?.Cancel();
+
             return Task.FromResult(true);
         }
 
         public Task<bool> BeforeGoNext()
         {
+            _cancellationTokenSource?.Cancel();
             UpdateSessionDocument();
 
             return Task.FromResult(true);
@@ -106,6 +119,11 @@ namespace TripToPrint.Presenters
             }
         }
 
+        internal void SetDocument(KmlDocument kmlDocument)
+        {
+            _kmlDocument = kmlDocument;
+        }
+
         private async Task<bool> PrepareAndReadInputFile()
         {
             switch (_userSession.InputSource)
@@ -119,6 +137,7 @@ namespace TripToPrint.Presenters
                     if (uri == null)
                     {
                         await _dialog.InvalidOperationMessage(errorMessage);
+                        return false;
                     }
                     try
                     {
@@ -141,27 +160,21 @@ namespace TripToPrint.Presenters
             return false;
         }
 
-        private void ReadKmlDocumentIntoViewModel(KmlDocument document)
-        {
-            ViewModel.FoldersToInclude.Clear();
-            foreach (var folder in document.Folders)
-            {
-                var folderVm = new KmlFolderNodeViewModel(folder) { Enabled = true };
-                foreach (var placemark in folder.Placemarks)
-                {
-                    folderVm.Children.Add(new KmlPlacemarkNodeViewModel(placemark) { Enabled = true });
-                }
-                ViewModel.FoldersToInclude.Add(folderVm);
-            }
-        }
-
         private void UpdateSessionDocument()
         {
-            var elementsToExclude = ViewModel.FoldersToInclude.Where(x => !x.Enabled).Select(x => x.Element)
-                .Concat(ViewModel.FoldersToInclude.SelectMany(x => x.Children).Where(x => !x.Enabled).Select(x => x.Element))
+            var elementsToExclude = ViewModel.KmlObjectsTree.FoldersToInclude.Where(x => !x.Enabled).Select(x => x.Element)
+                .Concat(ViewModel.KmlObjectsTree.FoldersToInclude.SelectMany(x => x.Children).Where(x => !x.Enabled).Select(x => x.Element))
                 .ToArray();
 
             _userSession.Document = _kmlDocument.CloneWithExcluding(elementsToExclude);
+
+            // TODO: Cover with unit test this assignment:
+            _userSession.DiscoveredPlacePerPlacemark = ViewModel.KmlObjectsTree.FoldersToInclude
+                .Where(x => x.Enabled)
+                .SelectMany(x => x.Children)
+                .OfType<KmlPlacemarkNodeViewModel>()
+                .Where(x => x.SelectedDiscoveredPlace != null && !(x.SelectedDiscoveredPlace is DummyDiscoveredPlace))
+                .ToDictionary(x => x.Element as KmlPlacemark, x => x.SelectedDiscoveredPlace);
         }
     }
 }

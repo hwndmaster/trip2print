@@ -6,9 +6,13 @@ namespace TripToPrint.ViewModels
     public abstract class KmlObjectTreeNodeViewModel : ViewModelBase
     {
         private bool _enabled;
+        private bool _suspendEnablingOfChildren;
 
         public abstract string Name { get; }
         public abstract IKmlElement Element { get; }
+
+        public bool IsPartOfRoute { get; set; }
+        public KmlObjectTreeNodeViewModel Parent { get; set; }
 
         public bool Enabled
         {
@@ -20,39 +24,29 @@ namespace TripToPrint.ViewModels
                 _enabled = value;
                 OnPropertyChanged();
 
-                foreach (var child in Children)
+                if (!_suspendEnablingOfChildren)
                 {
-                    child.Enabled = value;
+                    foreach (var child in Children)
+                    {
+                        child.Enabled = value;
+                    }
+                }
+
+                if (Parent != null && value && !Parent.Enabled)
+                {
+                    Parent.EnableOnlySelf();
                 }
             }
         }
 
-        public ObservableCollection<KmlObjectTreeNodeViewModel> Children { get; } = new ObservableCollection<KmlObjectTreeNodeViewModel>();
-    }
+        public ObservableCollection<KmlObjectTreeNodeViewModel> Children { get; }
+            = new ObservableCollection<KmlObjectTreeNodeViewModel>();
 
-    public class KmlFolderNodeViewModel : KmlObjectTreeNodeViewModel
-    {
-        private readonly KmlFolder _folder;
-
-        public KmlFolderNodeViewModel(KmlFolder folder)
+        public void EnableOnlySelf()
         {
-            _folder = folder;
+            _suspendEnablingOfChildren = true;
+            Enabled = true;
+            _suspendEnablingOfChildren = false;
         }
-
-        public override string Name => _folder.Name;
-        public override IKmlElement Element => _folder;
-    }
-
-    public class KmlPlacemarkNodeViewModel : KmlObjectTreeNodeViewModel
-    {
-        private readonly KmlPlacemark _placemark;
-
-        public KmlPlacemarkNodeViewModel(KmlPlacemark placemark)
-        {
-            _placemark = placemark;
-        }
-
-        public override string Name => _placemark.Name;
-        public override IKmlElement Element => _placemark;
     }
 }

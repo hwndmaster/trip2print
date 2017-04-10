@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:l="clr-namespace:TripToPrint"
              xmlns:valueConverters="clr-namespace:TripToPrint.ValueConverters"
              xmlns:attachedProperties="clr-namespace:TripToPrint.AttachedProperties"
              mc:Ignorable="d" 
@@ -50,6 +49,14 @@
                 <Label DockPanel.Dock="Left" Content="Input Google MyMap URL:"/>
                 <TextBox HorizontalAlignment="Stretch" Text="{Binding InputUri}" Name="textBox" />
             </DockPanel>
+            <StackPanel Margin="-4,0,0,0" Orientation="Horizontal">
+                <Label DockPanel.Dock="Left" Content="Language for matching placemarks:"/>
+                <ComboBox SelectedValue="{Binding UserLanguage}" SelectedValuePath="Tag">
+                    <ComboBoxItem Tag="uk-UA">Ukrainian</ComboBoxItem>
+                    <ComboBoxItem Tag="en-US">English</ComboBoxItem>
+                    <ComboBoxItem Tag="ru-RU">Russian</ComboBoxItem>
+                </ComboBox>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -11,12 +11,14 @@ namespace TripToPrint.Core.Tests.UnitTests
     [TestClass]
     public class MooiGroupFactoryTests
     {
+        private readonly Mock<IKmlCalculator> _kmlCalculatorMock = new Mock<IKmlCalculator>();
+
         private Mock<MooiGroupFactory> _factory;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _factory = new Mock<MooiGroupFactory> {
+            _factory = new Mock<MooiGroupFactory>(_kmlCalculatorMock.Object) {
                 CallBase = true
             };
         }
@@ -34,7 +36,7 @@ namespace TripToPrint.Core.Tests.UnitTests
             };
 
             // Act
-            var result = _factory.Object.CreateList(folder);
+            var result = _factory.Object.CreateList(folder, null);
 
             // Verify
             Assert.AreEqual(1, result.Count);
@@ -53,9 +55,10 @@ namespace TripToPrint.Core.Tests.UnitTests
                     } })
                     .ToList()
             };
+            _kmlCalculatorMock.Setup(x => x.CompleteFolderIsRoute(folder)).Returns(true);
 
             // Act
-            var result = _factory.Object.CreateList(folder);
+            var result = _factory.Object.CreateList(folder, null);
 
             // Verify
             Assert.AreEqual(1, result.Count);
@@ -101,7 +104,7 @@ namespace TripToPrint.Core.Tests.UnitTests
             };
 
             // Act
-            var result = _factory.Object.ConvertKmlPlacemarkToMooiPlacemark(placemark);
+            var result = _factory.Object.ConvertKmlPlacemarkToMooiPlacemark(placemark, null);
 
             // Verify
             Assert.AreEqual(placemark.Name, result.Name);
@@ -120,7 +123,7 @@ namespace TripToPrint.Core.Tests.UnitTests
             };
 
             // Act
-            var result = _factory.Object.ConvertKmlPlacemarkToMooiPlacemark(placemark);
+            var result = _factory.Object.ConvertKmlPlacemarkToMooiPlacemark(placemark, null);
 
             // Verify
             Assert.AreEqual("text<br>text<br>text <a href='http://sample.url/path/page?q=1&w=2'>http://sample.url/path/page?q=1&w=2</a> text", result.Description);

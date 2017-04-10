@@ -1,10 +1,11 @@
-﻿using Autofac;
-
+﻿using System.Diagnostics.CodeAnalysis;
+using Autofac;
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.ModelFactories;
 
 namespace TripToPrint.Core
 {
+    [ExcludeFromCodeCoverage]
     public class IocModule : Module
     {
         protected override void Load(ContainerBuilder builder)
@@ -19,6 +20,7 @@ namespace TripToPrint.Core
             builder.RegisterType<ZipService>().As<IZipService>();
             builder.RegisterType<ResourceNameProvider>().As<IResourceNameProvider>();
             builder.RegisterType<WebClientService>().As<IWebClientService>();
+            builder.RegisterType<KmlCalculator>().As<IKmlCalculator>();
 
             // Logging
             builder.RegisterType<LogStorage>().As<ILogStorage>().SingleInstance();

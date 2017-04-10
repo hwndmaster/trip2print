@@ -22,6 +22,8 @@ namespace TripToPrint.ViewModels
                     return Colors.Chocolate;
                 case LogSeverity.Error:
                     return Colors.OrangeRed;
+                case LogSeverity.Fatal:
+                    return Colors.DarkRed;
                 case LogSeverity.Info:
                 default:
                     return SystemColors.WindowTextColor;

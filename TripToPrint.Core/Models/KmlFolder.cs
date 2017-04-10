@@ -6,7 +6,7 @@ namespace TripToPrint.Core.Models
     public class KmlFolder : IKmlElement
     {
         public string Name { get; set; }
-        public List<KmlPlacemark> Placemarks { get; set; }
+        public List<KmlPlacemark> Placemarks { get; set; } = new List<KmlPlacemark>();
 
         public bool ContainsRoute => Placemarks.Any(x => x.Coordinates.Length > 1);
 

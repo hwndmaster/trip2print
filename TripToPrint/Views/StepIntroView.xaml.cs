@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Windows;
 using TripToPrint.Presenters;
 
@@ -8,6 +9,7 @@ namespace TripToPrint.Views
     {
     }
 
+    [ExcludeFromCodeCoverage]
     public partial class StepIntro : IStepIntroView
     {
         public StepIntro()

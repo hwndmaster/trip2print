@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace TripToPrint.Core
 {
     public interface IReportGenerator
     {
-        Task<string> Generate(KmlDocument document, IProgressTracker progress);
+        Task<string> Generate(KmlDocument document, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark, IProgressTracker progress);
 
         Task<bool> SaveHtmlReportAsPdf(string tempPath, string pdfFilePath);
     }
@@ -39,7 +40,7 @@ namespace TripToPrint.Core
             _webClient = webClient;
         }
 
-        public async Task<string> Generate(KmlDocument document, IProgressTracker progress)
+        public async Task<string> Generate(KmlDocument document, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark, IProgressTracker progress)
         {
             var tempPath = CreateAndGetTempPath();
 
@@ -49,7 +50,7 @@ namespace TripToPrint.Core
             }
             progress.ReportResourceEntriesProcessed();
 
-            var mooiDocument = _mooiDocumentFactory.Create(document);
+            var mooiDocument = _mooiDocumentFactory.Create(document, discoveredPlacePerPlacemark);
             var content = await _reportWriter.WriteReportAsync(mooiDocument);
 
             progress.ReportContentGenerationDone();
