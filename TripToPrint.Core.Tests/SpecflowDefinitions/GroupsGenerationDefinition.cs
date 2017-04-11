@@ -24,12 +24,10 @@ namespace TripToPrint.Core.Tests.SpecflowDefinitions
         [Then("these placemarks will be assigned to the following groups:")]
         public void ThenThesePlacemarksWillBeAssignedToTheFollowingGroups(Table table)
         {
-            var folder = new KmlFolder {
-                Placemarks = _placemarkTableRows.Select(x => new KmlPlacemark {
-                    Coordinates = new[] { new GeoCoordinate(x.Latitude, x.Longitude) },
-                    Name = x.Name
-                }).ToList()
-            };
+            var folder = new KmlFolder(_placemarkTableRows.Select(x => new KmlPlacemark {
+                Coordinates = new[] { new GeoCoordinate(x.Latitude, x.Longitude) },
+                Name = x.Name
+            }));
 
             var factory = new MooiGroupFactory(new KmlCalculator());
             var groups = factory.CreateList(folder, null);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Device.Location;
 using System.Linq;
 using System.Xml.Linq;
@@ -36,18 +37,12 @@ namespace TripToPrint.Core.ModelFactories
 
         public KmlFolder CreateKmlFolder(XElement xfolder)
         {
-            var model = new KmlFolder {
-                Name = xfolder.ElementByLocalName("name").Value
-            };
+            var placemarks = from xplacemark in xfolder.ElementsByLocalName("Placemark")
+                             let placemark = CreateKmlPlacemark(xplacemark)
+                             where placemark != null
+                             select placemark;
 
-            foreach (var xplacemark in xfolder.ElementsByLocalName("Placemark"))
-            {
-                var placemark = CreateKmlPlacemark(xplacemark);
-                if (placemark != null)
-                    model.Placemarks.Add(placemark);
-            }
-
-            return model;
+            return new KmlFolder(xfolder.ElementByLocalName("name").Value, placemarks);
         }
 
         public KmlPlacemark CreateKmlPlacemark(XElement xplacemark)

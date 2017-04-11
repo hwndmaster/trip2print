@@ -8,8 +8,6 @@ using System.Windows.Controls;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 
-using WinForms = System.Windows.Forms;
-
 namespace TripToPrint.Services
 {
     public interface IDialogService

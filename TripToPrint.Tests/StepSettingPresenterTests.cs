@@ -149,14 +149,12 @@ namespace TripToPrint.Tests
             // Arrange
             var kmlDocument = new KmlDocument {
                 Folders = {
-                    new KmlFolder { Name = "folder-1"},
-                    new KmlFolder {
-                        Name = "folder-2",
-                        Placemarks = {
+                    new KmlFolder("folder-1"),
+                    new KmlFolder("folder-2", new[] {
                             new KmlPlacemark { Name = "pm-1" },
                             new KmlPlacemark { Name = "pm-2" }
                         }
-                    }
+                    )
                 }
             };
             var vm = new StepSettingViewModel {
@@ -189,6 +187,43 @@ namespace TripToPrint.Tests
             Assert.AreEqual(kmlDocument.Folders[1].Name, _userSessionMock.Object.Document.Folders[0].Name);
             Assert.AreEqual(1, _userSessionMock.Object.Document.Folders[0].Placemarks.Count);
             Assert.AreEqual(kmlDocument.Folders[1].Placemarks[1].Name, _userSessionMock.Object.Document.Folders[0].Placemarks[0].Name);
+        }
+
+        [TestMethod]
+        public async Task When_going_next_and_placemarks_arent_available_then_false_is_returned()
+        {
+            // Arrange
+            var kmlDocument = new KmlDocument
+            {
+                Folders = {
+                    new KmlFolder(new[] {
+                            new KmlPlacemark { Name = "pm-1" }
+                        }
+                    )
+                }
+            };
+            var vm = new StepSettingViewModel
+            {
+                KmlObjectsTree = {
+                    FoldersToInclude = {
+                        new KmlFolderNodeViewModel(kmlDocument.Folders[0]) {
+                            Enabled = true,
+                            Children = {
+                                new KmlPlacemarkNodeViewModel(kmlDocument.Folders[0].Placemarks[0], null) { Enabled = false }
+                            }
+                        }
+                    }
+                }
+            };
+            _presenter.SetupGet(x => x.ViewModel).Returns(vm);
+            _presenter.Object.SetDocument(kmlDocument);
+            _userSessionMock.SetupProperty(x => x.Document);
+
+            // Act
+            var result = await _presenter.Object.BeforeGoNext();
+
+            // Verify
+            Assert.IsFalse(result);
         }
 
         private StepSettingViewModel SetupForActivatedMethod(KmlDocument kmlDocument)

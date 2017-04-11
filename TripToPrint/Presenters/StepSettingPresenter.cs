@@ -95,12 +95,18 @@ namespace TripToPrint.Presenters
             return Task.FromResult(true);
         }
 
-        public Task<bool> BeforeGoNext()
+        public async Task<bool> BeforeGoNext()
         {
-            _cancellationTokenSource?.Cancel();
             UpdateSessionDocument();
 
-            return Task.FromResult(true);
+            if (!_userSession.Document.Folders.Any(f => f.Placemarks.Any()))
+            {
+                await _dialog.InvalidOperationMessage("There are no placemarks selected for a report generation.");
+                return false;
+            }
+
+            _cancellationTokenSource?.Cancel();
+            return true;
         }
 
         public void GetBackNextTitles(ref string back, ref string next)

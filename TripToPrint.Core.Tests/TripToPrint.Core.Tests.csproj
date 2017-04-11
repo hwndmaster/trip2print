@@ -86,6 +86,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>GroupsGeneration.feature</DependentUpon>
     </Compile>
+    <Compile Include="UnitTests\KmlCalculatorTests.cs" />
     <Compile Include="UnitTests\ProgressTrackerTests.cs" />
     <Compile Include="UnitTests\HereAdapterTests.cs" />
     <Compile Include="UnitTests\KmlFileReaderTests.cs" />

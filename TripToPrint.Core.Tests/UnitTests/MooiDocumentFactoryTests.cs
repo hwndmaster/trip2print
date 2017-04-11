@@ -27,12 +27,9 @@ namespace TripToPrint.Core.Tests.UnitTests
                 Title = "kml-title",
                 Description = "kml-desc",
                 Folders = {
-                    new KmlFolder {
-                        Name = "folder-1",
-                        Placemarks = new List<KmlPlacemark> {
+                    new KmlFolder("folder-1", new List<KmlPlacemark> {
                             new KmlPlacemark()
-                        }
-                    }
+                        })
                 }
             };
             _mooiGroupFactoryMock.Setup(x => x.CreateList(kmlDocument.Folders[0], null)).Returns(new List<MooiGroup>());

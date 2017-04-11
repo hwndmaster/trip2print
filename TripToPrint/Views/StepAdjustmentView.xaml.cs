@@ -17,6 +17,7 @@ namespace TripToPrint.Views
         {
             InitializeComponent();
 
+            browser.AllowDrop = false;
             browser.Navigating += Browser_Navigating;
         }
 

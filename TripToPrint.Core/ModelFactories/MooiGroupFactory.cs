@@ -83,14 +83,12 @@ namespace TripToPrint.Core.ModelFactories
                     {
                         if (currentGroup.Placemarks.Count >= MIN_GROUP_COUNT)
                         {
-                            /*var linkToFirst = placemarksLookup[currentGroup.Placemarks[0]]
-                                .neighbors.First(x => x.placemark == pm.placemark);*/
                             var maxDistanceAmongAddedPlacemarks = placemarksWithNeighborsLookup[currentGroup.Placemarks[0]]
                                 .Neighbors.Where(x => currentGroup.Placemarks.Any(y => y == x.Placemark))
                                 .Select(x => x.AllowedDistance)
                                 .Max();
 
-                            if (pm.NeighborWithMinDistance.Distance > maxDistanceAmongAddedPlacemarks) // * COEF_ROOM_OVER_MAX_DISTANCE)
+                            if (pm.NeighborWithMinDistance.Distance > maxDistanceAmongAddedPlacemarks)
                             {
                                 continue;
                             }
@@ -108,8 +106,6 @@ namespace TripToPrint.Core.ModelFactories
 
                 currentGroup = new MooiGroup();
                 groups.Add(currentGroup);
-
-                //placemarksToProcess = placemarksToProcess.Where(x => !currentGroup.Placemarks.Any(y => y == x.placemark || y == x.minDist.placemark)).ToList();
             }
 
             // Trim out the last group which is always empty
@@ -200,7 +196,6 @@ namespace TripToPrint.Core.ModelFactories
                 }
 
                 if (groupForMerge.group.Placemarks.Count >= MIN_GROUP_COUNT)
-                    //&& groupToMerge.Placemarks.Count == MIN_GROUP_COUNT - 1)
                 {
                     var dist1 = CalculateDistances(groupForMerge.group, groupForMerge.group).Max();
 
@@ -240,9 +235,6 @@ namespace TripToPrint.Core.ModelFactories
 
             // Strip consecutive br's
             content = Regex.Replace(content, @"(<br\s*/?>){2,}", "<br>");
-
-            // Remove br's which go after images
-            //content = Regex.Replace(content, @"/><br>", "/>");
 
             // Wrap links with html <a> tags
             content = Regex.Replace(content,

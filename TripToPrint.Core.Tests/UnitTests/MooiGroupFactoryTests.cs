@@ -27,13 +27,11 @@ namespace TripToPrint.Core.Tests.UnitTests
         public void When_creating_group_list_for_a_few_placemarks_a_single_group_is_created()
         {
             // Arrange
-            var folder = new KmlFolder {
-                Placemarks = new List<KmlPlacemark> {
+            var folder = new KmlFolder(new List<KmlPlacemark> {
                     new KmlPlacemark(),
                     new KmlPlacemark(),
                     new KmlPlacemark()
-                }
-            };
+                });
 
             // Act
             var result = _factory.Object.CreateList(folder, null);
@@ -47,14 +45,14 @@ namespace TripToPrint.Core.Tests.UnitTests
         public void When_creating_group_list_for_route_a_single_group_is_created()
         {
             // Arrange
-            var folder = new KmlFolder {
-                Placemarks = Enumerable.Range(0, 10)
-                    .Select(x => new KmlPlacemark { Coordinates = new[] { new GeoCoordinate(1, x) } })
-                    .Concat(new [] { new KmlPlacemark {
+            var placemarks = Enumerable.Range(0, 10)
+                .Select(x => new KmlPlacemark { Coordinates = new[] { new GeoCoordinate(1, x) } })
+                .Concat(new[] {
+                    new KmlPlacemark {
                         Coordinates = Enumerable.Range(0, 10).Select(x => new GeoCoordinate(1, x)).ToArray()
-                    } })
-                    .ToList()
-            };
+                    }
+                });
+            var folder = new KmlFolder(placemarks);
             _kmlCalculatorMock.Setup(x => x.CompleteFolderIsRoute(folder)).Returns(true);
 
             // Act

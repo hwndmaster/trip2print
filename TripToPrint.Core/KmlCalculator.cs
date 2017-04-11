@@ -21,7 +21,7 @@ namespace TripToPrint.Core
             }
 
             var sum = 0d;
-            for (var i = 1; i < placemark.Coordinates.Length - 1; i++)
+            for (var i = 1; i < placemark.Coordinates.Length; i++)
             {
                 sum += placemark.Coordinates[i].GetDistanceTo(placemark.Coordinates[i - 1]);
             }

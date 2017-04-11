@@ -11,8 +11,7 @@ namespace TripToPrint.Core.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public string IconPath { get; set; }
-        [NotNull]
-        public GeoCoordinate[] Coordinates { get; set; } = new GeoCoordinate[0];
+        [NotNull] public GeoCoordinate[] Coordinates { get; set; } = new GeoCoordinate[0];
         public KmlExtendedData[] ExtendedData { get; set; }
 
         public KmlPlacemark Clone()

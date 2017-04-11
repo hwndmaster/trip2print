@@ -34,18 +34,13 @@ namespace TripToPrint.Tests
             // Arrange
             var kmlDocument = new KmlDocument {
                 Folders = {
-                    new KmlFolder {
-                        Name = "folder-1",
-                        Placemarks = {
-                            new KmlPlacemark { Name = "pm-1" },
-                            new KmlPlacemark()
-                        }
-                    },
-                    new KmlFolder {
-                        Placemarks = {
-                            new KmlPlacemark()
-                        }
-                    }
+                    new KmlFolder("folder-1", new[] {
+                        new KmlPlacemark { Name = "pm-1" },
+                        new KmlPlacemark()
+                    }),
+                    new KmlFolder(new[] {
+                        new KmlPlacemark()
+                    })
                 }
             };
             _kmlCalculatorMock.Setup(x => x.CompleteFolderIsRoute(kmlDocument.Folders[1])).Returns(true);
