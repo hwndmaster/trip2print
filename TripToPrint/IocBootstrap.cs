@@ -24,7 +24,7 @@ namespace TripToPrint
             // Services
             builder.RegisterType<DialogService>().As<IDialogService>();
 
-            // Views and Presenters
+            // Presenters
             builder.RegisterType<MainWindowPresenter>().As<IMainWindowPresenter>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<StepIntroPresenter>().As<IStepIntroPresenter>();
@@ -36,12 +36,21 @@ namespace TripToPrint
                 .PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies);
             builder.RegisterType<KmlObjectsTreePresenter>().As<IKmlObjectsTreePresenter>();
             builder.RegisterType<StepAdjustmentPresenter>().As<IStepAdjustmentPresenter>();
+            builder.RegisterType<AdjustBrowserViewPresenter>().As<IAdjustBrowserViewPresenter>();
+
+            // Views
             builder.RegisterType<MainWindow>().As<IMainWindowView>();
             builder.RegisterType<StepIntro>().As<IStepIntroView>();
             builder.RegisterType<StepSettingView>().As<IStepSettingView>();
             builder.RegisterType<StepGenerationView>().As<IStepGenerationView>();
             builder.RegisterType<StepAdjustmentView>().As<IStepAdjustmentView>();
             builder.RegisterType<KmlObjectsTreeView>().As<IKmlObjectsTreeView>();
+            builder.RegisterType<AdjustBrowserView>().As<IAdjustBrowserView>();
+
+            // Misc
+            builder.RegisterType<TestingEnv>()
+                .InstancePerLifetimeScope()
+                .PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies);
 
             return builder.Build();
         }

@@ -52,9 +52,9 @@
             <StackPanel Margin="-4,0,0,0" Orientation="Horizontal">
                 <Label DockPanel.Dock="Left" Content="Language for matching placemarks:"/>
                 <ComboBox SelectedValue="{Binding UserLanguage}" SelectedValuePath="Tag">
-                    <ComboBoxItem Tag="uk-UA">Ukrainian</ComboBoxItem>
                     <ComboBoxItem Tag="en-US">English</ComboBoxItem>
                     <ComboBoxItem Tag="ru-RU">Russian</ComboBoxItem>
+                    <ComboBoxItem Tag="uk-UA">Ukrainian</ComboBoxItem>
                 </ComboBox>
             </StackPanel>
         </StackPanel>

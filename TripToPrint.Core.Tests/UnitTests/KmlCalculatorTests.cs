@@ -52,5 +52,91 @@ namespace TripToPrint.Core.Tests.UnitTests
             // Verify
             Assert.AreEqual(0, result);
         }
+
+        [TestMethod]
+        public void Folder_with_simple_placemarks_is_not_recognized_as_complete_route()
+        {
+            // Arrange
+            var folder = new KmlFolder(new [] {
+                new KmlPlacemark {
+                    Coordinates = new [] { new GeoCoordinate() }
+                }
+            });
+
+            // Act
+            var result = _calculator.CompleteFolderIsRoute(folder);
+
+            // Verify
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void Folder_with_multiple_placemarks_with_shapes_is_not_recognized_as_complete_route()
+        {
+            // Arrange
+            var folder = new KmlFolder(new[] {
+                new KmlPlacemark {
+                    Coordinates = new [] { new GeoCoordinate(), new GeoCoordinate() }
+                },
+                new KmlPlacemark {
+                    Coordinates = new [] { new GeoCoordinate(), new GeoCoordinate() }
+                }
+            });
+
+            // Act
+            var result = _calculator.CompleteFolderIsRoute(folder);
+
+            // Verify
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void Folder_with_route_as_first_placemark_and_associated_placemarks_is_recognized_as_complete_route()
+        {
+            // Arrange
+            var folder = new KmlFolder(new[] {
+                new KmlPlacemark {
+                    Coordinates = new [] { new GeoCoordinate(1, 1), new GeoCoordinate(2, 2), new GeoCoordinate(3, 3) }
+                },
+                new KmlPlacemark {
+                    Coordinates = new [] { new GeoCoordinate(1, 1) }
+                },
+                new KmlPlacemark {
+                    Coordinates = new [] { new GeoCoordinate(2, 2) }
+                },
+                new KmlPlacemark {
+                    Coordinates = new [] { new GeoCoordinate(3, 3) }
+                }
+            });
+
+            // Act
+            var result = _calculator.CompleteFolderIsRoute(folder);
+
+            // Verify
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void Folder_with_route_as_first_placemark_and_not_associated_placemarks_is_not_recognized_as_complete_route()
+        {
+            // Arrange
+            var folder = new KmlFolder(new[] {
+                new KmlPlacemark {
+                    Coordinates = new [] { new GeoCoordinate(1, 1), new GeoCoordinate(3, 3) }
+                },
+                new KmlPlacemark {
+                    Coordinates = new [] { new GeoCoordinate(1, 1) }
+                },
+                new KmlPlacemark {
+                    Coordinates = new [] { new GeoCoordinate(2, 2) }
+                }
+            });
+
+            // Act
+            var result = _calculator.CompleteFolderIsRoute(folder);
+
+            // Verify
+            Assert.IsFalse(result);
+        }
     }
 }

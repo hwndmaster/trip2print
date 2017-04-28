@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:TripToPrint.Views"
         xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
-        Title="Trip-to-Print" Height="650" Width="900" Background="WhiteSmoke"
+        Title="Trip-to-Print" Height="700" Width="1000" Background="WhiteSmoke"
         WindowStartupLocation="CenterScreen" Icon="/TripToPrint;component/Resources/Logo.jpg">
     <Grid>
         <Grid.Resources>

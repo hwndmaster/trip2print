@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -16,9 +17,10 @@ namespace TripToPrint.Core
         Task<byte[]> PostAsync(Uri url, string parameters);
     }
 
+    [ExcludeFromCodeCoverage]
     public class WebClientService : IWebClientService
     {
-        private ILogger _logger;
+        private readonly ILogger _logger;
 
         public WebClientService(ILogger logger)
         {

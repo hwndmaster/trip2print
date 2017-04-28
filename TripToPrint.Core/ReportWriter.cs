@@ -55,7 +55,7 @@ namespace TripToPrint.Core
                 .pm .header { font-family: 'Calibri Light'; }
                 .pm .ix { position: relative; float: left; top: 126px; margin-left: -30px; background: #4189b3; border-radius: 10px; padding: 1px 6px; color: white; font-family: 'Consolas' }
                 .pm-desc { font-size: 9.5pt; }
-                .pm-xtra { font-size: 9pt; color: #444444; overflow: hidden; min-width: 90px; }
+                .pm-xtra { font-size: 9pt; color: #444444; }
                 .pm-xtra hr { margin: 5px 0; border: 0; border-top: 1px solid gray; }
                 .pm-img img { max-width: 200px; max-height: 150px; float: left; margin-right: 4px; }
                 .icon { position: relative; z-index: 5; float: left; }

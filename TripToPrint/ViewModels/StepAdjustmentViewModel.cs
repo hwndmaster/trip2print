@@ -15,5 +15,7 @@
                 OnPropertyChanged();
             }
         }
+
+        public AdjustBrowserViewModel AdjustBrowser { get; } = new AdjustBrowserViewModel();
     }
 }

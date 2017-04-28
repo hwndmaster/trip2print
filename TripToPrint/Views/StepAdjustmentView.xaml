@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:valueConverters="clr-namespace:TripToPrint.ValueConverters"
+             xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
+             xmlns:views="clr-namespace:TripToPrint.Views"
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600"
              Background="WhiteSmoke">
@@ -15,7 +17,7 @@
         </Grid.RowDefinitions>
         <Label Grid.Row="0" Content="Got it! Preview and adjust your report" Style="{DynamicResource StepHeader}" />
         <Grid Grid.Row="1">
-            <WebBrowser x:Name="browser" />
+            <views:AdjustBrowserView x:Name="adjustBrowser"/>
         </Grid>
         <Grid Grid.Row="2">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0"

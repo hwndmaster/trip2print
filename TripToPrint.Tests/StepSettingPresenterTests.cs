@@ -226,6 +226,23 @@ namespace TripToPrint.Tests
             Assert.IsFalse(result);
         }
 
+        [TestMethod]
+        public async Task When_disposing_presenter_all_temporary_files_are_removed()
+        {
+            // Arrange
+            var folderPrefix = "folder-prefix";
+            var kmlDocument = new KmlDocument();
+            var vm = SetupForActivatedMethod(kmlDocument);
+            _resourceNameMock.Setup(x => x.GetTempFolderPrefix()).Returns(folderPrefix);
+            await _presenter.Object.Activated();
+
+            // Act
+            _presenter.Object.Dispose();
+
+            // Verify
+            _fileMock.Verify(x => x.Delete(vm.InputFileName));
+        }
+
         private StepSettingViewModel SetupForActivatedMethod(KmlDocument kmlDocument)
         {
             var kmzUrl = new Uri(DEFAULT_KML_URL);

@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using TripToPrint.Core.Logging;
 using TripToPrint.ViewModels;
 using TripToPrint.Views;
 
@@ -10,6 +9,7 @@ namespace TripToPrint.Presenters
         Task GoBack();
         Task GoNext();
         void GetBackNextTitlesForCurrentStep(ref string back, ref string next);
+        IStepPresenter GetWizardStepPresenter(int wizardStepIndex);
     }
 
     public class MainWindowPresenter : IMainWindowPresenter
@@ -27,7 +27,6 @@ namespace TripToPrint.Presenters
             _stepAdjustmentPresenter = stepAdjustmentPresenter;
             _stepSettingPresenter = stepSettingPresenter;
         }
-
 
         public IMainWindowView View { get; private set; }
         public MainWindowViewModel ViewModel { get; private set; }
@@ -81,7 +80,7 @@ namespace TripToPrint.Presenters
             currentStepPresenter.GetBackNextTitles(ref back, ref next);
         }
 
-        private IStepPresenter GetWizardStepPresenter(int wizardStepIndex)
+        public IStepPresenter GetWizardStepPresenter(int wizardStepIndex)
         {
             switch (wizardStepIndex)
             {

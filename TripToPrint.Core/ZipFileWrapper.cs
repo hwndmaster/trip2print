@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace TripToPrint.Core
         void SaveToFolder(string filename, string path);
     }
 
+    [ExcludeFromCodeCoverage]
     public class ZipFileWrapper : IZipFileWrapper
     {
         private readonly ZipFile _zip;

@@ -27,7 +27,7 @@ namespace TripToPrint
 
         public UserSession()
         {
-            UserLanguage = "uk-UA";
+            UserLanguage = "en-US";
         }
     }
 }

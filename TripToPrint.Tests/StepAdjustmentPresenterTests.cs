@@ -19,6 +19,7 @@ namespace TripToPrint.Tests
         private readonly Mock<IReportGenerator> _reportGeneratorMock = new Mock<IReportGenerator>();
         private readonly Mock<IFileService> _fileServiceMock = new Mock<IFileService>();
         private readonly Mock<IUserSession> _userSessionMock = new Mock<IUserSession>();
+        private readonly Mock<IAdjustBrowserViewPresenter> _adjustBrowserViewPresenterMock = new Mock<IAdjustBrowserViewPresenter>();
 
         private Mock<StepAdjustmentPresenter> _presenter;
 
@@ -30,7 +31,8 @@ namespace TripToPrint.Tests
                 _resourceNameMock.Object,
                 _reportGeneratorMock.Object,
                 _fileServiceMock.Object,
-                _userSessionMock.Object) {
+                _userSessionMock.Object,
+                _adjustBrowserViewPresenterMock.Object) {
                 CallBase = true
             };
         }
@@ -52,16 +54,15 @@ namespace TripToPrint.Tests
         public async Task When_step_is_activated_the_report_preview_is_set()
         {
             // Arrange
-            CreateViewModel();
+            var vm = CreateViewModel();
             _userSessionMock.SetupGet(x => x.GeneratedReportTempPath).Returns("temp-path");
-            _presenter.SetupGet(x => x.View).Returns(_viewMock.Object);
             _resourceNameMock.Setup(x => x.GetDefaultHtmlReportName()).Returns("default");
 
             // Act
             await _presenter.Object.Activated();
 
             // Verify
-            _viewMock.Verify(x => x.SetAddress(@"temp-path\default"), Times.Once);
+            Assert.AreEqual(@"temp-path\default", vm.AdjustBrowser.Address);
         }
 
         [TestMethod]

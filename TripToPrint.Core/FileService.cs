@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -14,6 +15,7 @@ namespace TripToPrint.Core
         Task WriteStringAsync(string filePath, string content);
     }
 
+    [ExcludeFromCodeCoverage]
     public class FileService : IFileService
     {
         public bool Exists(string path)
@@ -23,7 +25,10 @@ namespace TripToPrint.Core
 
         public void Delete(string filePath)
         {
-            File.Delete(filePath);
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
         }
 
         public void Move(string sourceFileName, string destFileName)

@@ -118,10 +118,7 @@ namespace TripToPrint.Presenters
         {
             foreach (var tempFile in _tempFilesCreated)
             {
-                if (_file.Exists(tempFile))
-                {
-                    _file.Delete(tempFile);
-                }
+                _file.Delete(tempFile);
             }
         }
 

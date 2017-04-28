@@ -25,15 +25,18 @@ namespace TripToPrint.Presenters
         private readonly IReportGenerator _reportGenerator;
         private readonly IUserSession _userSession;
         private readonly IFileService _file;
+        private readonly IAdjustBrowserViewPresenter _adjustBrowserViewPresenter;
 
         public StepAdjustmentPresenter(IDialogService dialogService, IResourceNameProvider resourceName,
-            IReportGenerator reportGenerator, IFileService file, IUserSession userSession)
+            IReportGenerator reportGenerator, IFileService file, IUserSession userSession,
+            IAdjustBrowserViewPresenter adjustBrowserViewPresenter)
         {
             _dialogService = dialogService;
             _resourceName = resourceName;
             _reportGenerator = reportGenerator;
             _file = file;
             _userSession = userSession;
+            _adjustBrowserViewPresenter = adjustBrowserViewPresenter;
         }
 
         public virtual IStepAdjustmentView View { get; private set; }
@@ -45,11 +48,14 @@ namespace TripToPrint.Presenters
             View = view;
             View.DataContext = ViewModel;
             View.Presenter = this;
+
+            _adjustBrowserViewPresenter.InitializePresenter(View.AdjustBrowserView, ViewModel.AdjustBrowser);
         }
 
         public Task Activated()
         {
-            View.SetAddress(Path.Combine(_userSession.GeneratedReportTempPath, _resourceName.GetDefaultHtmlReportName()));
+            ViewModel.AdjustBrowser.Address = Path.Combine(_userSession.GeneratedReportTempPath,
+                _resourceName.GetDefaultHtmlReportName());
 
             return Task.CompletedTask;
         }
