@@ -73,7 +73,7 @@ namespace TripToPrint.Tests
             _userSessionMock.SetupGet(x => x.InputUri).Returns("input.kmz");
             _userSessionMock.SetupGet(x => x.GeneratedReportTempPath).Returns("temp-path");
             SetupDialogServiceAskUserToSaveFile("input.pdf", "output-filename.pdf");
-            _reportGeneratorMock.Setup(x => x.SaveHtmlReportAsPdf("temp-path", "output-filename.pdf"))
+            _adjustBrowserViewPresenterMock.Setup(x => x.SavePdfReportAsync("output-filename.pdf"))
                 .Returns(Task.FromResult(true));
 
             // Act
@@ -81,7 +81,7 @@ namespace TripToPrint.Tests
 
             // Verify
             Assert.AreEqual(false, result);
-            _reportGeneratorMock.Verify(x => x.SaveHtmlReportAsPdf("temp-path", "output-filename.pdf"));
+            _adjustBrowserViewPresenterMock.Verify(x => x.SavePdfReportAsync("output-filename.pdf"));
             Assert.AreEqual("output-filename.pdf", vm.OutputFilePath);
         }
 
@@ -99,7 +99,7 @@ namespace TripToPrint.Tests
 
             // Verify
             Assert.AreEqual(false, result);
-            _reportGeneratorMock.Verify(x => x.SaveHtmlReportAsPdf("temp-path", "output-filename.pdf"), Times.Never);
+            _adjustBrowserViewPresenterMock.Verify(x => x.SavePdfReportAsync(It.IsAny<string>()), Times.Never);
             Assert.AreEqual(null, vm.OutputFilePath);
         }
 
@@ -111,7 +111,7 @@ namespace TripToPrint.Tests
             _userSessionMock.SetupGet(x => x.InputUri).Returns("input.kmz");
             _userSessionMock.SetupGet(x => x.GeneratedReportTempPath).Returns("temp-path");
             SetupDialogServiceAskUserToSaveFile("input.pdf", "output-filename.pdf");
-            _reportGeneratorMock.Setup(x => x.SaveHtmlReportAsPdf("temp-path", "output-filename.pdf"))
+            _adjustBrowserViewPresenterMock.Setup(x => x.SavePdfReportAsync("output-filename.pdf"))
                 .Returns(Task.FromResult(false));
 
             // Act

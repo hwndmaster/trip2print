@@ -79,7 +79,8 @@ namespace TripToPrint.Presenters
                 return false;
             }
 
-            if (!await _reportGenerator.SaveHtmlReportAsPdf(_userSession.GeneratedReportTempPath, outputFileName))
+
+            if (!await _adjustBrowserViewPresenter.SavePdfReportAsync(outputFileName))
             {
                 await _dialogService.InvalidOperationMessage("An error occurred during report create. Try to save a file to another folder or using another name (For example, with Latin symbols only).");
                 return false;

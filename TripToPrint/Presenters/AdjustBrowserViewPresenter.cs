@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
+
+using CefSharp;
 
 using TripToPrint.Core.Logging;
 using TripToPrint.ViewModels;
@@ -10,6 +13,7 @@ namespace TripToPrint.Presenters
     {
         void HandleConsoleMessage(string message);
         ILogger GetLogger();
+        Task<bool> SavePdfReportAsync(string path);
     }
 
     public class AdjustBrowserViewPresenter : IAdjustBrowserViewPresenter
@@ -48,6 +52,17 @@ namespace TripToPrint.Presenters
         public void Dispose()
         {
             View?.Dispose();
+        }
+
+        public async Task<bool> SavePdfReportAsync(string path)
+        {
+            return await View.Browser.PrintToPdfAsync(path, new PdfPrintSettings {
+                MarginType = CefPdfPrintMarginType.Custom,
+                MarginTop = 20,
+                MarginBottom = 20,
+                MarginLeft = 20,
+                MarginRight = 20
+            });
         }
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Codaxy.WkHtmlToPdf;
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.ModelFactories;
 using TripToPrint.Core.Models;
@@ -13,8 +12,6 @@ namespace TripToPrint.Core
     public interface IReportGenerator
     {
         Task<string> Generate(KmlDocument document, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark, IProgressTracker progress);
-
-        Task<bool> SaveHtmlReportAsPdf(string tempPath, string pdfFilePath);
     }
 
     public class ReportGenerator : IReportGenerator
@@ -61,30 +58,6 @@ namespace TripToPrint.Core
             progress.ReportDone();
 
             return tempPath;
-        }
-
-        public Task<bool> SaveHtmlReportAsPdf(string tempPath, string pdfFilePath)
-        {
-            return Task.Run(() => {
-                var environment = new PdfConvertEnvironment {
-                    WkHtmlToPdfPath = @"wkhtmltopdf.exe",
-                    Timeout = 60000
-                };
-
-                try
-                {
-                    PdfConvert.ConvertHtmlToPdf(new PdfDocument
-                    {
-                        Url = Path.Combine(tempPath, _resourceName.GetDefaultHtmlReportName())
-                    }, environment, new PdfOutput { OutputFilePath = pdfFilePath });
-
-                    return true;
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
-            });
         }
 
         public virtual async Task FetchMapImages(MooiDocument document, string tempPath, IProgressTracker progress)

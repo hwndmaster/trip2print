@@ -8,6 +8,8 @@ namespace TripToPrint.Views
 {
     public interface IAdjustBrowserView : IView<IAdjustBrowserViewPresenter>, IDisposable
     {
+        IWebBrowser Browser { get; }
+
         void InitializeBrowser();
     }
 
@@ -19,6 +21,9 @@ namespace TripToPrint.Views
             InitializeComponent();
         }
 
+        public IAdjustBrowserViewPresenter Presenter { get; set; }
+        public IWebBrowser Browser => browser;
+
         public void InitializeBrowser()
         {
             browser.AllowDrop = false;
@@ -28,16 +33,14 @@ namespace TripToPrint.Views
             browser.MenuHandler = new MenuHandler();
         }
 
-        public IAdjustBrowserViewPresenter Presenter { get; set; }
+        public void Dispose()
+        {
+            browser?.Dispose();
+        }
 
         private void Browser_ConsoleMessage(object sender, ConsoleMessageEventArgs e)
         {
             Presenter.HandleConsoleMessage($"[{e.Source}:{e.Line}] {e.Message}");
-        }
-
-        public void Dispose()
-        {
-            browser?.Dispose();
         }
     }
 }

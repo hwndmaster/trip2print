@@ -41,11 +41,11 @@ namespace TripToPrint.Core
             sb.Append($"<title>{document.Title}</title>");
             sb.Append(@"<style>
                 body { margin: 0; -webkit-print-color-adjust: exact; font-family: Arial }
-                h3 { margin: 0; }
+                h3 { margin: 0; font-size: 12pt; }
                 .doc-desc { font-style: italic; color: gray; }
                 .ov { padding-top: 5px; overflow: hidden; }
                 .ov-notfirst { page-break-before: always; }
-                .ov .title { position: absolute; left: 8px; z-index: 2; margin-top: 8px; padding: 1px 6px; display: inline; background: white; border-radius: 8px; border: 1px solid #ccc; }
+                .ov .title { position: absolute; left: 8px; z-index: 2; margin-top: 8px; padding: 1px 6px; display: inline; background: white; border-radius: 8px; border: 1px solid #ccc; font-size: 10pt; }
                 .ov img { width: 100%; }
                 .pm-cols { overflow: hidden; }
                 .pm-col { width: 49.9999%; float: left; }
@@ -53,16 +53,22 @@ namespace TripToPrint.Core
                 .pm-col .pm { border: 1px solid #ccc; margin: 0 1px 2px 0; }
                 .pm .title { color: black; font-weight: bold; font-size: 12pt; }
                 .pm .header { font-family: 'Calibri Light'; }
-                .pm .ix { position: relative; float: left; top: 126px; margin-left: -30px; background: #4189b3; border-radius: 10px; padding: 1px 6px; color: white; font-family: 'Consolas' }
+                .pm .ix { position: relative; float: left; top: 106px; margin-left: -30px; background: #4189b3; border-radius: 10px; padding: 1px 6px; color: white; font-family: 'Consolas' }
                 .pm-desc { font-size: 9.5pt; }
                 .pm-xtra { font-size: 9pt; color: #444444; }
                 .pm-xtra hr { margin: 5px 0; border: 0; border-top: 1px solid gray; }
-                .pm-img img { max-width: 200px; max-height: 150px; float: left; margin-right: 4px; }
+                .pm-img img { max-width: 170px; max-height: 120px; float: left; margin-right: 4px; }
                 .icon { position: relative; z-index: 5; float: left; }
                 .pm-col .icon { width: 30px; }
                 .dir .icon { width: 20px; padding-right: 2px; }
-                .map { max-height: 150px; position: relative; vertical-align: top; left: -30px; float: left; margin-right: -26px; }
+                .map { max-height: 130px; position: relative; vertical-align: top; left: -30px; float: left; margin-right: -26px; }
                 .coord { color: gray; font-size: 9pt; font-weight: bold; }
+                .coord a { color: gray; }
+
+                @media print {
+                    /* TODO: Temporary solution while scaling in CEF v57 cannot be adjusted */
+                    .pm { zoom: 0.8; }
+                }
                 </style>");
             sb.Append(@"</head><body>");
 
@@ -173,13 +179,13 @@ namespace TripToPrint.Core
             }
             sb.Append($"</div>");
 
-            if (!string.IsNullOrEmpty(placemark.ImagesContent))
-            {
-                sb.Append($"<div class='pm-img'>{placemark.ImagesContent}</div>");
-            }
             if (!string.IsNullOrEmpty(placemark.Description))
             {
                 sb.Append($"<div class='pm-desc'>{placemark.Description}</div>");
+            }
+            if (!string.IsNullOrEmpty(placemark.ImagesContent))
+            {
+                sb.Append($"<div class='pm-img'>{placemark.ImagesContent}</div>");
             }
             if (placemark.DiscoveredData != null && !placemark.DiscoveredData.IsUseless())
             {
@@ -187,7 +193,7 @@ namespace TripToPrint.Core
                 sb.Append("<div class='pm-xtra'><hr />");
                 if (!string.IsNullOrEmpty(placemark.DiscoveredData.Address))
                 {
-                    sb.Append($"Address: {placemark.DiscoveredData.Address}");
+                    sb.Append(placemark.DiscoveredData.Address);
                     sep = " | ";
                 }
                 if (!string.IsNullOrEmpty(placemark.DiscoveredData.ContactPhone))
