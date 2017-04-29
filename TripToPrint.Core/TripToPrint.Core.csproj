@@ -98,6 +98,7 @@
     <Compile Include="ReportWriter.cs" />
     <Compile Include="ResourceNameProvider.cs" />
     <Compile Include="StringHelper.cs" />
+    <Compile Include="TestingEnvCore.cs" />
     <Compile Include="WebClientService.cs" />
     <Compile Include="XmlExtensionMethods.cs" />
     <Compile Include="ZipFileWrapper.cs" />

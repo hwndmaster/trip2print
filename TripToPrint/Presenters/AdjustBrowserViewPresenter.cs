@@ -14,6 +14,7 @@ namespace TripToPrint.Presenters
         void HandleConsoleMessage(string message);
         ILogger GetLogger();
         Task<bool> SavePdfReportAsync(string path);
+        void HandleActivated();
     }
 
     public class AdjustBrowserViewPresenter : IAdjustBrowserViewPresenter
@@ -63,6 +64,11 @@ namespace TripToPrint.Presenters
                 MarginLeft = 20,
                 MarginRight = 20
             });
+        }
+
+        public void HandleActivated()
+        {
+            View.HandleActivated();
         }
     }
 }

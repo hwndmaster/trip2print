@@ -256,6 +256,10 @@ namespace TripToPrint.Core.ModelFactories
             content = Regex.Replace(content, @"<img.+?>", m => {
                 // Remove image sizes
                 var imageFiltered = Regex.Replace(m.Value, @"\s*(height|width)=['""](\d+|auto)['""]", "");
+
+                // Append a script which removes that image on loading error
+                imageFiltered = Regex.Replace(imageFiltered, @"/?>", @" onerror=""this.style.display = 'none'"" />");
+
                 foundImages.Add(imageFiltered);
                 return string.Empty;
             });

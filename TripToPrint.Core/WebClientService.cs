@@ -29,6 +29,12 @@ namespace TripToPrint.Core
 
         public async Task<string> GetStringAsync(Uri url, CancellationToken cancellationToken, Dictionary<HttpRequestHeader, string> headers = null)
         {
+#if DEBUG
+            var cached = TestingEnvCore.GetUrlString(url);
+            if (cached != null)
+                return cached;
+#endif
+
             try
             {
                 using (var webClient = new WebClient())
@@ -36,7 +42,11 @@ namespace TripToPrint.Core
                 {
                     AppendHeaders(webClient, headers);
                     webClient.Encoding = Encoding.UTF8;
-                    return await webClient.DownloadStringTaskAsync(url);
+                    var result = await webClient.DownloadStringTaskAsync(url);
+#if DEBUG
+                    TestingEnvCore.StoreUrlString(url, result);
+#endif
+                    return result;
                 }
             }
             catch (WebException e) when (e.Status == WebExceptionStatus.RequestCanceled)
@@ -53,11 +63,21 @@ namespace TripToPrint.Core
 
         public async Task<byte[]> GetAsync(Uri url)
         {
+#if DEBUG
+            var cached = TestingEnvCore.GetUrlBytes(url);
+            if (cached != null)
+                return cached;
+#endif
+
             try
             {
                 using (var webClient = new WebClient())
                 {
-                    return await webClient.DownloadDataTaskAsync(url);
+                    var result = await webClient.DownloadDataTaskAsync(url);
+#if DEBUG
+                    TestingEnvCore.StoreUrlBytes(url, null, result);
+#endif
+                    return result;
                 }
             }
             catch (Exception e)
@@ -69,6 +89,11 @@ namespace TripToPrint.Core
 
         public async Task<byte[]> PostAsync(Uri url, string parameters)
         {
+#if DEBUG
+            var cached = TestingEnvCore.GetUrlBytes(url, parameters);
+            if (cached != null)
+                return cached;
+#endif
             try
             {
                 using (var webClient = new WebClient())
@@ -76,7 +101,13 @@ namespace TripToPrint.Core
                     webClient.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
                     var data = Encoding.Default.GetBytes(parameters);
 
-                    return await webClient.UploadDataTaskAsync(url, data);
+                    var result = await webClient.UploadDataTaskAsync(url, data);
+
+#if DEBUG
+                    TestingEnvCore.StoreUrlBytes(url, parameters, result);
+#endif
+
+                    return result;
                 }
             }
             catch (Exception e)

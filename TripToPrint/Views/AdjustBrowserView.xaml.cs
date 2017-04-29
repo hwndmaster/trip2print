@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Windows.Controls;
+
 using CefSharp;
+using CefSharp.Wpf;
+
 using TripToPrint.Chromium;
 using TripToPrint.Presenters;
+using TripToPrint.ViewModels;
 
 namespace TripToPrint.Views
 {
@@ -11,6 +16,7 @@ namespace TripToPrint.Views
         IWebBrowser Browser { get; }
 
         void InitializeBrowser();
+        void HandleActivated();
     }
 
     [ExcludeFromCodeCoverage]
@@ -26,11 +32,24 @@ namespace TripToPrint.Views
 
         public void InitializeBrowser()
         {
+            RecreateBrowser();
+
+            var requestContextSettings = new RequestContextSettings { CachePath = "" };
+
             browser.AllowDrop = false;
             browser.ConsoleMessage += Browser_ConsoleMessage;
-            browser.BrowserSettings.ApplicationCache = CefState.Disabled;
-            browser.RequestHandler = new RequestHandler(Presenter.GetLogger());
             browser.MenuHandler = new MenuHandler();
+            browser.BrowserSettings = new BrowserSettings {
+                ApplicationCache = CefState.Disabled
+            };
+            browser.RequestContext = new RequestContext(requestContextSettings);
+            browser.RequestHandler = new RequestHandler(Presenter.GetLogger());
+        }
+
+        public void HandleActivated()
+        {
+            RecreateBrowser();
+            InitializeBrowser();
         }
 
         public void Dispose()
@@ -41,6 +60,24 @@ namespace TripToPrint.Views
         private void Browser_ConsoleMessage(object sender, ConsoleMessageEventArgs e)
         {
             Presenter.HandleConsoleMessage($"[{e.Source}:{e.Line}] {e.Message}");
+        }
+
+        /// <summary>
+        /// This is a temporary solution to CefSharp's resizing issue when a custom DPI is set to the OS.
+        /// For more information: https://github.com/cefsharp/CefSharp/issues/1571
+        /// </summary>
+        private void RecreateBrowser()
+        {
+            var grid = browser.Parent as Grid;
+            grid.Children.Remove(browser);
+            browser.Dispose();
+
+            browser = new ChromiumWebBrowser
+            {
+                Address = (DataContext as AdjustBrowserViewModel).Address
+            };
+
+            grid.Children.Add(browser);
         }
     }
 }

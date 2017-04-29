@@ -57,6 +57,8 @@ namespace TripToPrint.Presenters
             ViewModel.AdjustBrowser.Address = Path.Combine(_userSession.GeneratedReportTempPath,
                 _resourceName.GetDefaultHtmlReportName());
 
+            _adjustBrowserViewPresenter.HandleActivated();
+
             return Task.CompletedTask;
         }
 

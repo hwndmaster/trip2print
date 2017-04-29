@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Device.Location;
 using System.Linq;
+using System.Text.RegularExpressions;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TripToPrint.Core.ModelFactories;
@@ -125,7 +127,7 @@ namespace TripToPrint.Core.Tests.UnitTests
 
             // Verify
             Assert.AreEqual("text<br>text<br>text <a href='http://sample.url/path/page?q=1&w=2'>http://sample.url/path/page?q=1&w=2</a> text", result.Description);
-            Assert.AreEqual("<img 1/><img 2/>", result.ImagesContent);
+            Assert.IsTrue(Regex.IsMatch(result.ImagesContent, @"<img 1\sonerror.+?/><img 2\sonerror.+?/>"));
         }
     }
 }
