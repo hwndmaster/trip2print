@@ -24,9 +24,12 @@ namespace TripToPrint.Views
 
         public void AddLogItem(LogItem item)
         {
-            listLog.Items.Add(new LogItemViewModel(item));
+            this.Dispatcher.Invoke(() =>
+            {
+                listLog.Items.Add(new LogItemViewModel(item));
 
-            listLog.ScrollIntoView(listLog.Items[listLog.Items.Count - 1]);
+                listLog.ScrollIntoView(listLog.Items[listLog.Items.Count - 1]);
+            });
         }
 
         public void ClearLogItems()

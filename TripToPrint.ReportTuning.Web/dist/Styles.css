@@ -1,0 +1,122 @@
+﻿body {
+  margin: 0;
+  -webkit-print-color-adjust: exact;
+  font-family: Arial;
+}
+h3 {
+  margin: 0;
+  font-size: 12pt;
+}
+.doc-desc {
+  font-style: italic;
+  color: gray;
+}
+.ov {
+  padding-top: 5px;
+  overflow: hidden;
+}
+.ov .title {
+  position: absolute;
+  left: 8px;
+  z-index: 2;
+  margin-top: 8px;
+  padding: 1px 6px;
+  display: inline;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 10pt;
+}
+.ov img {
+  width: 100%;
+}
+.ov-notfirst {
+  page-break-before: always;
+}
+.pm-cols {
+  overflow: hidden;
+}
+.pm-cols .pm-col {
+  width: 49.9999%;
+  float: left;
+}
+.pm-cols .pm-col .pm {
+  border: 1px solid #ccc;
+  margin: 0 1px 2px 0;
+}
+.pm-cols .pm-col .pm .icon {
+  width: 30px;
+}
+.pm {
+  overflow: hidden;
+  padding: 1px;
+  page-break-inside: avoid;
+}
+.pm .title {
+  color: black;
+  font-weight: bold;
+  font-size: 12pt;
+}
+.pm .header {
+  font-family: 'Calibri Light';
+}
+.pm .map {
+  max-height: 130px;
+  position: relative;
+  vertical-align: top;
+  left: -30px;
+  float: left;
+  margin-right: -26px;
+}
+.pm .ix {
+  position: relative;
+  float: left;
+  top: 106px;
+  margin-left: -30px;
+  background: #4189b3;
+  border-radius: 10px;
+  padding: 1px 6px;
+  color: white;
+  font-family: 'Consolas';
+}
+.pm .icon {
+  position: relative;
+  z-index: 5;
+  float: left;
+}
+.pm .pm-desc {
+  font-size: 9.5pt;
+}
+.pm .pm-xtra {
+  font-size: 9pt;
+  color: #444444;
+}
+.pm .pm-xtra hr {
+  margin: 5px 0;
+  border: 0;
+  border-top: 1px solid gray;
+}
+.pm .pm-img img {
+  max-width: 170px;
+  max-height: 120px;
+  float: left;
+  margin-right: 4px;
+}
+.dir .icon {
+  width: 20px;
+  padding-right: 2px;
+}
+.coord {
+  color: gray;
+  font-size: 9pt;
+  font-weight: bold;
+}
+.coord a {
+  color: gray;
+}
+@media print {
+  /* TODO: Temporary solution while scaling in CEF v57 cannot be adjusted */
+  .pm {
+    zoom: 0.8;
+  }
+}

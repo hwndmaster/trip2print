@@ -13,7 +13,7 @@ namespace TripToPrint.Views
         IStepIntroView StepIntroView { get; }
         IStepSettingView StepSettingView { get; }
         IStepGenerationView StepGenerationView { get; }
-        IStepAdjustmentView StepAdjustmentView { get; }
+        IStepTuningView StepTuningView { get; }
 
         void Show();
     }
@@ -30,7 +30,7 @@ namespace TripToPrint.Views
         public IStepIntroView StepIntroView => stepIntro;
         public IStepSettingView StepSettingView => stepSetting;
         public IStepGenerationView StepGenerationView => stepGeneration;
-        public IStepAdjustmentView StepAdjustmentView => stepAdjustment;
+        public IStepTuningView StepTuningView => stepTuning;
 
         private void TabWizard_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {

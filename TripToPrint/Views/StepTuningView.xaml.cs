@@ -4,22 +4,22 @@ using TripToPrint.Presenters;
 
 namespace TripToPrint.Views
 {
-    public interface IStepAdjustmentView : IView<IStepAdjustmentPresenter>
+    public interface IStepTuningView : IView<IStepTuningPresenter>
     {
-        IAdjustBrowserView AdjustBrowserView { get; }
+        ITuningBrowserView TuningBrowserView { get; }
     }
 
     [ExcludeFromCodeCoverage]
-    public partial class StepAdjustmentView : IStepAdjustmentView
+    public partial class StepTuningView : IStepTuningView
     {
 
-        public StepAdjustmentView()
+        public StepTuningView()
         {
             InitializeComponent();
         }
 
-        public IStepAdjustmentPresenter Presenter { get; set; }
-        public IAdjustBrowserView AdjustBrowserView => adjustBrowser;
+        public IStepTuningPresenter Presenter { get; set; }
+        public ITuningBrowserView TuningBrowserView => tuningBrowser;
 
         private void OpenReport_OnClick(object sender, RoutedEventArgs e)
         {

@@ -6,7 +6,7 @@ namespace TripToPrint.Core.ModelFactories
 {
     public interface IMooiDocumentFactory
     {
-        MooiDocument Create(KmlDocument kmlDocument, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark);
+        MooiDocument Create(KmlDocument kmlDocument, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark, string reportTempPath);
     }
 
     public class MooiDocumentFactory : IMooiDocumentFactory
@@ -18,7 +18,7 @@ namespace TripToPrint.Core.ModelFactories
             _mooiGroupFactory = mooiGroupFactory;
         }
 
-        public MooiDocument Create(KmlDocument kmlDocument, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark)
+        public MooiDocument Create(KmlDocument kmlDocument, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark, string reportTempPath)
         {
             var model = new MooiDocument {
                 Title = kmlDocument.Title,
@@ -35,15 +35,15 @@ namespace TripToPrint.Core.ModelFactories
                 };
                 model.Sections.Add(section);
 
-                ExtractGroupsFromFolderIntoSection(folder, section, discoveredPlacePerPlacemark);
+                ExtractGroupsFromFolderIntoSection(folder, section, discoveredPlacePerPlacemark, reportTempPath);
             }
 
             return model;
         }
 
-        private void ExtractGroupsFromFolderIntoSection(KmlFolder folder, MooiSection section, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark)
+        private void ExtractGroupsFromFolderIntoSection(KmlFolder folder, MooiSection section, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark, string reportTempPath)
         {
-            var groups = _mooiGroupFactory.CreateList(folder, discoveredPlacePerPlacemark);
+            var groups = _mooiGroupFactory.CreateList(folder, discoveredPlacePerPlacemark, reportTempPath);
             groups.ForEach(x => x.Section = section);
             section.Groups.AddRange(groups);
         }

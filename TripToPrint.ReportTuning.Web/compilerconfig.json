@@ -1,0 +1,7 @@
+﻿[
+    {
+        "outputFile": "dist/Styles.css",
+        "inputFile": "Styles.less",
+        "minify": { "enabled": false }
+    }
+]

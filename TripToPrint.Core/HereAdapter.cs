@@ -107,6 +107,10 @@ namespace TripToPrint.Core
             var discoveredPlaces = new List<DiscoveredPlace>();
             try
             {
+                if (placemark.Coordinates.Length == 0)
+                {
+                    return discoveredPlaces;
+                }
                 if (_kmlCalculator.PlacemarkIsShape(placemark))
                 {
                     return discoveredPlaces;

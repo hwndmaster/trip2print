@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TripToPrint.Core</RootNamespace>
     <AssemblyName>TripToPrint.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,8 +44,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -75,6 +75,7 @@
     <Compile Include="ModelFactories\KmlDocumentFactory.cs" />
     <Compile Include="ModelFactories\MooiDocumentFactory.cs" />
     <Compile Include="ModelFactories\MooiGroupFactory.cs" />
+    <Compile Include="ModelFactories\MooiPlacemarkFactory.cs" />
     <Compile Include="Models\DiscoveredPlace.cs" />
     <Compile Include="Models\IKmlElement.cs" />
     <Compile Include="Models\KmlExtendedData.cs" />
@@ -95,9 +96,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="ReportGenerator.cs" />
-    <Compile Include="ReportWriter.cs" />
     <Compile Include="ResourceNameProvider.cs" />
-    <Compile Include="StringHelper.cs" />
     <Compile Include="TestingEnvCore.cs" />
     <Compile Include="WebClientService.cs" />
     <Compile Include="XmlExtensionMethods.cs" />

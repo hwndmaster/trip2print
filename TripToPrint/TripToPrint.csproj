@@ -11,10 +11,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TripToPrint</RootNamespace>
     <AssemblyName>TripToPrint</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -51,6 +52,9 @@
       <HintPath>..\packages\MahApps.Metro.1.4.3\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -78,9 +82,14 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="AttachedProperties\VirtualToggleButton.cs" />
-    <Compile Include="Chromium\MenuHandler.cs" />
+    <Compile Include="Chromium\FileResourceHandler.cs" />
     <Compile Include="Chromium\RequestHandler.cs" />
-    <Compile Include="Presenters\AdjustBrowserViewPresenter.cs" />
+    <Compile Include="Chromium\TuningDtoFactory.cs" />
+    <Compile Include="Chromium\MenuHandler.cs" />
+    <Compile Include="Chromium\ReportTuningResourceHandler.cs" />
+    <Compile Include="Chromium\SchemeHandlerFactory.cs" />
+    <Compile Include="Chromium\TuningBrowserHostGate.cs" />
+    <Compile Include="Presenters\TuningBrowserViewPresenter.cs" />
     <Compile Include="Presenters\KmlObjectsTreePresenter.cs" />
     <Compile Include="TestingEnv.cs" />
     <Compile Include="UserSession.cs" />
@@ -93,7 +102,7 @@
     <Compile Include="Presenters\IPresenter.cs" />
     <Compile Include="Presenters\IStepPresenter.cs" />
     <Compile Include="Presenters\StepGenerationPresenter.cs" />
-    <Compile Include="Presenters\StepAdjustmentPresenter.cs" />
+    <Compile Include="Presenters\StepTuningPresenter.cs" />
     <Compile Include="Presenters\StepIntroPresenter.cs" />
     <Compile Include="Presenters\MainWindowPresenter.cs" />
     <Compile Include="InputSource.cs" />
@@ -101,7 +110,7 @@
     <Compile Include="ViewModels\DummyDiscoveredPlace.cs" />
     <Compile Include="ViewModels\KmlFolderNodeViewModel.cs" />
     <Compile Include="ViewModels\KmlObjectsTreeViewModel.cs" />
-    <Compile Include="ViewModels\AdjustBrowserViewModel.cs" />
+    <Compile Include="ViewModels\TuningBrowserViewModel.cs" />
     <Compile Include="ViewModels\KmlObjectTreeNodeViewModel.cs" />
     <Compile Include="ViewModels\KmlPlacemarkNodeViewModel.cs" />
     <Compile Include="ViewModels\StepAdjustmentViewModel.cs" />
@@ -110,8 +119,8 @@
     <Compile Include="ViewModels\StepIntroViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
-    <Compile Include="Views\AdjustBrowserView.xaml.cs">
-      <DependentUpon>AdjustBrowserView.xaml</DependentUpon>
+    <Compile Include="Views\TuningBrowserView.xaml.cs">
+      <DependentUpon>TuningBrowserView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\IView.cs" />
     <Compile Include="IocBootstrap.cs" />
@@ -124,8 +133,8 @@
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\StepAdjustmentView.xaml.cs">
-      <DependentUpon>StepAdjustmentView.xaml</DependentUpon>
+    <Compile Include="Views\StepTuningView.xaml.cs">
+      <DependentUpon>StepTuningView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\StepGenerationView.xaml.cs">
       <DependentUpon>StepGenerationView.xaml</DependentUpon>
@@ -163,6 +172,14 @@
       <Project>{52a4b333-14e2-47cd-877f-808cdbe2a85b}</Project>
       <Name>TripToPrint.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TripToPrint.ReportTuning.Dto\TripToPrint.ReportTuning.Dto.csproj">
+      <Project>{16a6c9ae-d723-404e-862f-f11aa48b0feb}</Project>
+      <Name>TripToPrint.ReportTuning.Dto</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TripToPrint.ReportTuning.Web\TripToPrint.ReportTuning.Web.csproj">
+      <Project>{88682d80-414b-47b4-a0cf-7b3cf0a9a699}</Project>
+      <Name>TripToPrint.ReportTuning.Web</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Error.gif" />
@@ -185,7 +202,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\AdjustBrowserView.xaml">
+    <Page Include="Views\TuningBrowserView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -197,7 +214,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\StepAdjustmentView.xaml">
+    <Page Include="Views\StepTuningView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

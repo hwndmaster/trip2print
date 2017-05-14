@@ -29,8 +29,10 @@ namespace TripToPrint.Core.Tests.SpecflowDefinitions
                 Name = x.Name
             }));
 
-            var factory = new MooiGroupFactory(new KmlCalculator());
-            var groups = factory.CreateList(folder, null);
+            var kmlCalculator = new KmlCalculator();
+            var resourceName = new ResourceNameProvider();
+            var factory = new MooiGroupFactory(kmlCalculator, resourceName, new MooiPlacemarkFactory(kmlCalculator, resourceName));
+            var groups = factory.CreateList(folder, null, string.Empty);
             var result = groups
                 .SelectMany((@group, groupIndex)
                     => @group.Placemarks.Select(placemark

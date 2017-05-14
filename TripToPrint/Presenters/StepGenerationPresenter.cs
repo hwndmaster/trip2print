@@ -44,8 +44,6 @@ namespace TripToPrint.Presenters
 
             _logStorage.ItemAdded += (sender, item) => View.AddLogItem(item);
             _logStorage.AllItemsRemoved += (sender, args) => View.ClearLogItems();
-
-            //ViewModel.GeneratedReportTempPathChanged += (sender, tempPath) => _userSession.InputFileName = tempPath;
         }
 
         public async Task Activated()
@@ -86,9 +84,10 @@ namespace TripToPrint.Presenters
             {
                 var progressTracker = _progressTrackerFactory.Create(value => ViewModel.ProgressInPercentage = value);
 
-                _userSession.GeneratedReportTempPath = await _reportGenerator.Generate(_userSession.Document
-                    , _userSession.DiscoveredPlacePerPlacemark
-                    , progressTracker);
+                (_userSession.GeneratedReportTempPath, _userSession.GeneratedDocument)
+                    = await _reportGenerator.Generate(_userSession.Document
+                        , _userSession.DiscoveredPlacePerPlacemark
+                        , progressTracker);
 
                 _logger.Info("Generation process complete");
 

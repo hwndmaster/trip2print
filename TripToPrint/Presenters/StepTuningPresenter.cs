@@ -11,53 +11,50 @@ using TripToPrint.Views;
 
 namespace TripToPrint.Presenters
 {
-    public interface IStepAdjustmentPresenter : IPresenter<StepAdjustmentViewModel, IStepAdjustmentView>, IStepPresenter
+    public interface IStepTuningPresenter : IPresenter<StepTuningViewModel, IStepTuningView>, IStepPresenter
     {
         void OpenReport();
         void OpenReportContainingFolder();
         void CopyReportPathToClipboard();
     }
 
-    public class StepAdjustmentPresenter : IStepAdjustmentPresenter
+    public class StepTuningPresenter : IStepTuningPresenter
     {
         private readonly IDialogService _dialogService;
         private readonly IResourceNameProvider _resourceName;
         private readonly IReportGenerator _reportGenerator;
         private readonly IUserSession _userSession;
         private readonly IFileService _file;
-        private readonly IAdjustBrowserViewPresenter _adjustBrowserViewPresenter;
+        private readonly ITuningBrowserViewPresenter _tuningBrowserViewPresenter;
 
-        public StepAdjustmentPresenter(IDialogService dialogService, IResourceNameProvider resourceName,
+        public StepTuningPresenter(IDialogService dialogService, IResourceNameProvider resourceName,
             IReportGenerator reportGenerator, IFileService file, IUserSession userSession,
-            IAdjustBrowserViewPresenter adjustBrowserViewPresenter)
+            ITuningBrowserViewPresenter tuningBrowserViewPresenter)
         {
             _dialogService = dialogService;
             _resourceName = resourceName;
             _reportGenerator = reportGenerator;
             _file = file;
             _userSession = userSession;
-            _adjustBrowserViewPresenter = adjustBrowserViewPresenter;
+            _tuningBrowserViewPresenter = tuningBrowserViewPresenter;
         }
 
-        public virtual IStepAdjustmentView View { get; private set; }
-        public virtual StepAdjustmentViewModel ViewModel { get; private set; }
+        public virtual IStepTuningView View { get; private set; }
+        public virtual StepTuningViewModel ViewModel { get; private set; }
 
-        public void InitializePresenter(IStepAdjustmentView view, StepAdjustmentViewModel viewModel = null)
+        public void InitializePresenter(IStepTuningView view, StepTuningViewModel viewModel = null)
         {
-            ViewModel = viewModel ?? new StepAdjustmentViewModel();
+            ViewModel = viewModel ?? new StepTuningViewModel();
             View = view;
             View.DataContext = ViewModel;
             View.Presenter = this;
 
-            _adjustBrowserViewPresenter.InitializePresenter(View.AdjustBrowserView, ViewModel.AdjustBrowser);
+            _tuningBrowserViewPresenter.InitializePresenter(View.TuningBrowserView, ViewModel.TuningBrowser);
         }
 
         public Task Activated()
         {
-            ViewModel.AdjustBrowser.Address = Path.Combine(_userSession.GeneratedReportTempPath,
-                _resourceName.GetDefaultHtmlReportName());
-
-            _adjustBrowserViewPresenter.HandleActivated();
+            _tuningBrowserViewPresenter.HandleActivated(_userSession.GeneratedReportTempPath, _userSession.GeneratedDocument);
 
             return Task.CompletedTask;
         }
@@ -82,7 +79,7 @@ namespace TripToPrint.Presenters
             }
 
 
-            if (!await _adjustBrowserViewPresenter.SavePdfReportAsync(outputFileName))
+            if (!await _tuningBrowserViewPresenter.SavePdfReportAsync(outputFileName))
             {
                 await _dialogService.InvalidOperationMessage("An error occurred during report create. Try to save a file to another folder or using another name (For example, with Latin symbols only).");
                 return false;

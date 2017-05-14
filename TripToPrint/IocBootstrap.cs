@@ -6,6 +6,7 @@ using TripToPrint.Core;
 using TripToPrint.Presenters;
 using TripToPrint.Services;
 using TripToPrint.Views;
+using TripToPrint.Chromium;
 
 namespace TripToPrint
 {
@@ -35,22 +36,27 @@ namespace TripToPrint
                 .InstancePerLifetimeScope()
                 .PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies);
             builder.RegisterType<KmlObjectsTreePresenter>().As<IKmlObjectsTreePresenter>();
-            builder.RegisterType<StepAdjustmentPresenter>().As<IStepAdjustmentPresenter>();
-            builder.RegisterType<AdjustBrowserViewPresenter>().As<IAdjustBrowserViewPresenter>();
+            builder.RegisterType<StepTuningPresenter>().As<IStepTuningPresenter>();
+            builder.RegisterType<TuningBrowserViewPresenter>().As<ITuningBrowserViewPresenter>();
 
             // Views
             builder.RegisterType<MainWindow>().As<IMainWindowView>();
             builder.RegisterType<StepIntro>().As<IStepIntroView>();
             builder.RegisterType<StepSettingView>().As<IStepSettingView>();
             builder.RegisterType<StepGenerationView>().As<IStepGenerationView>();
-            builder.RegisterType<StepAdjustmentView>().As<IStepAdjustmentView>();
+            builder.RegisterType<StepTuningView>().As<IStepTuningView>();
             builder.RegisterType<KmlObjectsTreeView>().As<IKmlObjectsTreeView>();
-            builder.RegisterType<AdjustBrowserView>().As<IAdjustBrowserView>();
+            builder.RegisterType<TuningBrowserView>().As<ITuningBrowserView>();
 
             // Misc
+            builder.RegisterType<TuningDtoFactory>().As<ITuningDtoFactory>();
+
+            // For debugging purposes
+#if DEBUG
             builder.RegisterType<TestingEnv>()
                 .InstancePerLifetimeScope()
                 .PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies);
+#endif
 
             return builder.Build();
         }

@@ -34,7 +34,7 @@
             </TabItem>
             <TabItem Height="0">
                 <Grid>
-                    <local:StepAdjustmentView x:Name="stepAdjustment" />
+                    <local:StepTuningView x:Name="stepTuning" />
                 </Grid>
             </TabItem>
         </TabControl>

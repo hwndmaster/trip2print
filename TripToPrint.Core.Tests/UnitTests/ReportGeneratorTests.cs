@@ -9,12 +9,12 @@ using TripToPrint.Core.Models;
 
 namespace TripToPrint.Core.Tests.UnitTests
 {
+    // TODO: Currently this is not a report generator, but downloader of resources + creation of mooidocument
     [TestClass]
     public class ReportGeneratorTests
     {
         private readonly Mock<IMooiDocumentFactory> _mooiDocumentFactoryMock = new Mock<IMooiDocumentFactory>();
         private readonly Mock<IHereAdapter> _hereAdapterMock = new Mock<IHereAdapter>();
-        private readonly Mock<IReportWriter> _reportWriterMock = new Mock<IReportWriter>();
         private readonly Mock<ILogger> _loggerMock = new Mock<ILogger>();
         private readonly Mock<IFileService> _fileMock = new Mock<IFileService>();
         private readonly Mock<IResourceNameProvider> _resourceNameMock = new Mock<IResourceNameProvider>();
@@ -31,7 +31,6 @@ namespace TripToPrint.Core.Tests.UnitTests
             _reportGenerator = new Mock<ReportGenerator>(
                 _mooiDocumentFactoryMock.Object,
                 _hereAdapterMock.Object,
-                _reportWriterMock.Object,
                 _loggerMock.Object,
                 _fileMock.Object,
                 _resourceNameMock.Object,
@@ -58,16 +57,14 @@ namespace TripToPrint.Core.Tests.UnitTests
             };
             _reportGenerator.Setup(x => x.FetchMapImages(It.IsAny<MooiDocument>(), It.IsAny<string>(), _progressTrackerMock.Object))
                 .Returns(Task.CompletedTask);
-            _reportWriterMock.Setup(x => x.WriteReportAsync(It.IsAny<MooiDocument>())).Returns(Task.FromResult("content"));
 
             // Act
             var result = await _reportGenerator.Object.Generate(document, null, _progressTrackerMock.Object);
 
             // Verify
-            Assert.IsTrue(result.StartsWith(Path.Combine(Path.GetTempPath(), _tempFolderName)));
+            Assert.IsTrue(result.tempPath.StartsWith(Path.Combine(Path.GetTempPath(), _tempFolderName)));
             AssertDocumentResourcesAreSaved(document);
-            _fileMock.Verify(x => x.WriteStringAsync(Path.Combine(result, "default"), "content"), Times.Once);
-            _reportGenerator.Verify(x => x.FetchMapImages(It.IsAny<MooiDocument>(), result, _progressTrackerMock.Object), Times.Once);
+            _reportGenerator.Verify(x => x.FetchMapImages(It.IsAny<MooiDocument>(), result.tempPath, _progressTrackerMock.Object), Times.Once);
         }
 
         [TestMethod]
@@ -112,29 +109,6 @@ namespace TripToPrint.Core.Tests.UnitTests
             _fileMock.Verify(x => x.WriteBytesAsync(tempPath + @"\thumb-path", thumbnailBytes));
             _progressTrackerMock.Verify(x => x.ReportFetchImagesCount(1 + 1), Times.Once);
             _progressTrackerMock.Verify(x => x.ReportFetchImageProcessed(), Times.Exactly(2));
-        }
-
-        [TestMethod]
-        public async Task When_fetching_placemark_thumbnails_with_icons_on_the_web_the_icons_are_downloaded()
-        {
-            // Arrange
-            var placemark = new MooiPlacemark {
-                IconPath = "http://icon-path"
-            };
-            var document = new MooiDocument {
-                Sections = {
-                    new MooiSection { Groups = { new MooiGroup { Placemarks = { placemark } } } }
-                }
-            };
-            var tempPath = "temp-path";
-            var iconBytes = new byte[] { 0x55 };
-            _webClientMock.Setup(x => x.GetAsync(new Uri(placemark.IconPath))).Returns(Task.FromResult(iconBytes));
-
-            // Act
-            await _reportGenerator.Object.FetchMapImages(document, tempPath, _progressTrackerMock.Object);
-
-            // Verify
-            _fileMock.Verify(x => x.WriteBytesAsync(tempPath + @"\iconpath", iconBytes));
         }
 
         private void AssertDocumentResourcesAreSaved(KmlDocument document)

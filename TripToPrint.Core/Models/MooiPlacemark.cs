@@ -1,4 +1,4 @@
-using System;
+using JetBrains.Annotations;
 using System.Device.Location;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -22,12 +22,16 @@ namespace TripToPrint.Core.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public DiscoveredPlace DiscoveredData { get; set; }
-        public string ImagesContent { get; set; }
+        [NotNull] public string[] Images { get; set; }
         public string IconPath { get; set; }
         public GeoCoordinate[] Coordinates { get; set; } = new GeoCoordinate[0];
         public GeoCoordinate PrimaryCoordinate => Coordinates.FirstOrDefault();
         // TODO: где бы заюзать этот KmlExtendedData?
         //public List<KmlExtendedData> KmlExtendedData { get; set; }
+
+        public string ThumbnailMapFilePath { get; set; }
+        public bool IsShape { get; set; }
+        public string Distance { get; set; }
 
         public string Id => (int) Type + "-" + string.Join("-",
                                 new[] { PrimaryCoordinate?.Latitude, PrimaryCoordinate?.Longitude }

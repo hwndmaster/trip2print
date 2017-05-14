@@ -17,14 +17,14 @@ namespace TripToPrint.Presenters
         private readonly IStepIntroPresenter _stepIntroPresenter;
         private readonly IStepSettingPresenter _stepSettingPresenter;
         private readonly IStepGenerationPresenter _stepGenerationPresenter;
-        private readonly IStepAdjustmentPresenter _stepAdjustmentPresenter;
+        private readonly IStepTuningPresenter _stepTuningPresenter;
 
         public MainWindowPresenter(IStepIntroPresenter stepIntroPresenter, IStepSettingPresenter stepSettingPresenter,
-            IStepGenerationPresenter stepGenerationPresenter, IStepAdjustmentPresenter stepAdjustmentPresenter)
+            IStepGenerationPresenter stepGenerationPresenter, IStepTuningPresenter stepTuningPresenter)
         {
             _stepIntroPresenter = stepIntroPresenter;
             _stepGenerationPresenter = stepGenerationPresenter;
-            _stepAdjustmentPresenter = stepAdjustmentPresenter;
+            _stepTuningPresenter = stepTuningPresenter;
             _stepSettingPresenter = stepSettingPresenter;
         }
 
@@ -41,7 +41,7 @@ namespace TripToPrint.Presenters
             _stepIntroPresenter.InitializePresenter(View.StepIntroView, ViewModel.StepIntro);
             _stepSettingPresenter.InitializePresenter(View.StepSettingView, ViewModel.StepSetting);
             _stepGenerationPresenter.InitializePresenter(View.StepGenerationView, ViewModel.StepGeneration);
-            _stepAdjustmentPresenter.InitializePresenter(View.StepAdjustmentView, ViewModel.StepAdjustment);
+            _stepTuningPresenter.InitializePresenter(View.StepTuningView, ViewModel.StepTuning);
 
             GetWizardStepPresenter(ViewModel.WizardStepIndex).Activated().GetAwaiter().GetResult();
         }
@@ -91,7 +91,7 @@ namespace TripToPrint.Presenters
                 case 2:
                     return _stepGenerationPresenter;
                 case 3:
-                    return _stepAdjustmentPresenter;
+                    return _stepTuningPresenter;
                 default:
                     return null;
             }

@@ -1,37 +1,39 @@
 ﻿using System;
 using System.Threading.Tasks;
-
 using CefSharp;
-
 using TripToPrint.Core.Logging;
 using TripToPrint.ViewModels;
 using TripToPrint.Views;
+using TripToPrint.Chromium;
+using TripToPrint.Core.Models;
 
 namespace TripToPrint.Presenters
 {
-    public interface IAdjustBrowserViewPresenter : IPresenter<AdjustBrowserViewModel, IAdjustBrowserView>, IDisposable
+    public interface ITuningBrowserViewPresenter : IPresenter<TuningBrowserViewModel, ITuningBrowserView>, IDisposable
     {
         void HandleConsoleMessage(string message);
         ILogger GetLogger();
         Task<bool> SavePdfReportAsync(string path);
-        void HandleActivated();
+        void HandleActivated(string reportTempPath, MooiDocument document);
     }
 
-    public class AdjustBrowserViewPresenter : IAdjustBrowserViewPresenter
+    public class TuningBrowserViewPresenter : ITuningBrowserViewPresenter
     {
         private readonly ILogger _logger;
+        private readonly ITuningDtoFactory _tuningDtoFactory;
 
-        public AdjustBrowserViewPresenter(ILogger logger)
+        public TuningBrowserViewPresenter(ILogger logger, ITuningDtoFactory tuningDtoFactory)
         {
             _logger = logger;
+            _tuningDtoFactory = tuningDtoFactory;
         }
 
-        public IAdjustBrowserView View { get; private set; }
-        public virtual AdjustBrowserViewModel ViewModel { get; private set; }
+        public ITuningBrowserView View { get; private set; }
+        public virtual TuningBrowserViewModel ViewModel { get; private set; }
 
-        public void InitializePresenter(IAdjustBrowserView view, AdjustBrowserViewModel viewModel = null)
+        public void InitializePresenter(ITuningBrowserView view, TuningBrowserViewModel viewModel = null)
         {
-            ViewModel = viewModel ?? new AdjustBrowserViewModel();
+            ViewModel = viewModel ?? new TuningBrowserViewModel();
 
             View = view;
             View.DataContext = ViewModel;
@@ -66,8 +68,10 @@ namespace TripToPrint.Presenters
             });
         }
 
-        public void HandleActivated()
+        public void HandleActivated(string reportTempPath, MooiDocument document)
         {
+            ViewModel.Document = _tuningDtoFactory.Create(document, reportTempPath);
+
             View.HandleActivated();
         }
     }

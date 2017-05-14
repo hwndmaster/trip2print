@@ -9,35 +9,35 @@ using TripToPrint.Core.Models;
 
 namespace TripToPrint.Core
 {
+    // TODO: Rename to something like "Report Resource Fetcher/Downloader"
+
     public interface IReportGenerator
     {
-        Task<string> Generate(KmlDocument document, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark, IProgressTracker progress);
+        Task<(string tempPath, MooiDocument document)> Generate(KmlDocument document, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark, IProgressTracker progress);
     }
 
     public class ReportGenerator : IReportGenerator
     {
         private readonly IMooiDocumentFactory _mooiDocumentFactory;
         private readonly IHereAdapter _hereAdapter;
-        private readonly IReportWriter _reportWriter;
         private readonly ILogger _logger;
         private readonly IFileService _file;
         private readonly IResourceNameProvider _resourceName;
         private readonly IWebClientService _webClient;
 
         public ReportGenerator(IMooiDocumentFactory mooiDocumentFactory, IHereAdapter hereAdapter,
-            IReportWriter reportWriter, ILogger logger, IFileService file, IResourceNameProvider resourceName,
+            ILogger logger, IFileService file, IResourceNameProvider resourceName,
             IWebClientService webClient)
         {
             _mooiDocumentFactory = mooiDocumentFactory;
             _hereAdapter = hereAdapter;
-            _reportWriter = reportWriter;
             _logger = logger;
             _file = file;
             _resourceName = resourceName;
             _webClient = webClient;
         }
 
-        public async Task<string> Generate(KmlDocument document, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark, IProgressTracker progress)
+        public async Task<(string tempPath, MooiDocument document)> Generate(KmlDocument document, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark, IProgressTracker progress)
         {
             var tempPath = CreateAndGetTempPath();
 
@@ -47,17 +47,16 @@ namespace TripToPrint.Core
             }
             progress.ReportResourceEntriesProcessed();
 
-            var mooiDocument = _mooiDocumentFactory.Create(document, discoveredPlacePerPlacemark);
-            var content = await _reportWriter.WriteReportAsync(mooiDocument);
+            var mooiDocument = _mooiDocumentFactory.Create(document, discoveredPlacePerPlacemark, tempPath);
 
+            // TODO: This step is useless now:
             progress.ReportContentGenerationDone();
 
             await FetchMapImages(mooiDocument, tempPath, progress);
 
-            await _file.WriteStringAsync(Path.Combine(tempPath, _resourceName.GetDefaultHtmlReportName()), content);
             progress.ReportDone();
 
-            return tempPath;
+            return (tempPath, mooiDocument);
         }
 
         public virtual async Task FetchMapImages(MooiDocument document, string tempPath, IProgressTracker progress)
@@ -100,16 +99,6 @@ namespace TripToPrint.Core
                 imageBytes = await _hereAdapter.FetchThumbnail(placemark);
                 filePath = Path.Combine(tempPath, _resourceName.CreateFileNameForPlacemarkThumbnail(placemark));
                 await _file.WriteBytesAsync(filePath, imageBytes);
-            }
-
-            if (placemark.IconPathIsOnWeb)
-            {
-                filePath = Path.Combine(tempPath, StringHelper.MakeUrlStringSafeForFileName(placemark.IconPath));
-                if (!_file.Exists(filePath))
-                {
-                    imageBytes = await _webClient.GetAsync(new Uri(placemark.IconPath));
-                    await _file.WriteBytesAsync(filePath, imageBytes);
-                }
             }
 
             _logger.Info($"A thumbnail image for '{placemark.Id}' has been successfully downloaded");

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using TripToPrint.Core.Models;
 
 namespace TripToPrint.Core.ModelFactories
 {
     public interface IMooiGroupFactory
     {
-        List<MooiGroup> CreateList(KmlFolder folder, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark);
+        List<MooiGroup> CreateList(KmlFolder folder, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark, string reportTempPath);
     }
 
     public class MooiGroupFactory : IMooiGroupFactory
@@ -19,29 +19,35 @@ namespace TripToPrint.Core.ModelFactories
         private const double COEF_ROOM_OVER_MAX_DISTANCE = 1.5; // 50%
 
         private readonly IKmlCalculator _kmlCalculator;
+        private readonly IResourceNameProvider _resourceName;
+        private readonly IMooiPlacemarkFactory _mooiPlacemarkFactory;
 
-        public MooiGroupFactory(IKmlCalculator kmlCalculator)
+        public MooiGroupFactory(IKmlCalculator kmlCalculator, IResourceNameProvider resourceName, IMooiPlacemarkFactory mooiPlacemarkFactory)
         {
             _kmlCalculator = kmlCalculator;
+            _resourceName = resourceName;
+            _mooiPlacemarkFactory = mooiPlacemarkFactory;
         }
 
-        public List<MooiGroup> CreateList(KmlFolder folder, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark)
+        public List<MooiGroup> CreateList(KmlFolder folder, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark
+            , string reportTempPath)
         {
             var groups = new List<MooiGroup>();
 
             var placemarksConverted = folder.Placemarks
-                .Select(x => ConvertKmlPlacemarkToMooiPlacemark(x,
-                    discoveredPlacePerPlacemark?.ContainsKey(x) == true ? discoveredPlacePerPlacemark[x] : null))
+                .Select(x => _mooiPlacemarkFactory.Create(x,
+                    discoveredPlacePerPlacemark?.ContainsKey(x) == true ? discoveredPlacePerPlacemark[x] : null,
+                    reportTempPath))
                 .ToList();
 
             if (placemarksConverted.Count <= MIN_GROUP_COUNT)
             {
-                return CreateSingleGroup(placemarksConverted);
+                return CreateSingleGroup(placemarksConverted, reportTempPath);
             }
 
             if (folder.ContainsRoute && _kmlCalculator.CompleteFolderIsRoute(folder))
             {
-                return CreateSingleGroup(placemarksConverted);
+                return CreateSingleGroup(placemarksConverted, reportTempPath);
             }
 
             // TODO: Add support of lines within a folder which are not 'routes'
@@ -66,12 +72,12 @@ namespace TripToPrint.Core.ModelFactories
                     continue;
                 }
 
-                currentGroup.Placemarks.Add(startingPoint.Placemark);
+                AppendPlacemarkToGroup(startingPoint.Placemark, currentGroup);
 
                 // Add its closest neighbor to current group
                 if (!groups.Any(g => g.Placemarks.Any(p => p == startingPoint.NeighborWithMinDistance.Placemark)))
                 {
-                    currentGroup.Placemarks.Add(startingPoint.NeighborWithMinDistance.Placemark);
+                    AppendPlacemarkToGroup(startingPoint.NeighborWithMinDistance.Placemark, currentGroup);
                 }
 
                 foreach (var pm in placemarksToProcess.Skip(1).ToList())
@@ -94,7 +100,7 @@ namespace TripToPrint.Core.ModelFactories
                             }
                         }
 
-                        currentGroup.Placemarks.Add(pm.Placemark);
+                        AppendPlacemarkToGroup(pm.Placemark, currentGroup);
                         placemarksToProcess.Remove(pm);
                     }
 
@@ -104,6 +110,7 @@ namespace TripToPrint.Core.ModelFactories
                     }
                 }
 
+                currentGroup.OverviewMapFilePath = Path.Combine(reportTempPath, _resourceName.CreateFileNameForOverviewMap(currentGroup));
                 currentGroup = new MooiGroup();
                 groups.Add(currentGroup);
             }
@@ -116,31 +123,14 @@ namespace TripToPrint.Core.ModelFactories
             return groups;
         }
 
-        public MooiPlacemark ConvertKmlPlacemarkToMooiPlacemark(KmlPlacemark kmlPlacemark, DiscoveredPlace discoveredPlace)
-        {
-            string imagesContent;
-            var description = ExtractImagesFromContent(kmlPlacemark.Description, out imagesContent);
-            description = FilterContent(description);
-
-            return new MooiPlacemark
-            {
-                Name = kmlPlacemark.Name,
-                Description = description,
-                DiscoveredData = discoveredPlace,
-                ImagesContent = imagesContent,
-                Coordinates = kmlPlacemark.Coordinates,
-                IconPath = kmlPlacemark.IconPath
-            };
-        }
-
-        public List<MooiGroup> CreateSingleGroup(List<MooiPlacemark> placemarks)
+        public List<MooiGroup> CreateSingleGroup(List<MooiPlacemark> placemarks, string reportTempPath)
         {
             var group = new MooiGroup();
             foreach (var pm in placemarks)
             {
-                pm.Group = group;
-                group.Placemarks.Add(pm);
+                AppendPlacemarkToGroup(pm, group);
             }
+            group.OverviewMapFilePath = Path.Combine(reportTempPath, _resourceName.CreateFileNameForOverviewMap(group));
 
             return new List<MooiGroup> { group };
         }
@@ -208,8 +198,7 @@ namespace TripToPrint.Core.ModelFactories
 
                 foreach (var pm in groupToMerge.Placemarks)
                 {
-                    pm.Group = groupForMerge.group;
-                    groupForMerge.group.Placemarks.Add(pm);
+                    AppendPlacemarkToGroup(pm, groupForMerge.group);
                 }
 
                 groups.Remove(groupToMerge);
@@ -222,51 +211,6 @@ namespace TripToPrint.Core.ModelFactories
                    from pm2 in group1.Placemarks
                    where pm1 != pm2
                    select DistanceBetweenPlacemarks(pm1, pm2);
-        }
-
-        private string FilterContent(string content)
-        {
-            if (string.IsNullOrEmpty(content))
-                return content;
-
-            // Trim <br>'s at the beginning and at the end
-            content = Regex.Replace(content, @"^(<br\s*/?>)+", string.Empty);
-            content = Regex.Replace(content, @"(<br\s*/?>)+$", string.Empty);
-
-            // Strip consecutive br's
-            content = Regex.Replace(content, @"(<br\s*/?>){2,}", "<br>");
-
-            // Wrap links with html <a> tags
-            content = Regex.Replace(content,
-                @"((http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?)",
-                "<a href='$1'>$1</a>");
-
-            return content;
-        }
-
-        private string ExtractImagesFromContent(string content, out string imagesContent)
-        {
-            if (string.IsNullOrEmpty(content))
-            {
-                imagesContent = null;
-                return content;
-            }
-
-            var foundImages = new List<string>();
-            content = Regex.Replace(content, @"<img.+?>", m => {
-                // Remove image sizes
-                var imageFiltered = Regex.Replace(m.Value, @"\s*(height|width)=['""](\d+|auto)['""]", "");
-
-                // Append a script which removes that image on loading error
-                imageFiltered = Regex.Replace(imageFiltered, @"/?>", @" onerror=""this.style.display = 'none'"" />");
-
-                foundImages.Add(imageFiltered);
-                return string.Empty;
-            });
-
-            imagesContent = string.Join(string.Empty, foundImages);
-
-            return content;
         }
 
         private double DistanceBetweenPlacemarks(MooiPlacemark placemark1, MooiPlacemark placemark2)
@@ -286,6 +230,12 @@ namespace TripToPrint.Core.ModelFactories
             public MooiPlacemark Placemark { get; set; }
             public IEnumerable<PlacemarkNeighbor> Neighbors { get; set; }
             public PlacemarkNeighbor NeighborWithMinDistance { get; set; }
+        }
+
+        private void AppendPlacemarkToGroup(MooiPlacemark placemark, MooiGroup group)
+        {
+            placemark.Group = group;
+            group.Placemarks.Add(placemark);
         }
     }
 }

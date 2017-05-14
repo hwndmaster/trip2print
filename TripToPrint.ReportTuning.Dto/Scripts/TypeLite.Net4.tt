@@ -1,0 +1,32 @@
+﻿<#@ template debug="false" hostspecific="True" language="C#" #>
+<#@ assembly name="$(TargetDir)TypeLite.dll" #>
+<#@ assembly name="$(TargetDir)TypeLite.Net4.dll" #>
+<#@ assembly name="$(TargetDir)$(TargetFileName)" #>
+
+<#@ import namespace="TypeLite" #> 
+<#@ import namespace="TypeLite.Net4" #> 
+<#@output extension=".d.ts"#>
+
+ <#@include file="Manager.ttinclude"#>
+<# var manager = Manager.Create(Host, GenerationEnvironment); #>
+
+<# var ts = TypeScript.Definitions()
+        //.For<TripToPrint.ReportTuning.Dto.IHostGate>()
+        .For<TripToPrint.ReportTuning.Dto.MooiDocumentDto>()
+		.WithReference("Enums.ts")
+        .WithModuleNameFormatter((module) => "Interfaces")
+        .WithTypeFormatter((type, f) => {
+            var classType = (TypeLite.TsModels.TsClass)type;
+            if (classType.Name[0] == 'I' && char.IsUpper(classType.Name[1]))
+                return classType.Name;
+            return "I" + classType.Name;
+        })
+        .WithMemberFormatter((identifier) => Char.ToLower(identifier.Name[0]) + identifier.Name.Substring(1));
+#>
+
+<#= ts.Generate(TsGeneratorOutput.Properties) #>
+
+<# manager.StartNewFile("Enums.ts"); #>
+<#= ts.Generate(TsGeneratorOutput.Enums) #>
+<# manager.EndBlock(); #>
+<# manager.Process(true); #>

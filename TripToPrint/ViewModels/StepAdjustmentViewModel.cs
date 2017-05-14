@@ -1,6 +1,6 @@
 ﻿namespace TripToPrint.ViewModels
 {
-    public class StepAdjustmentViewModel : ViewModelBase
+    public class StepTuningViewModel : ViewModelBase
     {
         private string _outputFilePath;
 
@@ -16,6 +16,6 @@
             }
         }
 
-        public AdjustBrowserViewModel AdjustBrowser { get; } = new AdjustBrowserViewModel();
+        public TuningBrowserViewModel TuningBrowser { get; } = new TuningBrowserViewModel();
     }
 }

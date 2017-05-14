@@ -4,9 +4,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using Autofac;
-
 using CefSharp;
-
+using TripToPrint.Chromium;
 using TripToPrint.Core;
 using TripToPrint.Presenters;
 using TripToPrint.Views;
@@ -34,7 +33,9 @@ namespace TripToPrint
 
             mainWindowView.Show();
 
+#if DEBUG
             _container.Resolve<TestingEnv>().Run();
+#endif
 
             base.OnStartup(e);
         }
@@ -74,13 +75,30 @@ namespace TripToPrint
 
             var settings = new CefSettings {
                 IgnoreCertificateErrors = true,
+#if DEBUG
+                LogSeverity = LogSeverity.Default,
+                LogFile = "cef.log",
+                RemoteDebuggingPort = 9999,
+#else
                 LogSeverity = LogSeverity.Disable,
-                //LogSeverity = LogSeverity.Default,
-                //LogFile = "cef.log",
+#endif
                 BrowserSubprocessPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
                     Environment.Is64BitProcess ? "x64" : "x86",
-                    "CefSharp.BrowserSubprocess.exe")
+                    "CefSharp.BrowserSubprocess.exe"),
+
+                WindowlessRenderingEnabled = true
             };
+
+            settings.RegisterScheme(new CefCustomScheme
+            {
+                SchemeName = SchemeHandlerFactory.T2P_SCHEME_NAME,
+                SchemeHandlerFactory = new SchemeHandlerFactory()
+            });
+            settings.RegisterScheme(new CefCustomScheme
+            {
+                SchemeName = SchemeHandlerFactory.FILE_SCHEME_NAME,
+                SchemeHandlerFactory = new SchemeHandlerFactory()
+            });
             CefSharpSettings.WcfTimeout = TimeSpan.Zero;
 
             Cef.Initialize(settings, performDependencyCheck: false, browserProcessHandler: null);

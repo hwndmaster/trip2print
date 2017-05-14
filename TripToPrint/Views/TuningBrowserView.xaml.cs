@@ -1,33 +1,33 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Controls;
-
 using CefSharp;
 using CefSharp.Wpf;
-
 using TripToPrint.Chromium;
 using TripToPrint.Presenters;
-using TripToPrint.ViewModels;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace TripToPrint.Views
 {
-    public interface IAdjustBrowserView : IView<IAdjustBrowserViewPresenter>, IDisposable
+    public interface ITuningBrowserView : IView<ITuningBrowserViewPresenter>, IDisposable
     {
         IWebBrowser Browser { get; }
 
         void InitializeBrowser();
         void HandleActivated();
+        void RefreshData();
     }
 
     [ExcludeFromCodeCoverage]
-    public partial class AdjustBrowserView : IAdjustBrowserView
+    public partial class TuningBrowserView : ITuningBrowserView
     {
-        public AdjustBrowserView()
+        public TuningBrowserView()
         {
             InitializeComponent();
         }
 
-        public IAdjustBrowserViewPresenter Presenter { get; set; }
+        public ITuningBrowserViewPresenter Presenter { get; set; }
         public IWebBrowser Browser => browser;
 
         public void InitializeBrowser()
@@ -42,14 +42,25 @@ namespace TripToPrint.Views
             browser.BrowserSettings = new BrowserSettings {
                 ApplicationCache = CefState.Disabled
             };
-            browser.RequestContext = new RequestContext(requestContextSettings);
             browser.RequestHandler = new RequestHandler(Presenter.GetLogger());
+
+            browser.RegisterJsObject("host", new TuningBrowserHostGate(this));
         }
 
         public void HandleActivated()
         {
             RecreateBrowser();
             InitializeBrowser();
+        }
+
+        public void RefreshData()
+        {
+            var data = JsonConvert.SerializeObject(Presenter.ViewModel.Document,
+                new JsonSerializerSettings
+                {
+                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                });
+            browser.ExecuteScriptAsync($"app.applyData({data})");
         }
 
         public void Dispose()
@@ -74,7 +85,7 @@ namespace TripToPrint.Views
 
             browser = new ChromiumWebBrowser
             {
-                Address = (DataContext as AdjustBrowserViewModel).Address
+                Address = "t2p://internal/index.html"
             };
 
             grid.Children.Add(browser);

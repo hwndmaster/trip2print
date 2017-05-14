@@ -17,7 +17,8 @@ namespace TripToPrint.Chromium
         public bool OnBeforeBrowse(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request, bool isRedirect)
         {
             var requestUri = new Uri(request.Url);
-            if (requestUri.IsFile)
+            if (requestUri.Scheme.Equals(SchemeHandlerFactory.T2P_SCHEME_NAME)
+                || requestUri.Scheme.Equals(SchemeHandlerFactory.FILE_SCHEME_NAME))
             {
                 return false;
             }

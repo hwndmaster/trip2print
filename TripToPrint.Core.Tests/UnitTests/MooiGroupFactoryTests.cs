@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Device.Location;
 using System.Linq;
-using System.Text.RegularExpressions;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TripToPrint.Core.ModelFactories;
@@ -14,15 +12,29 @@ namespace TripToPrint.Core.Tests.UnitTests
     public class MooiGroupFactoryTests
     {
         private readonly Mock<IKmlCalculator> _kmlCalculatorMock = new Mock<IKmlCalculator>();
+        private readonly Mock<IResourceNameProvider> _resourceNameMock = new Mock<IResourceNameProvider>();
+        private readonly Mock<IMooiPlacemarkFactory> _mooiPlacemarkFactoryMock = new Mock<IMooiPlacemarkFactory>();
 
         private Mock<MooiGroupFactory> _factory;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _factory = new Mock<MooiGroupFactory>(_kmlCalculatorMock.Object) {
+            _factory = new Mock<MooiGroupFactory>(
+                _kmlCalculatorMock.Object,
+                _resourceNameMock.Object,
+                _mooiPlacemarkFactoryMock.Object) {
                 CallBase = true
             };
+
+            _resourceNameMock.Setup(x => x.CreateFileNameForPlacemarkThumbnail(It.IsAny<MooiPlacemark>()))
+                .Returns("thumb.jpg");
+            _resourceNameMock.Setup(x => x.CreateFileNameForOverviewMap(It.IsAny<MooiGroup>()))
+                .Returns("overview.jpg");
+            _mooiPlacemarkFactoryMock.Setup(x => x.Create(
+                It.IsAny<KmlPlacemark>(),
+                It.IsAny<DiscoveredPlace>(),
+                It.IsAny<string>())).Returns(() => new MooiPlacemark());
         }
 
         [TestMethod]
@@ -36,7 +48,7 @@ namespace TripToPrint.Core.Tests.UnitTests
                 });
 
             // Act
-            var result = _factory.Object.CreateList(folder, null);
+            var result = _factory.Object.CreateList(folder, null, string.Empty);
 
             // Verify
             Assert.AreEqual(1, result.Count);
@@ -58,7 +70,7 @@ namespace TripToPrint.Core.Tests.UnitTests
             _kmlCalculatorMock.Setup(x => x.CompleteFolderIsRoute(folder)).Returns(true);
 
             // Act
-            var result = _factory.Object.CreateList(folder, null);
+            var result = _factory.Object.CreateList(folder, null, string.Empty);
 
             // Verify
             Assert.AreEqual(1, result.Count);
@@ -90,44 +102,6 @@ namespace TripToPrint.Core.Tests.UnitTests
             };
             CollectionAssert.AreEqual(expectedOrderWithNeighbors,
                 result.Select(x => new { pl = x.Placemark, neighbor = x.NeighborWithMinDistance.Placemark }).ToList());
-        }
-
-        [TestMethod]
-        public void When_converting_kmlplacemark_the_values_are_copied_correctly()
-        {
-            // Arrange
-            var placemark = new KmlPlacemark {
-                Name = "placemark-name",
-                Description = "description-1",
-                Coordinates = new [] { new GeoCoordinate(1, 2, 3) },
-                IconPath = "icon-path"
-            };
-
-            // Act
-            var result = _factory.Object.ConvertKmlPlacemarkToMooiPlacemark(placemark, null);
-
-            // Verify
-            Assert.AreEqual(placemark.Name, result.Name);
-            Assert.AreEqual(placemark.Description, result.Description);
-            CollectionAssert.AreEqual(placemark.Coordinates, result.Coordinates);
-            Assert.AreEqual(placemark.IconPath, result.IconPath);
-        }
-
-        [TestMethod]
-        public void When_converting_kmlplacemark_the_description_is_filtered_and_images_are_reordered()
-        {
-            // Arrange
-            var placemark = new KmlPlacemark
-            {
-                Description = "text<br><br><img 1/><br>text<img width='200' height='100' 2/><br>text http://sample.url/path/page?q=1&w=2 text"
-            };
-
-            // Act
-            var result = _factory.Object.ConvertKmlPlacemarkToMooiPlacemark(placemark, null);
-
-            // Verify
-            Assert.AreEqual("text<br>text<br>text <a href='http://sample.url/path/page?q=1&w=2'>http://sample.url/path/page?q=1&w=2</a> text", result.Description);
-            Assert.IsTrue(Regex.IsMatch(result.ImagesContent, @"<img 1\sonerror.+?/><img 2\sonerror.+?/>"));
         }
     }
 }
