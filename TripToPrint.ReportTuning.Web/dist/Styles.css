@@ -44,13 +44,42 @@ h3 {
   border: 1px solid #ccc;
   margin: 0 1px 2px 0;
 }
-.pm-cols .pm-col .pm .icon {
-  width: 30px;
-}
 .pm {
   overflow: hidden;
   padding: 1px;
   page-break-inside: avoid;
+}
+.pm .thumbnail-map-ctr {
+  width: 200px;
+  height: 130px;
+  float: left;
+  margin-right: 4px;
+}
+.pm .thumbnail-map-ctr .icon {
+  position: relative;
+  width: 30px;
+}
+.pm .thumbnail-map-ctr .map {
+  max-height: 130px;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.pm .thumbnail-map-ctr .ix {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  background: #4189b3;
+  border-radius: 10px;
+  padding: 1px 6px;
+  color: white;
+  font-family: 'Consolas';
+}
+.pm .small-icon {
+  position: relative;
+  float: left;
+  width: 20px;
+  padding-right: 2px;
 }
 .pm .title {
   color: black;
@@ -59,30 +88,6 @@ h3 {
 }
 .pm .header {
   font-family: 'Calibri Light';
-}
-.pm .map {
-  max-height: 130px;
-  position: relative;
-  vertical-align: top;
-  left: -30px;
-  float: left;
-  margin-right: -26px;
-}
-.pm .ix {
-  position: relative;
-  float: left;
-  top: 106px;
-  margin-left: -30px;
-  background: #4189b3;
-  border-radius: 10px;
-  padding: 1px 6px;
-  color: white;
-  font-family: 'Consolas';
-}
-.pm .icon {
-  position: relative;
-  z-index: 5;
-  float: left;
 }
 .pm .pm-desc {
   font-size: 9.5pt;
@@ -102,10 +107,6 @@ h3 {
   float: left;
   margin-right: 4px;
 }
-.dir .icon {
-  width: 20px;
-  padding-right: 2px;
-}
 .coord {
   color: gray;
   font-size: 9pt;
@@ -114,9 +115,82 @@ h3 {
 .coord a {
   color: gray;
 }
+.commands-parent {
+  position: relative;
+}
+.commands-parent.hidden {
+  opacity: 0.2;
+  position: absolute;
+}
+.commands-parent.hidden .commands-ctr {
+  visibility: visible;
+}
+.commands-parent.hidden .commands-ctr button {
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 1;
+}
+.commands-parent.hidden:hover {
+  opacity: 1;
+}
+.commands-parent.hidden:hover .commands-ctr button {
+  background: #ffffff;
+}
+.commands-ctr {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: table;
+  visibility: hidden;
+}
+.commands-ctr button {
+  opacity: 0;
+}
+.commands-ctr .commands-inner {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+.commands-ctr button {
+  background: linear-gradient(#ffffff, #e6e6e6);
+  border: 1px solid #e6e6e6;
+  padding: 2px;
+  height: 30px;
+  cursor: pointer;
+}
+.commands-parent:hover .commands-ctr {
+  visibility: visible;
+  animation: commands-appear-bg 0.25s ease-in-out forwards;
+}
+.commands-parent:hover .commands-ctr button {
+  animation: commands-appear 0.25s ease-in-out forwards;
+}
+.commands-parent.hidden:hover .commands-ctr button {
+  animation: none;
+}
 @media print {
   /* TODO: Temporary solution while scaling in CEF v57 cannot be adjusted */
   .pm {
     zoom: 0.8;
+  }
+  .hidden {
+    display: none;
+  }
+}
+@keyframes commands-appear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes commands-appear-bg {
+  0% {
+    background-color: rgba(255, 255, 255, 0);
+  }
+  100% {
+    background-color: rgba(255, 255, 255, 0.6);
   }
 }

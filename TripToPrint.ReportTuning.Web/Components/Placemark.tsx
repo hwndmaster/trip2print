@@ -11,8 +11,8 @@
             let pm = this.props.placemark;
 
             return <div className="pm">
-                <img className="icon" src={pm.iconPath} />
-                {this.renderThumbnailMap()}
+                {this.props.isInRouteGroup ? null : <ThumbnailMap placemark={pm} />}
+                {this.props.isInRouteGroup ? <img className="small-icon" src={pm.iconPath} /> : null}
                 <div className="header">
                     <span className="coord">
                         (<a href={`http://maps.google.com/?ll=${pm.coordinates[0]}`} onClick={this.preventNavigation}>{pm.coordinates[0]}</a>)
@@ -23,19 +23,6 @@
                 {pm.description ? <div className="pm-desc" dangerouslySetInnerHTML={{ __html: pm.description }} /> : null}
                 {this.renderImages(pm.images)}
                 {this.renderDiscoveredData(pm.discoveredData)}
-            </div>;
-        }
-
-        private renderThumbnailMap() {
-            let pm = this.props.placemark;
-
-            if (this.props.isInRouteGroup) {
-                return null;
-            }
-
-            return <div>
-                <img className="map" src={pm.thumbnailFilePath} />
-                <div className="ix">{pm.index}</div>
             </div>;
         }
 
