@@ -10,8 +10,8 @@
         }
 
         init() {
-            let rootElement = React.createElement(Root, {});
-            this.root = <Root>ReactDOM.render(rootElement, document.getElementById("root"));
+            const rootElement = React.createElement(Root, {});
+            this.root = ReactDOM.render(rootElement, document.getElementById("root")) as Root;
 
             host.documentInitialized();
         }

@@ -5,7 +5,7 @@ var TripToPrint;
             this.init();
         }
         init() {
-            let rootElement = React.createElement(TripToPrint.Root, {});
+            const rootElement = React.createElement(TripToPrint.Root, {});
             this.root = ReactDOM.render(rootElement, document.getElementById("root"));
             host.documentInitialized();
         }
@@ -17,21 +17,54 @@ var TripToPrint;
 })(TripToPrint || (TripToPrint = {}));
 var TripToPrint;
 (function (TripToPrint) {
+    class BaseCommand extends React.Component {
+        render() {
+            const imagePath = `Images/${this.getImageName()}`;
+            return React.createElement("button", { onClick: this.props.onClick, title: this.getTitle() },
+                React.createElement("img", { src: imagePath }));
+        }
+    }
+    TripToPrint.BaseCommand = BaseCommand;
+})(TripToPrint || (TripToPrint = {}));
+var TripToPrint;
+(function (TripToPrint) {
+    class CommandHide extends TripToPrint.BaseCommand {
+        getTitle() { return "Hide this in report"; }
+        getImageName() { return "Power.png"; }
+    }
+    TripToPrint.CommandHide = CommandHide;
+})(TripToPrint || (TripToPrint = {}));
+var TripToPrint;
+(function (TripToPrint) {
+    class Commands extends React.Component {
+        render() {
+            const className = "commands-ctr";
+            return React.createElement("div", { className: className, ref: "ctr" },
+                React.createElement("div", { className: "commands-inner" }, this.props.children));
+        }
+        componentDidMount() {
+            const me = this.refs["ctr"];
+            me.parentElement.classList.add("commands-parent");
+        }
+    }
+    TripToPrint.Commands = Commands;
+})(TripToPrint || (TripToPrint = {}));
+var TripToPrint;
+(function (TripToPrint) {
+    class CommandShow extends TripToPrint.BaseCommand {
+        getTitle() { return "Show hidden content"; }
+        getImageName() { return "Play.png"; }
+    }
+    TripToPrint.CommandShow = CommandShow;
+})(TripToPrint || (TripToPrint = {}));
+var TripToPrint;
+(function (TripToPrint) {
     class Group extends React.Component {
         render() {
             let group = this.props.group;
             return React.createElement("div", null,
-                this.renderOverviewMap(),
+                React.createElement(TripToPrint.OverviewMap, { group: this.props.group, section: this.props.section, isFirst: this.props.isFirst }),
                 group.isRoute ? this.renderRoute() : this.renderPoints());
-        }
-        renderOverviewMap() {
-            let className = "ov";
-            if (!this.props.isFirst) {
-                className += " ov-notfirst";
-            }
-            return React.createElement("div", { className: className },
-                React.createElement("h4", { className: "title" }, this.props.section.name),
-                React.createElement("img", { src: this.props.group.overviewMapFilePath }));
         }
         renderRoute() {
             let group = this.props.group;
@@ -65,6 +98,51 @@ var TripToPrint;
 })(TripToPrint || (TripToPrint = {}));
 var TripToPrint;
 (function (TripToPrint) {
+    class Hideable extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = { hidden: false };
+        }
+        render() {
+            if (this.state.hidden) {
+                return React.createElement("div", { className: "hidden" },
+                    React.createElement(TripToPrint.Commands, null,
+                        React.createElement(TripToPrint.CommandShow, { onClick: () => { this.show(); } })));
+            }
+            return this.renderUnhidden();
+        }
+        hide() {
+            this.setState({
+                hidden: true
+            });
+        }
+        show() {
+            this.setState({
+                hidden: false
+            });
+        }
+    }
+    TripToPrint.Hideable = Hideable;
+})(TripToPrint || (TripToPrint = {}));
+var TripToPrint;
+(function (TripToPrint) {
+    class OverviewMap extends TripToPrint.Hideable {
+        renderUnhidden() {
+            let className = "ov";
+            if (!this.props.isFirst) {
+                className += " ov-notfirst";
+            }
+            return React.createElement("div", { className: className },
+                React.createElement("h4", { className: "title" }, this.props.section.name),
+                React.createElement("img", { src: this.props.group.overviewMapFilePath }),
+                React.createElement(TripToPrint.Commands, null,
+                    React.createElement(TripToPrint.CommandHide, { onClick: () => { this.hide(); } })));
+        }
+    }
+    TripToPrint.OverviewMap = OverviewMap;
+})(TripToPrint || (TripToPrint = {}));
+var TripToPrint;
+(function (TripToPrint) {
     class Placemark extends React.Component {
         render() {
             let pm = this.props.placemark;
@@ -80,7 +158,9 @@ var TripToPrint;
                         " ",
                         pm.name),
                     this.renderDistance()),
-                pm.description ? React.createElement("div", { className: "pm-desc", dangerouslySetInnerHTML: { __html: pm.description } }) : null,
+                pm.description
+                    ? React.createElement("div", { className: "pm-desc", dangerouslySetInnerHTML: { __html: pm.description } })
+                    : null,
                 this.renderImages(pm.images),
                 this.renderDiscoveredData(pm.discoveredData));
         }
@@ -95,7 +175,7 @@ var TripToPrint;
                 ")");
         }
         renderImages(images) {
-            if (images.length == 0)
+            if (images.length === 0)
                 return null;
             return React.createElement("div", { className: "pm-img" }, images.map(x => React.createElement("img", { src: x, onError: this.onImageError })));
         }
@@ -127,10 +207,12 @@ var TripToPrint;
                     React.createElement("br", null),
                     "Opening hours: ",
                     discovered.openingHours) : null,
-                discovered.wikipediaContent ? React.createElement("span", null,
-                    React.createElement("br", null),
-                    "Wikipedia: ",
-                    React.createElement("span", { dangerouslySetInnerHTML: { __html: discovered.wikipediaContent } })) : null);
+                discovered.wikipediaContent
+                    ? React.createElement("span", null,
+                        React.createElement("br", null),
+                        "Wikipedia: ",
+                        React.createElement("span", { dangerouslySetInnerHTML: { __html: discovered.wikipediaContent } }))
+                    : null);
         }
         preventNavigation(event) {
             event.stopPropagation();
@@ -150,17 +232,19 @@ var TripToPrint;
             };
         }
         render() {
-            let doc = this.state.document;
+            const doc = this.state.document;
             if (doc == null)
                 return null;
             return React.createElement("div", null,
                 React.createElement("h3", null, doc.title),
-                (doc.description != null ? React.createElement("p", { className: "doc-desc", dangerouslySetInnerHTML: { __html: doc.description } }) : null),
+                (doc.description != null
+                    ? React.createElement("p", { className: "doc-desc", dangerouslySetInnerHTML: { __html: doc.description } })
+                    : null),
                 this.renderSections());
         }
         renderSections() {
-            let sections = this.state.document.sections;
-            return sections.map((s, i) => React.createElement(TripToPrint.Section, { section: s, isFirst: i == 0 }));
+            const sections = this.state.document.sections;
+            return sections.map((s, i) => React.createElement(TripToPrint.Section, { section: s, isFirst: i === 0 }));
         }
     }
     TripToPrint.Root = Root;
@@ -173,34 +257,6 @@ var TripToPrint;
         }
     }
     TripToPrint.Section = Section;
-})(TripToPrint || (TripToPrint = {}));
-var TripToPrint;
-(function (TripToPrint) {
-    class Hideable extends React.Component {
-        constructor(props) {
-            super(props);
-            this.state = { hidden: false };
-        }
-        render() {
-            if (this.state.hidden) {
-                return React.createElement("div", { className: "hidden" },
-                    React.createElement(TripToPrint.Commands, null,
-                        React.createElement(TripToPrint.CommandShow, { onClick: () => { this.show(); } })));
-            }
-            return this.renderUnhidden();
-        }
-        hide() {
-            this.setState({
-                hidden: true
-            });
-        }
-        show() {
-            this.setState({
-                hidden: false
-            });
-        }
-    }
-    TripToPrint.Hideable = Hideable;
 })(TripToPrint || (TripToPrint = {}));
 var TripToPrint;
 (function (TripToPrint) {
@@ -219,40 +275,5 @@ var TripToPrint;
         }
     }
     TripToPrint.ThumbnailMap = ThumbnailMap;
-})(TripToPrint || (TripToPrint = {}));
-var TripToPrint;
-(function (TripToPrint) {
-    class CommandHide extends React.Component {
-        render() {
-            return React.createElement("button", { onClick: this.props.onClick, title: "Hide this in report" },
-                React.createElement("img", { src: "Images/Power.png" }));
-        }
-    }
-    TripToPrint.CommandHide = CommandHide;
-})(TripToPrint || (TripToPrint = {}));
-var TripToPrint;
-(function (TripToPrint) {
-    class Commands extends React.Component {
-        render() {
-            const className = "commands-ctr";
-            return React.createElement("div", { className: className, ref: "ctr" },
-                React.createElement("div", { className: "commands-inner" }, this.props.children));
-        }
-        componentDidMount() {
-            const me = this.refs["ctr"];
-            me.parentElement.classList.add("commands-parent");
-        }
-    }
-    TripToPrint.Commands = Commands;
-})(TripToPrint || (TripToPrint = {}));
-var TripToPrint;
-(function (TripToPrint) {
-    class CommandShow extends React.Component {
-        render() {
-            return React.createElement("button", { onClick: this.props.onClick, title: "Show hidden content" },
-                React.createElement("img", { src: "Images/Play.png" }));
-        }
-    }
-    TripToPrint.CommandShow = CommandShow;
 })(TripToPrint || (TripToPrint = {}));
 //# sourceMappingURL=combined.js.map

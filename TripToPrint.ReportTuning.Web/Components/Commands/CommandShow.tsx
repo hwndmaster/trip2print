@@ -1,15 +1,7 @@
-﻿module TripToPrint
-{
-    export interface ICommandShowProps {
-        onClick: React.MouseEventHandler<HTMLButtonElement>;
-    }
+﻿﻿module TripToPrint {
+﻿    export class CommandShow extends BaseCommand {
+﻿        getTitle() { return "Show hidden content"; }
 
-    export class CommandShow extends React.Component<ICommandShowProps, {}>
-    {
-        render() {
-            return <button onClick={this.props.onClick} title="Show hidden content">
-                       <img src="Images/Play.png"/>
-                   </button>;
-        }
-    }
-}
+﻿        getImageName() { return "Play.png"; }
+﻿    }
+﻿}

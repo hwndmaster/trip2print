@@ -12,14 +12,13 @@ h3 {
   color: gray;
 }
 .ov {
-  padding-top: 5px;
-  overflow: hidden;
+  height: 514px;
 }
 .ov .title {
   position: absolute;
   left: 8px;
+  top: 0;
   z-index: 2;
-  margin-top: 8px;
   padding: 1px 6px;
   display: inline;
   background: white;
@@ -121,6 +120,7 @@ h3 {
 .commands-parent.hidden {
   opacity: 0.2;
   position: absolute;
+  z-index: 9;
 }
 .commands-parent.hidden .commands-ctr {
   visibility: visible;

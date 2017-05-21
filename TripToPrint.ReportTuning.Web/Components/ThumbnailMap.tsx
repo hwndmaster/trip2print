@@ -1,13 +1,9 @@
-﻿/// <reference path="Hideable.tsx" />
-
-module TripToPrint
-{
+﻿module TripToPrint {
     export interface IThumbnailMapProps {
         placemark: Interfaces.IMooiPlacemarkDto
     }
 
-    export class ThumbnailMap extends Hideable<IThumbnailMapProps>
-    {
+    export class ThumbnailMap extends Hideable<IThumbnailMapProps> {
         constructor(props) {
             super(props);
         }

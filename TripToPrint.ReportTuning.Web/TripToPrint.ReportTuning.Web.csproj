@@ -84,12 +84,14 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="App.ts" />
+    <TypeScriptCompile Include="Components\Commands\BaseCommand.tsx" />
     <TypeScriptCompile Include="Components\Commands\CommandShow.tsx" />
     <TypeScriptCompile Include="Components\Commands\Commands.tsx" />
     <TypeScriptCompile Include="Components\Commands\CommandHide.tsx" />
     <TypeScriptCompile Include="Components\Group.tsx" />
     <TypeScriptCompile Include="Components\Placemark.tsx" />
     <TypeScriptCompile Include="Components\Hideable.tsx" />
+    <TypeScriptCompile Include="Components\OverviewMap.tsx" />
     <TypeScriptCompile Include="Components\ThumbnailMap.tsx" />
     <TypeScriptCompile Include="Components\Section.tsx" />
     <TypeScriptCompile Include="Components\Root.tsx" />

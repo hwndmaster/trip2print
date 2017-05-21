@@ -1,11 +1,9 @@
-﻿module TripToPrint
-{
+﻿module TripToPrint {
     export interface IRootState {
         document: Interfaces.IMooiDocumentDto
     }
 
-    export class Root extends React.Component<{}, IRootState>
-    {
+    export class Root extends React.Component<{}, IRootState> {
         constructor() {
             super();
 
@@ -15,22 +13,24 @@
         }
 
         render() {
-            let doc = this.state.document;
+            const doc = this.state.document;
 
             if (doc == null)
                 return null;
 
             return <div>
-                <h3>{doc.title}</h3>
-                {(doc.description != null ? <p className="doc-desc" dangerouslySetInnerHTML={{ __html: doc.description }} /> : null)}
-                {this.renderSections()}
-            </div>;
+                       <h3>{doc.title}</h3>
+                       {(doc.description != null
+                           ? <p className="doc-desc" dangerouslySetInnerHTML={{ __html: doc.description }} />
+                           : null)}
+                       {this.renderSections()}
+                   </div>;
         }
 
         private renderSections() {
-            let sections = this.state.document.sections;
+            const sections = this.state.document.sections;
 
-            return sections.map((s, i) => <Section section={s} isFirst={i == 0} />);
+            return sections.map((s, i) => <Section section={s} isFirst={i === 0}/>);
         }
     }
 }

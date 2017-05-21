@@ -1,4 +1,5 @@
 ﻿@icon-size: 30px;
+@overview-height: 514px;
 @thumbnail-width: 200px;
 @thumbnail-height: 130px;
 @command-button-bg: #ffffff;
@@ -20,14 +21,13 @@ h3 {
 }
 
 .ov {
-    padding-top: 5px;
-    overflow: hidden;
+    height: @overview-height;
 
     .title {
         position: absolute;
         left: 8px;
+        top: 0;
         z-index: 2;
-        margin-top: 8px;
         padding: 1px 6px;
         display: inline;
         background: white;
@@ -150,6 +150,7 @@ h3 {
     &.hidden {
         opacity: 0.2;
         position: absolute;
+        z-index: 9;
 
         .commands-ctr {
             visibility: visible;

@@ -1,8 +1,8 @@
 ﻿module TripToPrint
 {
     export interface ISectionProps {
-        section: Interfaces.IMooiSectionDto,
-        isFirst: boolean
+        section: Interfaces.IMooiSectionDto;
+        isFirst: boolean;
     }
 
     export class Section extends React.Component<ISectionProps, {}>
