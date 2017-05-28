@@ -14,11 +14,11 @@ using TripToPrint.Views;
 
 namespace TripToPrint.Presenters
 {
-    public interface IStepSettingPresenter : IPresenter<StepSettingViewModel, IStepSettingView>, IStepPresenter, IDisposable
+    public interface IStepPickPresenter : IPresenter<StepPickViewModel, IStepPickView>, IStepPresenter, IDisposable
     {
     }
 
-    public class StepSettingPresenter : IStepSettingPresenter
+    public class StepPickPresenter : IStepPickPresenter
     {
         private readonly IGoogleMyMapAdapter _googleMyMapAdapter;
         private readonly IResourceNameProvider _resourceName;
@@ -33,7 +33,7 @@ namespace TripToPrint.Presenters
         private KmlDocument _kmlDocument;
         private CancellationTokenSource _cancellationTokenSource;
 
-        public StepSettingPresenter(IGoogleMyMapAdapter googleMyMapAdapter, IWebClientService webClient,
+        public StepPickPresenter(IGoogleMyMapAdapter googleMyMapAdapter, IWebClientService webClient,
             IFileService file, IResourceNameProvider resourceName, IDialogService dialog, IUserSession userSession,
             IKmlFileReader kmlFileReader, IKmlObjectsTreePresenter kmlObjectsTreePresenter)
         {
@@ -47,19 +47,17 @@ namespace TripToPrint.Presenters
             _kmlObjectsTreePresenter = kmlObjectsTreePresenter;
         }
 
-        public IStepSettingView View { get; private set; }
-        public virtual StepSettingViewModel ViewModel { get; private set; }
+        public IStepPickView View { get; private set; }
+        public virtual StepPickViewModel ViewModel { get; private set; }
         public virtual IMainWindowPresenter MainWindow { get; set; }
 
-        public void InitializePresenter(IStepSettingView view, StepSettingViewModel viewModel = null)
+        public void InitializePresenter(IStepPickView view, StepPickViewModel viewModel = null)
         {
-            ViewModel = viewModel ?? new StepSettingViewModel();
+            ViewModel = viewModel ?? new StepPickViewModel();
 
             View = view;
             View.DataContext = ViewModel;
             View.Presenter = this;
-
-            ViewModel.InputFileNameChanged += (sender, inputFileName) => _userSession.InputFileName = inputFileName;
 
             _kmlObjectsTreePresenter.InitializePresenter(View.KmlObjectsTreeView, ViewModel.KmlObjectsTree);
         }
@@ -111,7 +109,6 @@ namespace TripToPrint.Presenters
 
         public void GetBackNextTitles(ref string back, ref string next)
         {
-            next = "Generate";
         }
 
         public void Dispose()
@@ -170,14 +167,6 @@ namespace TripToPrint.Presenters
                 .ToArray();
 
             _userSession.Document = _kmlDocument.CloneWithExcluding(elementsToExclude);
-
-            // TODO: Cover with unit test this assignment:
-            _userSession.DiscoveredPlacePerPlacemark = ViewModel.KmlObjectsTree.FoldersToInclude
-                .Where(x => x.Enabled)
-                .SelectMany(x => x.Children)
-                .OfType<KmlPlacemarkNodeViewModel>()
-                .Where(x => x.SelectedDiscoveredPlace != null && !(x.SelectedDiscoveredPlace is DummyDiscoveredPlace))
-                .ToDictionary(x => x.Element as KmlPlacemark, x => x.SelectedDiscoveredPlace);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace TripToPrint.Core
     {
         public static string GetUrlString(Uri url)
         {
-            var filename = MakeFileName(url.ToString());
+            var filename = MakeFileName(url.PathAndQuery);
             var fullpath = Path.Combine(GetCachePath(), filename);
             if (File.Exists(fullpath))
                 return File.ReadAllText(fullpath);

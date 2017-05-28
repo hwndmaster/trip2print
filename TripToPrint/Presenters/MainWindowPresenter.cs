@@ -15,17 +15,22 @@ namespace TripToPrint.Presenters
     public class MainWindowPresenter : IMainWindowPresenter
     {
         private readonly IStepIntroPresenter _stepIntroPresenter;
-        private readonly IStepSettingPresenter _stepSettingPresenter;
+        private readonly IStepPickPresenter _stepPickPresenter;
+        private readonly IStepDiscoveringPresenter _stepDiscoveringPresenter;
+        private readonly IStepExplorePresenter _stepExplorePresenter;
         private readonly IStepGenerationPresenter _stepGenerationPresenter;
         private readonly IStepTuningPresenter _stepTuningPresenter;
 
-        public MainWindowPresenter(IStepIntroPresenter stepIntroPresenter, IStepSettingPresenter stepSettingPresenter,
+        public MainWindowPresenter(IStepIntroPresenter stepIntroPresenter, IStepPickPresenter stepPickPresenter,
+            IStepDiscoveringPresenter stepDiscoveringPresenter, IStepExplorePresenter stepExplorePresenter,
             IStepGenerationPresenter stepGenerationPresenter, IStepTuningPresenter stepTuningPresenter)
         {
             _stepIntroPresenter = stepIntroPresenter;
+            _stepPickPresenter = stepPickPresenter;
+            _stepDiscoveringPresenter = stepDiscoveringPresenter;
+            _stepExplorePresenter = stepExplorePresenter;
             _stepGenerationPresenter = stepGenerationPresenter;
             _stepTuningPresenter = stepTuningPresenter;
-            _stepSettingPresenter = stepSettingPresenter;
         }
 
         public IMainWindowView View { get; private set; }
@@ -39,7 +44,9 @@ namespace TripToPrint.Presenters
             View.Presenter = this;
 
             _stepIntroPresenter.InitializePresenter(View.StepIntroView, ViewModel.StepIntro);
-            _stepSettingPresenter.InitializePresenter(View.StepSettingView, ViewModel.StepSetting);
+            _stepPickPresenter.InitializePresenter(View.StepPickView, ViewModel.StepPick);
+            _stepDiscoveringPresenter.InitializePresenter(View.StepDiscoveringView, ViewModel.StepDiscovering);
+            _stepExplorePresenter.InitializePresenter(View.StepExploreView, ViewModel.StepExplore);
             _stepGenerationPresenter.InitializePresenter(View.StepGenerationView, ViewModel.StepGeneration);
             _stepTuningPresenter.InitializePresenter(View.StepTuningView, ViewModel.StepTuning);
 
@@ -51,9 +58,16 @@ namespace TripToPrint.Presenters
             var currentStepPresenter = GetWizardStepPresenter(ViewModel.WizardStepIndex);
             if (await currentStepPresenter.BeforeGoBack())
             {
-                ViewModel.WizardStepIndex = 0;
+                ViewModel.WizardStepIndex--;
 
-                await GetWizardStepPresenter(ViewModel.WizardStepIndex).Activated();
+                var step = GetWizardStepPresenter(ViewModel.WizardStepIndex);
+                if (step is IStepInProgressPresenter)
+                {
+                    ViewModel.WizardStepIndex--;
+                    step = GetWizardStepPresenter(ViewModel.WizardStepIndex);
+                }
+
+                await step.Activated();
             }
         }
 
@@ -87,10 +101,14 @@ namespace TripToPrint.Presenters
                 case 0:
                     return _stepIntroPresenter;
                 case 1:
-                    return _stepSettingPresenter;
+                    return _stepPickPresenter;
                 case 2:
-                    return _stepGenerationPresenter;
+                    return _stepDiscoveringPresenter;
                 case 3:
+                    return _stepExplorePresenter;
+                case 4:
+                    return _stepGenerationPresenter;
+                case 5:
                     return _stepTuningPresenter;
                 default:
                     return null;

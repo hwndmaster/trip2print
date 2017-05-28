@@ -6,21 +6,21 @@ using TripToPrint.ViewModels;
 
 namespace TripToPrint.Views
 {
-    public interface IStepGenerationView : IView<IStepGenerationPresenter>
+    public interface IStepInProgressView : IView<IStepInProgressPresenter>
     {
         void AddLogItem(LogItem item);
         void ClearLogItems();
     }
 
     [ExcludeFromCodeCoverage]
-    public partial class StepGenerationView : IStepGenerationView
+    public partial class StepInProgressView : IStepInProgressView
     {
-        public StepGenerationView()
+        public StepInProgressView()
         {
             InitializeComponent();
         }
 
-        public IStepGenerationPresenter Presenter { get; set; }
+        public IStepInProgressPresenter Presenter { get; set; }
 
         public void AddLogItem(LogItem item)
         {

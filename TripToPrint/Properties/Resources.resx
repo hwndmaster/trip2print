@@ -120,4 +120,16 @@
   <data name="Error_FailedToLoadDocument" xml:space="preserve">
     <value>Failed to load document</value>
   </data>
+  <data name="StepExplore_Source_Foursquare_Tooltip" xml:space="preserve">
+    <value>This item has been discovered on Foursquare.com</value>
+  </data>
+  <data name="StepExplore_Source_Here_Tooltip" xml:space="preserve">
+    <value>This item has been discovered on HERE.com</value>
+  </data>
+  <data name="StepExplore_UpperGroup_Explore" xml:space="preserve">
+    <value>Explore recommended and popular places nearby</value>
+  </data>
+  <data name="StepExplore_UpperGroup_Placemarks" xml:space="preserve">
+    <value>Extra information found for your placemarks</value>
+  </data>
 </root>

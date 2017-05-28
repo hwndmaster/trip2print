@@ -16,7 +16,7 @@ namespace TripToPrint.Tests
         private readonly Mock<IStepTuningView> _viewMock = new Mock<IStepTuningView>();
         private readonly Mock<IDialogService> _dialogServiceMock = new Mock<IDialogService>();
         private readonly Mock<IResourceNameProvider> _resourceNameMock = new Mock<IResourceNameProvider>();
-        private readonly Mock<IReportGenerator> _reportGeneratorMock = new Mock<IReportGenerator>();
+        private readonly Mock<IReportResourceFetcher> _reportResourceFetcherMock = new Mock<IReportResourceFetcher>();
         private readonly Mock<IFileService> _fileServiceMock = new Mock<IFileService>();
         private readonly Mock<IUserSession> _userSessionMock = new Mock<IUserSession>();
         private readonly Mock<ITuningBrowserViewPresenter> _tuningBrowserViewPresenterMock = new Mock<ITuningBrowserViewPresenter>();
@@ -29,7 +29,7 @@ namespace TripToPrint.Tests
             _presenter = new Mock<StepTuningPresenter>(
                 _dialogServiceMock.Object,
                 _resourceNameMock.Object,
-                _reportGeneratorMock.Object,
+                _reportResourceFetcherMock.Object,
                 _fileServiceMock.Object,
                 _userSessionMock.Object,
                 _tuningBrowserViewPresenterMock.Object) {
@@ -49,21 +49,6 @@ namespace TripToPrint.Tests
             _viewMock.VerifySet(x => x.Presenter = _presenter.Object);
             _viewMock.VerifySet(x => x.DataContext = _presenter.Object.ViewModel);
         }
-
-        /*[TestMethod]
-        public async Task When_step_is_activated_the_report_preview_is_set()
-        {
-            // Arrange
-            var vm = CreateViewModel();
-            _userSessionMock.SetupGet(x => x.GeneratedReportTempPath).Returns("temp-path");
-            _resourceNameMock.Setup(x => x.GetDefaultHtmlReportName()).Returns("default");
-
-            // Act
-            await _presenter.Object.Activated();
-
-            // Verify
-            Assert.AreEqual(@"temp-path\default", vm.AdjustBrowser.Address);
-        }*/
 
         [TestMethod]
         public async Task When_going_next_the_user_is_asked_to_select_output_file_and_pdf_is_generated()

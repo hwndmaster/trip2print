@@ -28,15 +28,5 @@ namespace TripToPrint.Views
         {
             Presenter.SelectAllItemsToInclude(true);
         }
-
-        private void NoMatching_OnClick(object sender, RoutedEventArgs e)
-        {
-            Presenter.SelectBestMatchingDiscoveredPlaces(false);
-        }
-
-        private void BestMatching_OnClick(object sender, RoutedEventArgs e)
-        {
-            Presenter.SelectBestMatchingDiscoveredPlaces(true);
-        }
     }
 }

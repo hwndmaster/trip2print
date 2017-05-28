@@ -1,21 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using TripToPrint.Core.Models;
+using TripToPrint.Core.Models.Venues;
 
 namespace TripToPrint.Core.ModelFactories
 {
     public interface IMooiPlacemarkFactory
     {
-        MooiPlacemark Create(KmlPlacemark kmlPlacemark, DiscoveredPlace discoveredPlace, string reportTempPath);
+        MooiPlacemark Create(KmlPlacemark kmlPlacemark, IEnumerable<VenueBase> venues, string reportTempPath);
     }
 
     public class MooiPlacemarkFactory : IMooiPlacemarkFactory
     {
         private readonly IKmlCalculator _kmlCalculator;
         private readonly IResourceNameProvider _resourceName;
-
-        private const int DISTANCE_IN_METERS_THRESHOLD = 2000;
+        private readonly CultureAgnosticFormatter _formatter = new CultureAgnosticFormatter();
 
         public MooiPlacemarkFactory(IKmlCalculator kmlCalculator, IResourceNameProvider resourceName)
         {
@@ -23,7 +24,7 @@ namespace TripToPrint.Core.ModelFactories
             _resourceName = resourceName;
         }
 
-        public MooiPlacemark Create(KmlPlacemark kmlPlacemark, DiscoveredPlace discoveredPlace, string reportTempPath)
+        public MooiPlacemark Create(KmlPlacemark kmlPlacemark, IEnumerable<VenueBase> venues, string reportTempPath)
         {
             var descriptionAndImages = ExtractImagesFromContent(kmlPlacemark.Description);
             var description = FilterContent(descriptionAndImages.filteredContent);
@@ -32,7 +33,7 @@ namespace TripToPrint.Core.ModelFactories
             {
                 Name = kmlPlacemark.Name,
                 Description = description,
-                DiscoveredData = discoveredPlace,
+                AttachedVenues = venues?.ToArray(),
                 Images = descriptionAndImages.images ?? new string[0],
                 Coordinates = kmlPlacemark.Coordinates,
                 IconPath = kmlPlacemark.IconPath
@@ -50,15 +51,7 @@ namespace TripToPrint.Core.ModelFactories
             if (placemark.IsShape)
             {
                 var distanceInMeters = _kmlCalculator.CalculateRouteDistanceInMeters(placemark);
-                if (distanceInMeters < DISTANCE_IN_METERS_THRESHOLD)
-                {
-                    placemark.Distance = $"{distanceInMeters:#,##0} m";
-                }
-                else
-                {
-                    var distanceInKm = distanceInMeters / 1000;
-                    placemark.Distance = $"{distanceInKm:#,##0} km";
-                }
+                placemark.Distance = _formatter.FormatDistance(distanceInMeters);
             }
 
             return placemark;

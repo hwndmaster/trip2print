@@ -62,7 +62,7 @@
   <ItemGroup>
     <Compile Include="StepAdjustmentPresenterTests.cs" />
     <Compile Include="KmlObjectsTreePresenterTests.cs" />
-    <Compile Include="StepSettingPresenterTests.cs" />
+    <Compile Include="StepPickPresenterTests.cs" />
     <Compile Include="StepGenerationPresenterTests.cs" />
     <Compile Include="StepIntroPresenterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

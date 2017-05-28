@@ -3,9 +3,11 @@ using System.Device.Location;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+using TripToPrint.Core.Models.Venues;
+
 namespace TripToPrint.Core.Models
 {
-    public interface IHaveCoordinates
+    public interface IHasCoordinates
     {
         GeoCoordinate[] Coordinates { get; set; }
     }
@@ -16,12 +18,12 @@ namespace TripToPrint.Core.Models
         Route
     }
 
-    public class MooiPlacemark : IHaveCoordinates
+    public class MooiPlacemark : IHasCoordinates
     {
         public MooiGroup Group { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public DiscoveredPlace DiscoveredData { get; set; }
+        public VenueBase[] AttachedVenues { get; set; }
         [NotNull] public string[] Images { get; set; }
         public string IconPath { get; set; }
         public GeoCoordinate[] Coordinates { get; set; } = new GeoCoordinate[0];

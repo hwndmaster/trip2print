@@ -2,6 +2,7 @@
 using Autofac;
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.ModelFactories;
+using TripToPrint.Core.ProgressTracking;
 
 namespace TripToPrint.Core
 {
@@ -12,18 +13,22 @@ namespace TripToPrint.Core
         {
             // Services
             builder.RegisterType<HereAdapter>().As<IHereAdapter>();
+            builder.RegisterType<FoursquareAdapter>().As<IFoursquareAdapter>();
             builder.RegisterType<GoogleMyMapAdapter>().As<IGoogleMyMapAdapter>();
-            builder.RegisterType<ReportGenerator>().As<IReportGenerator>();
+            builder.RegisterType<ReportResourceFetcher>().As<IReportResourceFetcher>();
             builder.RegisterType<KmlFileReader>().As<IKmlFileReader>();
             builder.RegisterType<FileService>().As<IFileService>();
             builder.RegisterType<ZipService>().As<IZipService>();
             builder.RegisterType<ResourceNameProvider>().As<IResourceNameProvider>();
             builder.RegisterType<WebClientService>().As<IWebClientService>();
             builder.RegisterType<KmlCalculator>().As<IKmlCalculator>();
+            builder.RegisterType<DiscoveringService>().As<IDiscoveringService>();
 
             // Logging
             builder.RegisterType<LogStorage>().As<ILogStorage>().SingleInstance();
-            builder.RegisterType<Logger>().As<ILogger>();
+            builder.RegisterType<GeneralLogger>().As<ILogger>();
+            builder.RegisterType<DiscoveringLogger>().As<IDiscoveringLogger>();
+            builder.RegisterType<ResourceFetchingLogger>().As<IResourceFetchingLogger>();
 
             // Class Factories
             builder.RegisterType<ProgressTrackerFactory>().As<IProgressTrackerFactory>();

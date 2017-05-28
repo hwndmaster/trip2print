@@ -9,9 +9,6 @@
         Title="Trip-to-Print" Height="700" Width="1000" Background="WhiteSmoke"
         WindowStartupLocation="CenterScreen" Icon="/TripToPrint;component/Resources/Logo.jpg">
     <Grid>
-        <Grid.Resources>
-            <BooleanToVisibilityConverter x:Key="BoolToVis" />
-        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="40"></RowDefinition>
@@ -24,12 +21,22 @@
             </TabItem>
             <TabItem Height="0">
                 <Grid>
-                    <local:StepSettingView x:Name="stepSetting" />
+                    <local:StepPickView x:Name="stepPick" />
                 </Grid>
             </TabItem>
             <TabItem Height="0">
                 <Grid>
-                    <local:StepGenerationView x:Name="stepGeneration" />
+                    <local:StepInProgressView x:Name="stepDiscovering" />
+                </Grid>
+            </TabItem>
+            <TabItem Height="0">
+                <Grid>
+                    <local:StepExploreView x:Name="stepExplore" />
+                </Grid>
+            </TabItem>
+            <TabItem Height="0">
+                <Grid>
+                    <local:StepInProgressView x:Name="stepGeneration" />
                 </Grid>
             </TabItem>
             <TabItem Height="0">

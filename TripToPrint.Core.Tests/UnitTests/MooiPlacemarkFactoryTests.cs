@@ -1,8 +1,10 @@
-﻿using System.Device.Location;
+﻿using System.Collections.Generic;
+using System.Device.Location;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TripToPrint.Core.ModelFactories;
 using TripToPrint.Core.Models;
+using TripToPrint.Core.Models.Venues;
 
 namespace TripToPrint.Core.Tests.UnitTests
 {
@@ -37,7 +39,7 @@ namespace TripToPrint.Core.Tests.UnitTests
             };
 
             // Act
-            var result = _factory.Object.Create(placemark, null, string.Empty);
+            var result = _factory.Object.Create(placemark, new List<VenueBase>(), string.Empty);
 
             // Verify
             Assert.AreEqual(placemark.Name, result.Name);
@@ -56,7 +58,7 @@ namespace TripToPrint.Core.Tests.UnitTests
             };
 
             // Act
-            var result = _factory.Object.Create(placemark, null, "root-folder");
+            var result = _factory.Object.Create(placemark, new List<VenueBase>(), "root-folder");
 
             // Verify
             Assert.AreEqual("text<br>text<br>text <a href='http://sample.url/path/page?q=1&w=2'>http://sample.url/path/page?q=1&w=2</a> text", result.Description);

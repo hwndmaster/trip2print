@@ -22,7 +22,7 @@ namespace TripToPrint.Core.Tests.UnitTests
         public void Valid_calculation_of_placemark_distance()
         {
             // Arrange
-            var placemark = new Mock<IHaveCoordinates>();
+            var placemark = new Mock<IHasCoordinates>();
             placemark.SetupGet(x => x.Coordinates).Returns(new[] {
                 new GeoCoordinate(1.0001, 1.0001),
                 new GeoCoordinate(1.0002, 1.0005),
@@ -41,7 +41,7 @@ namespace TripToPrint.Core.Tests.UnitTests
         public void When_calculating_distance_with_only_one_coordinate_zero_is_returned()
         {
             // Arrange
-            var placemark = new Mock<IHaveCoordinates>();
+            var placemark = new Mock<IHasCoordinates>();
             placemark.SetupGet(x => x.Coordinates).Returns(new[] {
                 new GeoCoordinate(1.0001, 1.0001)
             });

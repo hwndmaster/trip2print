@@ -5,9 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:valueConverters="clr-namespace:TripToPrint.ValueConverters"
              xmlns:attachedProperties="clr-namespace:TripToPrint.AttachedProperties"
+             xmlns:viewModels="clr-namespace:TripToPrint.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="600"
-             Background="WhiteSmoke">
+             Background="WhiteSmoke"
+             d:DataContext="{d:DesignInstance {x:Type viewModels:StepIntroViewModel}, IsDesignTimeCreatable=True}">
     <Grid AllowDrop="True" Drop="OnInputSourceDrop" Background="Transparent">
         <Grid.Resources>
             <valueConverters:EnumBooleanConverter x:Key="EnumBooleanConverter" />
@@ -51,10 +53,10 @@
             </DockPanel>
             <StackPanel Margin="-4,0,0,0" Orientation="Horizontal">
                 <Label DockPanel.Dock="Left" Content="Language for matching placemarks:"/>
-                <ComboBox SelectedValue="{Binding UserLanguage}" SelectedValuePath="Tag">
+                <ComboBox SelectedValue="{Binding ReportLanguage}" SelectedValuePath="Tag">
                     <ComboBoxItem Tag="en-US">English</ComboBoxItem>
-                    <ComboBoxItem Tag="ru-RU">Russian</ComboBoxItem>
-                    <ComboBoxItem Tag="uk-UA">Ukrainian</ComboBoxItem>
+                    <ComboBoxItem Tag="ru-RU">Русский</ComboBoxItem>
+                    <ComboBoxItem Tag="uk-UA">Українська</ComboBoxItem>
                 </ComboBox>
             </StackPanel>
         </StackPanel>

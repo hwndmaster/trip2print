@@ -46,5 +46,29 @@ namespace TripToPrint.Core.Properties {
                 this["HereApiAppCode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("put your Foursquare.com app client id here")]
+        public string FoursquareApiClientId {
+            get {
+                return ((string)(this["FoursquareApiClientId"]));
+            }
+            set {
+                this["FoursquareApiClientId"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("put your Foursquare.com app client secret here")]
+        public string FoursquareApiClientSecret {
+            get {
+                return ((string)(this["FoursquareApiClientSecret"]));
+            }
+            set {
+                this["FoursquareApiClientSecret"] = value;
+            }
+        }
     }
 }

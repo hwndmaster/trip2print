@@ -22,18 +22,18 @@ namespace TripToPrint.Presenters
     {
         private readonly IDialogService _dialogService;
         private readonly IResourceNameProvider _resourceName;
-        private readonly IReportGenerator _reportGenerator;
+        private readonly IReportResourceFetcher _reportResourceFetcher;
         private readonly IUserSession _userSession;
         private readonly IFileService _file;
         private readonly ITuningBrowserViewPresenter _tuningBrowserViewPresenter;
 
         public StepTuningPresenter(IDialogService dialogService, IResourceNameProvider resourceName,
-            IReportGenerator reportGenerator, IFileService file, IUserSession userSession,
+            IReportResourceFetcher reportResourceFetcher, IFileService file, IUserSession userSession,
             ITuningBrowserViewPresenter tuningBrowserViewPresenter)
         {
             _dialogService = dialogService;
             _resourceName = resourceName;
-            _reportGenerator = reportGenerator;
+            _reportResourceFetcher = reportResourceFetcher;
             _file = file;
             _userSession = userSession;
             _tuningBrowserViewPresenter = tuningBrowserViewPresenter;

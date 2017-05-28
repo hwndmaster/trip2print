@@ -7,13 +7,26 @@
 /// <reference path="Enums.ts" />
 
 declare namespace Interfaces {
-	interface IDiscoveredPlaceDto {
-		address: string;
-		averageRating: number;
-		contactPhone: string;
-		openingHours: string;
-		title: string;
-		website: string;
+	interface IFoursquareVenueDto extends Interfaces.IVenueBaseDto {
+		distance: number;
+		likesCount: number;
+		maxRating: number;
+		photoUrls: string[];
+		phrases: string[];
+		priceLevel: string;
+		rating: number;
+		ratingColor: string;
+		remainingPriceLevel: string;
+		tags: string[];
+		tips: Interfaces.IFoursquareVenueTipDto[];
+	}
+	interface IFoursquareVenueTipDto {
+		agreeCount: number;
+		disagreeCount: number;
+		likes: number;
+		message: string;
+	}
+	interface IHereVenueDto extends Interfaces.IVenueBaseDto {
 		wikipediaContent: string;
 	}
 	interface IMooiDocumentDto {
@@ -28,9 +41,9 @@ declare namespace Interfaces {
 		placemarks: Interfaces.IMooiPlacemarkDto[];
 	}
 	interface IMooiPlacemarkDto {
+		attachedVenues: Interfaces.IVenueBaseDto[];
 		coordinates: string[];
 		description: string;
-		discoveredData: Interfaces.IDiscoveredPlaceDto;
 		distance: string;
 		iconPath: string;
 		id: string;
@@ -43,6 +56,15 @@ declare namespace Interfaces {
 	interface IMooiSectionDto {
 		groups: Interfaces.IMooiGroupDto[];
 		name: string;
+	}
+	interface IVenueBaseDto {
+		address: string;
+		category: string;
+		contactPhone: string;
+		openingHours: string;
+		sourceType: string;
+		title: string;
+		website: string;
 	}
 }
 

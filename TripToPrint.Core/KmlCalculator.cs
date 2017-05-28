@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Device.Location;
 using System.Linq;
 using TripToPrint.Core.Models;
 
@@ -6,14 +7,35 @@ namespace TripToPrint.Core
 {
     public interface IKmlCalculator
     {
-        double CalculateRouteDistanceInMeters(IHaveCoordinates placemark);
+        double GetDistanceInMeters(IHasCoordinates placemark1, IHasCoordinates placemark2);
+        double? GetDistanceInMeters(GeoCoordinate coordinate1, GeoCoordinate coordinate2);
+        double CalculateRouteDistanceInMeters(IHasCoordinates placemark);
         bool CompleteFolderIsRoute(KmlFolder folder);
-        bool PlacemarkIsShape(IHaveCoordinates placemark);
+        bool PlacemarkIsShape(IHasCoordinates placemark);
     }
 
     public class KmlCalculator : IKmlCalculator
     {
-        public double CalculateRouteDistanceInMeters(IHaveCoordinates placemark)
+        public double GetDistanceInMeters(IHasCoordinates placemark1, IHasCoordinates placemark2)
+        {
+            if (placemark1.Coordinates?.Length != 1 || placemark2.Coordinates?.Length != 1)
+            {
+                throw new InvalidOperationException("Placemarks with multiple or zero coordinates are not supported");
+            }
+
+            return placemark1.Coordinates[0].GetDistanceTo(placemark2.Coordinates[0]);
+        }
+
+        public double? GetDistanceInMeters(GeoCoordinate coordinate1, GeoCoordinate coordinate2)
+        {
+            if (coordinate1 == null || coordinate2 == null)
+            {
+                return null;
+            }
+            return coordinate1.GetDistanceTo(coordinate2);
+        }
+
+        public double CalculateRouteDistanceInMeters(IHasCoordinates placemark)
         {
             if (placemark.Coordinates.Length < 2)
             {
@@ -49,7 +71,7 @@ namespace TripToPrint.Core
             return pointsOutsideRoute != true;
         }
 
-        public bool PlacemarkIsShape(IHaveCoordinates placemark)
+        public bool PlacemarkIsShape(IHasCoordinates placemark)
         {
             return placemark.Coordinates.Length > 1;
         }

@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TripToPrint.Core.ModelFactories;
 using TripToPrint.Core.Models;
+using TripToPrint.Core.Models.Venues;
 
 namespace TripToPrint.Core.Tests.UnitTests
 {
@@ -33,7 +34,7 @@ namespace TripToPrint.Core.Tests.UnitTests
                 .Returns("overview.jpg");
             _mooiPlacemarkFactoryMock.Setup(x => x.Create(
                 It.IsAny<KmlPlacemark>(),
-                It.IsAny<DiscoveredPlace>(),
+                It.IsAny<IEnumerable<VenueBase>>(),
                 It.IsAny<string>())).Returns(() => new MooiPlacemark());
         }
 

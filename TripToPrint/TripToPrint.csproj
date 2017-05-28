@@ -81,6 +81,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AttachedProperties\VenueDataSource.cs" />
     <Compile Include="AttachedProperties\VirtualToggleButton.cs" />
     <Compile Include="Chromium\FileResourceHandler.cs" />
     <Compile Include="Chromium\RequestHandler.cs" />
@@ -89,14 +90,18 @@
     <Compile Include="Chromium\ReportTuningResourceHandler.cs" />
     <Compile Include="Chromium\SchemeHandlerFactory.cs" />
     <Compile Include="Chromium\TuningBrowserHostGate.cs" />
+    <Compile Include="Presenters\StepDiscoveringPresenter.cs" />
+    <Compile Include="Presenters\StepInProgressPresenterBase.cs" />
+    <Compile Include="Presenters\StepExplorePresenter.cs" />
     <Compile Include="Presenters\TuningBrowserViewPresenter.cs" />
     <Compile Include="Presenters\KmlObjectsTreePresenter.cs" />
     <Compile Include="TestingEnv.cs" />
     <Compile Include="UserSession.cs" />
     <Compile Include="NormalCursor.cs" />
-    <Compile Include="Presenters\StepSettingPresenter.cs" />
+    <Compile Include="Presenters\StepPickPresenter.cs" />
     <Compile Include="ValueConverters\BooleanConverter.cs" />
     <Compile Include="ValueConverters\BooleanToVisibilityConverter.cs" />
+    <Compile Include="ValueConverters\StringToBrushConverter.cs" />
     <Compile Include="ValueConverters\EnumBooleanConverter.cs" />
     <Compile Include="AttachedProperties\EventFocusAttachment.cs" />
     <Compile Include="Presenters\IPresenter.cs" />
@@ -107,18 +112,32 @@
     <Compile Include="Presenters\MainWindowPresenter.cs" />
     <Compile Include="InputSource.cs" />
     <Compile Include="ValueConverters\StringNullOrEmptyToVisibilityConverter.cs" />
-    <Compile Include="ViewModels\DummyDiscoveredPlace.cs" />
+    <Compile Include="ViewModels\HereVenueViewModel.cs" />
+    <Compile Include="ViewModels\FoursquareVenueViewModel.cs" />
+    <Compile Include="ViewModels\DiscoveredGroupViewModel.cs" />
+    <Compile Include="ViewModels\DiscoveredSectionViewModel.cs" />
+    <Compile Include="ViewModels\DiscoveredVenueViewModel.cs" />
     <Compile Include="ViewModels\KmlFolderNodeViewModel.cs" />
     <Compile Include="ViewModels\KmlObjectsTreeViewModel.cs" />
+    <Compile Include="ViewModels\StepExploreViewModel.cs" />
     <Compile Include="ViewModels\TuningBrowserViewModel.cs" />
     <Compile Include="ViewModels\KmlObjectTreeNodeViewModel.cs" />
     <Compile Include="ViewModels\KmlPlacemarkNodeViewModel.cs" />
     <Compile Include="ViewModels\StepAdjustmentViewModel.cs" />
-    <Compile Include="ViewModels\StepSettingViewModel.cs" />
-    <Compile Include="ViewModels\StepGenerationViewModel.cs" />
+    <Compile Include="ViewModels\StepPickViewModel.cs" />
+    <Compile Include="ViewModels\StepInProgressViewModel.cs" />
     <Compile Include="ViewModels\StepIntroViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="Views\VenueDescriptionForHere.xaml.cs">
+      <DependentUpon>VenueDescriptionForHere.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\VenueDescriptionForFoursquare.xaml.cs">
+      <DependentUpon>VenueDescriptionForFoursquare.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StepExploreView.xaml.cs">
+      <DependentUpon>StepExploreView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TuningBrowserView.xaml.cs">
       <DependentUpon>TuningBrowserView.xaml</DependentUpon>
     </Compile>
@@ -136,18 +155,18 @@
     <Compile Include="Views\StepTuningView.xaml.cs">
       <DependentUpon>StepTuningView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\StepGenerationView.xaml.cs">
-      <DependentUpon>StepGenerationView.xaml</DependentUpon>
+    <Compile Include="Views\StepInProgressView.xaml.cs">
+      <DependentUpon>StepInProgressView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\StepIntroView.xaml.cs">
       <DependentUpon>StepIntroView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\StepSettingView.xaml.cs">
-      <DependentUpon>StepSettingView.xaml</DependentUpon>
+    <Compile Include="Views\StepPickView.xaml.cs">
+      <DependentUpon>StepPickView.xaml</DependentUpon>
     </Compile>
     <Compile Include="WaitCursor.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -202,6 +221,18 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\VenueDescriptionForHere.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\VenueDescriptionForFoursquare.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\StepExploreView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\TuningBrowserView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -218,7 +249,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\StepGenerationView.xaml">
+    <Page Include="Views\StepInProgressView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -226,7 +257,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\StepSettingView.xaml">
+    <Page Include="Views\StepPickView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -245,6 +276,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Fatal.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\FoursquareLogo.png" />
+    <Resource Include="Resources\HereLogo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\Web\Microsoft.Web.Publishing.targets" />

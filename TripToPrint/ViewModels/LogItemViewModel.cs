@@ -7,7 +7,7 @@ namespace TripToPrint.ViewModels
 {
     public class LogItemViewModel : LogItem
     {
-        public LogItemViewModel(LogItem logItem) : base(logItem.Severity, logItem.Text)
+        public LogItemViewModel(LogItem logItem) : base(logItem.Category, logItem.Severity, logItem.Text)
         {
         }
 

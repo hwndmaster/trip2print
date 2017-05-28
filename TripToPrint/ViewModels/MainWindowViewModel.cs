@@ -7,19 +7,23 @@
         public MainWindowViewModel()
         {
             StepIntro = new StepIntroViewModel();
-            StepSetting = new StepSettingViewModel();
-            StepGeneration = new StepGenerationViewModel();
+            StepPick = new StepPickViewModel();
+            StepDiscovering = new StepInProgressViewModel();
+            StepExplore = new StepExploreViewModel();
+            StepGeneration = new StepInProgressViewModel();
             StepTuning = new StepTuningViewModel();
         }
 
-        public StepIntroViewModel StepIntro { get; private set; }
-        public StepSettingViewModel StepSetting { get; private set; }
-        public StepGenerationViewModel StepGeneration { get; private set; }
-        public StepTuningViewModel StepTuning { get; private set; }
+        public StepIntroViewModel StepIntro { get; }
+        public StepPickViewModel StepPick { get; }
+        public StepInProgressViewModel StepDiscovering { get; }
+        public StepExploreViewModel StepExplore { get; }
+        public StepInProgressViewModel StepGeneration { get; }
+        public StepTuningViewModel StepTuning { get; }
 
         public int WizardStepIndex
         {
-            get { return _wizardStepIndex; }
+            get => _wizardStepIndex;
             set
             {
                 if (value == _wizardStepIndex)

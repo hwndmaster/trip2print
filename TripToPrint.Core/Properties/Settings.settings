@@ -8,5 +8,11 @@
     <Setting Name="HereApiAppCode" Type="System.String" Scope="User">
       <Value Profile="(Default)">put your HERE.com app code here</Value>
     </Setting>
+    <Setting Name="FoursquareApiClientId" Type="System.String" Scope="User">
+      <Value Profile="(Default)">put your Foursquare.com app client id here</Value>
+    </Setting>
+    <Setting Name="FoursquareApiClientSecret" Type="System.String" Scope="User">
+      <Value Profile="(Default)">put your Foursquare.com app client secret here</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

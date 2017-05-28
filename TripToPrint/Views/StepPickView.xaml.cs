@@ -3,20 +3,20 @@ using TripToPrint.Presenters;
 
 namespace TripToPrint.Views
 {
-    public interface IStepSettingView : IView<IStepSettingPresenter>
+    public interface IStepPickView : IView<IStepPickPresenter>
     {
         IKmlObjectsTreeView KmlObjectsTreeView { get; }
     }
 
     [ExcludeFromCodeCoverage]
-    public partial class StepSettingView : IStepSettingView
+    public partial class StepPickView : IStepPickView
     {
-        public StepSettingView()
+        public StepPickView()
         {
             InitializeComponent();
         }
 
-        public IStepSettingPresenter Presenter { get; set; }
+        public IStepPickPresenter Presenter { get; set; }
         public IKmlObjectsTreeView KmlObjectsTreeView => kmlObjectsTreeViewCtrl;
     }
 }

@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:attachedProperties="clr-namespace:TripToPrint.AttachedProperties"
              xmlns:viewModels="clr-namespace:TripToPrint.ViewModels"
-             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600">
     <Grid>
@@ -48,81 +47,30 @@
                     </StackPanel>
                 </HierarchicalDataTemplate>
                 <DataTemplate DataType="{x:Type viewModels:KmlPlacemarkNodeViewModel}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="500" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0" HorizontalAlignment="Stretch" Orientation="Horizontal">
-                            <CheckBox IsChecked="{Binding Enabled}" IsTabStop="False" Focusable="False"/>
-                            <Image Width="20" Height="20" Margin="0,0,4,0">
-                                <Image.Style>
-                                    <Style TargetType="{x:Type Image}">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsPartOfRoute}" Value="False">
-                                                <Setter Property="Source" Value="/TripToPrint;component/Resources/KmlPlacemark.png"/>
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsPartOfRoute}" Value="True">
-                                                <Setter Property="Source" Value="/TripToPrint;component/Resources/Route.png"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Image.Style>
-                            </Image>
-                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
-                        </StackPanel>
-                        <StackPanel Grid.Column="1">
-                            <StackPanel.Style>
-                                <Style TargetType="{x:Type StackPanel}">
+                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding Enabled}" IsTabStop="False" Focusable="False"/>
+                        <Image Width="20" Height="20" Margin="0,0,4,0">
+                            <Image.Style>
+                                <Style TargetType="{x:Type Image}">
                                     <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsPartOfRoute}" Value="False">
+                                            <Setter Property="Source" Value="/TripToPrint;component/Resources/KmlPlacemark.png"/>
+                                        </DataTrigger>
                                         <DataTrigger Binding="{Binding IsPartOfRoute}" Value="True">
-                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Setter Property="Source" Value="/TripToPrint;component/Resources/Route.png"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </StackPanel.Style>
-                            <StackPanel Visibility="{Binding DiscoveredPlacesLoadedAndAvailable, Converter={StaticResource BoolToVis}}"
-                                            Orientation="Horizontal">
-                                <ComboBox Width="200"
-                                          IsTabStop="False"
-                                          Focusable="False"
-                                          DisplayMemberPath="Title"
-                                          SelectedIndex="0"
-                                          SelectedItem="{Binding SelectedDiscoveredPlace}">
-                                    <ComboBox.Resources>
-                                        <CollectionViewSource x:Key="DiscoveredPlacesStatic" Source="{Binding DiscoveredPlaces}" />
-                                    </ComboBox.Resources>
-                                    <ComboBox.ItemsSource>
-                                        <CompositeCollection>
-                                            <viewModels:DummyDiscoveredPlace />
-                                            <CollectionContainer Collection="{Binding Source={StaticResource DiscoveredPlacesStatic}}" />
-                                        </CompositeCollection>
-                                    </ComboBox.ItemsSource>
-                                </ComboBox>
-                                <TextBlock Margin="3,0,0,0" VerticalAlignment="Center">
-                                    <Run Text="{Binding DiscoveredPlaces.Count, Mode=OneWay}"/>
-                                    <Run Text=" found"/>
-                                </TextBlock>
-                            </StackPanel>
-                            <controls:ProgressRing Width="20" Height="20" Visibility="{Binding DiscoveredPlacesLoaded, Converter={StaticResource BoolToVisInverted}}" />
-                        </StackPanel>
-                    </Grid>
+                            </Image.Style>
+                        </Image>
+                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                    </StackPanel>
                 </DataTemplate>
             </TreeView.Resources>
         </TreeView>
-        <Grid Grid.Row="1">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,4,0,0"
-                        Style="{StaticResource ReportButtonsAppear}"
-                        Visibility="{Binding DiscoveringIsDone, Converter={StaticResource BoolToVis}}">
-                <Button Content="Select all" Click="SelectAll_OnClick" />
-                <Button Content="Select none" Click="SelectNone_OnClick" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0"
-                        Style="{StaticResource ReportButtonsAppear}"
-                        Visibility="{Binding DiscoveringIsDoneAndAvailable, Converter={StaticResource BoolToVis}}">
-                <Button Content="No matching" Click="NoMatching_OnClick" />
-                <Button Content="Best matching" Click="BestMatching_OnClick" />
-            </StackPanel>
-        </Grid>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Style="{StaticResource ReportButtonsAppear}">
+            <Button Content="Select all" Click="SelectAll_OnClick" />
+            <Button Content="Select none" Click="SelectNone_OnClick" />
+        </StackPanel>
     </Grid>
 </UserControl>

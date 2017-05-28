@@ -1,0 +1,12 @@
+﻿<UserControl x:Class="TripToPrint.Views.VenueDescriptionForHere"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModels="clr-namespace:TripToPrint.ViewModels"
+             d:DataContext="{d:DesignInstance {x:Type viewModels:HereVenueViewModel}, IsDesignTimeCreatable=True}"
+             mc:Ignorable="d">
+    <StackPanel Orientation="Horizontal" Focusable="False">
+        <TextBlock Text="{Binding Venue.Category}" />
+    </StackPanel>
+</UserControl>

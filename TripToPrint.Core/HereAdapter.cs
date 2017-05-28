@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.Models;
+using TripToPrint.Core.Models.Venues;
 
 namespace TripToPrint.Core
 {
@@ -17,7 +18,7 @@ namespace TripToPrint.Core
     {
         Task<byte[]> FetchThumbnail(MooiPlacemark placemark);
         Task<byte[]> FetchOverviewMap(MooiGroup group);
-        Task<List<DiscoveredPlace>> LookupPlaces(KmlPlacemark placemark, string culture, CancellationToken cancellationToken);
+        Task<VenueBase> LookupMatchingVenue(KmlPlacemark placemark, string culture, CancellationToken cancellationToken);
     }
 
     public class HereAdapter : IHereAdapter
@@ -36,7 +37,6 @@ namespace TripToPrint.Core
 
         internal const int TOO_MUCH_OF_COORDINATE_POINTS = 400;
         private const int LOOKUP_PLACES_WITHIN_DISTANCE_IN_METERS = 500;
-        private const int MAX_COORDINATE_VALUE_PRECISION = 8;
         private const int COORDINATE_PRECISION_ON_POINTS = 6;
         private const int COORDINATE_PRECISION_ON_ROUTES = 4;
         private const int OVERVIEW_MAP_WIDTH = 1200;
@@ -65,7 +65,7 @@ namespace TripToPrint.Core
                 throw new NotSupportedException("Routes are not supported");
             }
 
-            var url = $"c={CreateStringForCoordinates(null, placemark)}&z={THUMBNAIL_MAP_ZOOM}&ppi=320&w=600&h=390";
+            var url = $"c={_formatter.FormatCoordinates(null, placemark)}&z={THUMBNAIL_MAP_ZOOM}&ppi=320&w=600&h=390";
 
             return await DownloadData(IMAGES_MAPVIEW_URL, url);
         }
@@ -79,18 +79,18 @@ namespace TripToPrint.Core
             if (group.Type == GroupType.Routes)
             {
                 var route = GetAndTrimRouteCoordinates(group);
-                var routeCoords = CreateStringForCoordinates(COORDINATE_PRECISION_ON_ROUTES, route);
+                var routeCoords = _formatter.FormatCoordinates(COORDINATE_PRECISION_ON_ROUTES, route);
 
                 parameters += $"&{IMAGES_ROUTE_ROUTE_PARAM_NAME}={routeCoords}";
-                parameters += $"&{IMAGES_ROUTE_POINT_PARAM_NAME}=" + CreateStringForCoordinates(COORDINATE_PRECISION_ON_POINTS, group.Placemarks
+                parameters += $"&{IMAGES_ROUTE_POINT_PARAM_NAME}=" + _formatter.FormatCoordinates(COORDINATE_PRECISION_ON_POINTS, group.Placemarks
                                   .Where(x => x.Type == PlacemarkType.Point)
-                                  .Cast<IHaveCoordinates>()
+                                  .Cast<IHasCoordinates>()
                                   .ToArray());
                 parameters += "&lc0=navy&sc0=888888";
             }
             else
             {
-                var poi = CreateStringForCoordinates(null, group.Placemarks.Cast<IHaveCoordinates>().ToArray());
+                var poi = _formatter.FormatCoordinates(null, group.Placemarks.Cast<IHasCoordinates>().ToArray());
                 parameters += $"&poi={poi}&poitxc=black&poifc=yellow&poitxs=15";
 
                 if (group.Placemarks.Count == 1)
@@ -102,95 +102,100 @@ namespace TripToPrint.Core
             return await DownloadData(baseUrl, parameters);
         }
 
-        public async Task<List<DiscoveredPlace>> LookupPlaces(KmlPlacemark placemark, string culture, CancellationToken cancellationToken)
+        public async Task<VenueBase> LookupMatchingVenue(KmlPlacemark placemark, string culture, CancellationToken cancellationToken)
         {
-            var discoveredPlaces = new List<DiscoveredPlace>();
             try
             {
                 if (placemark.Coordinates.Length == 0)
                 {
-                    return discoveredPlaces;
+                    return null;
                 }
                 if (_kmlCalculator.PlacemarkIsShape(placemark))
                 {
-                    return discoveredPlaces;
+                    return null;
                 }
-                var coord = CreateStringForCoordinates(null, placemark);
-                var url = $"{PLACES_DISCOVER_URL}at={coord}&refinements=true&size=4&q=" + Uri.EscapeUriString(placemark.Name);
+                var coord = _formatter.FormatCoordinates(null, placemark);
+                var url = $"{PLACES_DISCOVER_URL}at={coord}&refinements=true&size=4&q={Uri.EscapeUriString(placemark.Name)}";
 
                 // Refer to: https://developer.here.com/rest-apis/documentation/places/topics_api/resource-search.html
                 var jsonValue = await DownloadString(url, culture, cancellationToken);
                 if (jsonValue == null)
-                    return discoveredPlaces;
+                {
+                    return null;
+                }
 
                 dynamic json = JObject.Parse(jsonValue);
-                foreach (var place in json.results.items)
+
+                dynamic place = ((JArray) json.results.items)
+                    .FirstOrDefault(x => Convert.ToInt32(((dynamic) x).distance) < LOOKUP_PLACES_WITHIN_DISTANCE_IN_METERS);
+
+                if (place == null)
                 {
-                    if (Convert.ToInt32(place.distance) > LOOKUP_PLACES_WITHIN_DISTANCE_IN_METERS)
-                        continue;
+                    return null;
+                }
 
-                    var discoveredPlace = new DiscoveredPlace {
-                        Title = (string) place.title,
-                        Coordinate = new GeoCoordinate(Convert.ToDouble(place.position[0]), Convert.ToDouble(place.position[1])),
-                        Address = ReplaceHtmlNewLines((string) place.vicinity),
-                        AverageRating = Convert.ToDouble(place.averageRating),
-                        IconUrl = new Uri((string) place.icon),
-                        OpeningHours = ReplaceHtmlNewLines((string)place.openingHours?.text)
-                    };
+                var discoveredPlace = new HereVenue {
+                    Title = (string) place.title,
+                    Coordinate = new GeoCoordinate(Convert.ToDouble(place.position[0]), Convert.ToDouble(place.position[1])),
+                    Address = ReplaceHtmlNewLines((string) place.vicinity),
+                    IconUrl = new Uri((string) place.icon),
+                    OpeningHours = ReplaceHtmlNewLines((string)place.openingHours?.text),
+                    Category = place.category.title
+                };
 
-                    if (place.href != null)
+                if (place.href != null)
+                {
+                    var extraInfoUrl = (string) place.href;
+                    extraInfoUrl += "&show_content=wikipedia";
+                    var jsonValueExtra = await DownloadString(extraInfoUrl, culture, cancellationToken);
+                    if (jsonValueExtra != null)
                     {
-                        var extraInfoUrl = (string) place.href;
-                        extraInfoUrl += "&show_content=wikipedia";
-                        var jsonValueExtra = await DownloadString(extraInfoUrl, culture, cancellationToken);
-                        if (jsonValueExtra != null)
+                        dynamic jsonExtra = JObject.Parse(jsonValueExtra);
+                        if (jsonExtra.contacts != null)
                         {
-                            dynamic jsonExtra = JObject.Parse(jsonValueExtra);
-                            if (jsonExtra.contacts != null)
+                            var phonesArray = jsonExtra.contacts.phone as JArray;
+                            if (phonesArray != null)
                             {
-                                var phonesArray = jsonExtra.contacts.phone as JArray;
-                                if (phonesArray != null)
-                                {
-                                    dynamic phone = phonesArray[0];
-                                    discoveredPlace.ContactPhone = (string) phone.value;
-                                }
-
-                                var websitesArray = jsonExtra.contacts.website as JArray;
-                                if (websitesArray != null)
-                                {
-                                    dynamic website = websitesArray[0];
-                                    discoveredPlace.Website = (string) website.value;
-                                }
+                                dynamic phone = phonesArray[0];
+                                discoveredPlace.ContactPhone = (string) phone.value;
                             }
-                            var editorialsArray = jsonExtra.media?.editorials?.items as JArray;
-                            if (editorialsArray != null)
+
+                            var websitesArray = jsonExtra.contacts.website as JArray;
+                            if (websitesArray != null)
                             {
-                                // TODO: Что если элементов больше, чем 1?
-                                var editorialLanguage = (string) ((dynamic) editorialsArray[0]).language;
-                                var requestedLanguage = culture.Split('-')[0];
-                                if (editorialLanguage.Equals(requestedLanguage, StringComparison.OrdinalIgnoreCase)
-                                    || editorialLanguage.Equals(ACCEPTABLE_LANGUAGE, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    discoveredPlace.WikipediaContent = FilterContent((string)((dynamic)editorialsArray[0]).description);
-                                }
+                                dynamic website = websitesArray[0];
+                                discoveredPlace.Websites = new [] {
+                                    (string) website.value
+                                };
+                            }
+                        }
+                        var editorialsArray = jsonExtra.media?.editorials?.items as JArray;
+                        if (editorialsArray != null)
+                        {
+                            // TODO: Что если элементов больше, чем 1?
+                            var editorialLanguage = (string) ((dynamic) editorialsArray[0]).language;
+                            var requestedLanguage = culture.Split('-')[0];
+                            if (editorialLanguage.Equals(requestedLanguage, StringComparison.OrdinalIgnoreCase)
+                                || editorialLanguage.Equals(ACCEPTABLE_LANGUAGE, StringComparison.OrdinalIgnoreCase))
+                            {
+                                discoveredPlace.WikipediaContent = FilterContent((string)((dynamic)editorialsArray[0]).description);
                             }
                         }
                     }
-
-                    if (discoveredPlace.IsUseless())
-                    {
-                        continue;
-                    }
-
-                    discoveredPlaces.Add(discoveredPlace);
                 }
+
+                if (discoveredPlace.IsUseless())
+                {
+                    return null;
+                }
+
+                return discoveredPlace;
             }
             catch (Exception e)
             {
                 _logger.Exception(e);
+                return null;
             }
-
-            return discoveredPlaces;
         }
 
         internal async Task<string> DownloadString(string url, string language, CancellationToken cancellationToken)
@@ -207,7 +212,7 @@ namespace TripToPrint.Core
             return await _webClient.PostAsync(new Uri(url + GetAppCodeUrlPart()), parameters);
         }
 
-        internal IHaveCoordinates GetAndTrimRouteCoordinates(MooiGroup group)
+        internal IHasCoordinates GetAndTrimRouteCoordinates(MooiGroup group)
         {
             var route = group.Placemarks.Single(x => x.Type == PlacemarkType.Route);
 
@@ -223,15 +228,6 @@ namespace TripToPrint.Core
             }
 
             return route;
-        }
-
-        private string CreateStringForCoordinates(int? precision, params IHaveCoordinates[] placemarks)
-        {
-            precision = precision ?? MAX_COORDINATE_VALUE_PRECISION;
-            return string.Join(",", placemarks
-                .SelectMany(x => x.Coordinates)
-                .Select(x => $"{_formatter.Format(x.Latitude, precision.Value)},{_formatter.Format(x.Longitude, precision.Value)}")
-                .Distinct());
         }
 
         private string GetAppCodeUrlPart()

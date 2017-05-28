@@ -1,43 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.ModelFactories;
 using TripToPrint.Core.Models;
+using TripToPrint.Core.Models.Venues;
+using TripToPrint.Core.ProgressTracking;
 
 namespace TripToPrint.Core
 {
-    // TODO: Rename to something like "Report Resource Fetcher/Downloader"
-
-    public interface IReportGenerator
+    public interface IReportResourceFetcher
     {
-        Task<(string tempPath, MooiDocument document)> Generate(KmlDocument document, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark, IProgressTracker progress);
+        Task<(string tempPath, MooiDocument document)> Generate(KmlDocument document, List<DiscoveredPlace> discoveredPlaces, IResourceFetchingProgress progress);
     }
 
-    public class ReportGenerator : IReportGenerator
+    public class ReportResourceFetcher : IReportResourceFetcher
     {
         private readonly IMooiDocumentFactory _mooiDocumentFactory;
         private readonly IHereAdapter _hereAdapter;
-        private readonly ILogger _logger;
+        private readonly IResourceFetchingLogger _logger;
         private readonly IFileService _file;
         private readonly IResourceNameProvider _resourceName;
-        private readonly IWebClientService _webClient;
 
-        public ReportGenerator(IMooiDocumentFactory mooiDocumentFactory, IHereAdapter hereAdapter,
-            ILogger logger, IFileService file, IResourceNameProvider resourceName,
-            IWebClientService webClient)
+        public ReportResourceFetcher(IMooiDocumentFactory mooiDocumentFactory, IHereAdapter hereAdapter,
+            IResourceFetchingLogger logger, IFileService file, IResourceNameProvider resourceName)
         {
             _mooiDocumentFactory = mooiDocumentFactory;
             _hereAdapter = hereAdapter;
             _logger = logger;
             _file = file;
             _resourceName = resourceName;
-            _webClient = webClient;
         }
 
-        public async Task<(string tempPath, MooiDocument document)> Generate(KmlDocument document, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark, IProgressTracker progress)
+        public async Task<(string tempPath, MooiDocument document)> Generate(KmlDocument document, List<DiscoveredPlace> discoveredPlaces, IResourceFetchingProgress progress)
         {
             var tempPath = CreateAndGetTempPath();
 
@@ -47,10 +43,9 @@ namespace TripToPrint.Core
             }
             progress.ReportResourceEntriesProcessed();
 
-            var mooiDocument = _mooiDocumentFactory.Create(document, discoveredPlacePerPlacemark, tempPath);
+            // TODO: Download {discoveredPlaces.Select(x => x.Venue.IconUrl)}
 
-            // TODO: This step is useless now:
-            progress.ReportContentGenerationDone();
+            var mooiDocument = _mooiDocumentFactory.Create(document, discoveredPlaces, tempPath);
 
             await FetchMapImages(mooiDocument, tempPath, progress);
 
@@ -59,7 +54,7 @@ namespace TripToPrint.Core
             return (tempPath, mooiDocument);
         }
 
-        public virtual async Task FetchMapImages(MooiDocument document, string tempPath, IProgressTracker progress)
+        public virtual async Task FetchMapImages(MooiDocument document, string tempPath, IResourceFetchingProgress progress)
         {
             var groups = document.Sections.SelectMany(x => x.Groups).ToList();
             var placemarks = document.Sections.SelectMany(x => x.Groups).SelectMany(x => x.Placemarks).ToList();
@@ -91,13 +86,10 @@ namespace TripToPrint.Core
 
         private async Task FetchPlacemarkMapImage(MooiPlacemark placemark, string tempPath)
         {
-            string filePath;
-            byte[] imageBytes;
-
             if (placemark.Type == PlacemarkType.Point)
             {
-                imageBytes = await _hereAdapter.FetchThumbnail(placemark);
-                filePath = Path.Combine(tempPath, _resourceName.CreateFileNameForPlacemarkThumbnail(placemark));
+                var imageBytes = await _hereAdapter.FetchThumbnail(placemark);
+                var filePath = Path.Combine(tempPath, _resourceName.CreateFileNameForPlacemarkThumbnail(placemark));
                 await _file.WriteBytesAsync(filePath, imageBytes);
             }
 

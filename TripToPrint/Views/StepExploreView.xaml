@@ -1,0 +1,111 @@
+﻿<UserControl x:Class="TripToPrint.Views.StepExploreView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:viewModels="clr-namespace:TripToPrint.ViewModels"
+             xmlns:attachedProperties="clr-namespace:TripToPrint.AttachedProperties"
+             xmlns:prop="clr-namespace:TripToPrint.Properties"
+             xmlns:views="clr-namespace:TripToPrint.Views"
+             mc:Ignorable="d"
+             d:DesignHeight="400" d:DesignWidth="600"
+             d:DataContext="{d:DesignInstance {x:Type viewModels:StepExploreViewModel}, IsDesignTimeCreatable=True}"
+             Background="WhiteSmoke">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" Content="Check this out! Add additional recommended information to your report" Style="{DynamicResource StepHeader}" />
+        <TreeView Grid.Row="1" Name="discoveredVenues" ItemsSource="{Binding Sections, Mode=OneTime}">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="True"/>
+                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="Margin" Value="0,2" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="attachedProperties:VirtualToggleButton.IsVirtualToggleButton" Value="True" />
+                    <Setter Property="attachedProperties:VirtualToggleButton.IsChecked" Value="{Binding Enabled}" />
+                </Style>
+            </TreeView.ItemContainerStyle>
+            <TreeView.Resources>
+                <HierarchicalDataTemplate 
+                    DataType="{x:Type viewModels:DiscoveredSectionViewModel}"
+                    ItemsSource="{Binding Groups}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Name}" Foreground="DarkGreen" FontWeight="Bold" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <HierarchicalDataTemplate 
+                    DataType="{x:Type viewModels:DiscoveredGroupViewModel}"
+                    ItemsSource="{Binding Venues}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type viewModels:DiscoveredVenueViewModel}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="400" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" HorizontalAlignment="Stretch" Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding Enabled}" IsTabStop="False" Focusable="False"/>
+                            <Image Width="20" Height="20" Margin="0,0,4,0">
+                                <Image.Style>
+                                    <Style TargetType="{x:Type Image}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Venue.SourceType}" Value="Here">
+                                                <Setter Property="Source" Value="/TripToPrint;component/Resources/HereLogo.png"/>
+                                                <Setter Property="ToolTip" Value="{x:Static prop:Resources.StepExplore_Source_Here_Tooltip}"></Setter>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Venue.SourceType}" Value="Foursquare">
+                                                <Setter Property="Source" Value="/TripToPrint;component/Resources/FoursquareLogo.png"/>
+                                                <Setter Property="ToolTip" Value="{x:Static prop:Resources.StepExplore_Source_Foursquare_Tooltip}"></Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Image.Style>
+                            </Image>
+                            <TextBlock Text="{Binding Venue.Title}" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <ContentControl>
+                                <ContentControl.Style>
+                                    <Style TargetType="{x:Type ContentControl}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=Venue.SourceType}" Value="Here">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate>
+                                                            <views:VenueDescriptionForHere attachedProperties:VenueDataSource.Venue="{Binding Venue}" />
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Path=Venue.SourceType}" Value="Foursquare">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate>
+                                                            <views:VenueDescriptionForFoursquare attachedProperties:VenueDataSource.Venue="{Binding Venue}" />
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ContentControl.Style>
+                            </ContentControl>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Style="{StaticResource ReportButtonsAppear}">
+            <Button Content="Select all" Click="SelectAll_OnClick" />
+            <Button Content="Select none" Click="SelectNone_OnClick" />
+            <Button Content="Select best" Click="SelectBest_OnClick" />
+        </StackPanel>
+    </Grid>
+</UserControl>

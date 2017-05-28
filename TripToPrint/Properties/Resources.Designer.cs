@@ -22,7 +22,7 @@ namespace TripToPrint.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace TripToPrint.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TripToPrint.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace TripToPrint.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,9 +63,45 @@ namespace TripToPrint.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Failed to load document.
         /// </summary>
-        internal static string Error_FailedToLoadDocument {
+        public static string Error_FailedToLoadDocument {
             get {
                 return ResourceManager.GetString("Error_FailedToLoadDocument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This item has been discovered on Foursquare.com.
+        /// </summary>
+        public static string StepExplore_Source_Foursquare_Tooltip {
+            get {
+                return ResourceManager.GetString("StepExplore_Source_Foursquare_Tooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This item has been discovered on HERE.com.
+        /// </summary>
+        public static string StepExplore_Source_Here_Tooltip {
+            get {
+                return ResourceManager.GetString("StepExplore_Source_Here_Tooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Explore recommended and popular places nearby.
+        /// </summary>
+        public static string StepExplore_UpperGroup_Explore {
+            get {
+                return ResourceManager.GetString("StepExplore_UpperGroup_Explore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extra information found for your placemarks.
+        /// </summary>
+        public static string StepExplore_UpperGroup_Placemarks {
+            get {
+                return ResourceManager.GetString("StepExplore_UpperGroup_Placemarks", resourceCulture);
             }
         }
     }

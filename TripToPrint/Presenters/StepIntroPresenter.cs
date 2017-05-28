@@ -41,7 +41,7 @@ namespace TripToPrint.Presenters
             View.DataContext = ViewModel;
             View.Presenter = this;
 
-            ViewModel.UserLanguage = _userSession.UserLanguage;
+            ViewModel.ReportLanguage = _userSession.ReportLanguage;
 
             ViewModel.InputSourceChanged += (sender, inputSource) => {
                 _userSession.InputSource = inputSource;
@@ -50,8 +50,8 @@ namespace TripToPrint.Presenters
             ViewModel.InputUriChanged += (sender, inputUri) => {
                 _userSession.InputUri = inputUri;
             };
-            ViewModel.UserLanguageChanged += (sender, userLanguage) => {
-                _userSession.UserLanguage = userLanguage;
+            ViewModel.ReportLanguageChanged += (sender, userLanguage) => {
+                _userSession.ReportLanguage = userLanguage;
             };
         }
 

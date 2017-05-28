@@ -2,6 +2,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
+using TripToPrint.Core.ProgressTracking;
+
 namespace TripToPrint.Core.Tests.UnitTests
 {
     [TestClass]
@@ -9,18 +11,18 @@ namespace TripToPrint.Core.Tests.UnitTests
     {
         private readonly Mock<IProgress<int>> _progressMock = new Mock<IProgress<int>>();
 
-        private ProgressTracker _tracker;
+        private ResourceFetchingProgress _tracker;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _tracker = new ProgressTracker(_progressMock.Object);
+            _tracker = new ResourceFetchingProgress(_progressMock.Object);
         }
 
         [TestMethod]
         public void When_resource_entries_process_is_reported_the_progress_is_calculated_properly()
         {
-            var value = _tracker.GetProgressStageWeights()[ProgressStages.ResourceEntriesExtract];
+            var value = _tracker.GetProgressStageWeights()[ResourceFetchingProgressStages.ResourceEntriesExtract];
 
             _tracker.ReportResourceEntriesProcessed();
 
@@ -28,19 +30,9 @@ namespace TripToPrint.Core.Tests.UnitTests
         }
 
         [TestMethod]
-        public void When_report_content_generation_is_reported_the_progress_is_calculated_properly()
-        {
-            var value = _tracker.GetProgressStageWeights()[ProgressStages.ReportGeneration];
-
-            _tracker.ReportContentGenerationDone();
-
-            _progressMock.Verify(x => x.Report(value));
-        }
-
-        [TestMethod]
         public void When_images_fetching_is_reported_the_progress_is_calculated_properly()
         {
-            var value = _tracker.GetProgressStageWeights()[ProgressStages.FetchMapImages];
+            var value = _tracker.GetProgressStageWeights()[ResourceFetchingProgressStages.FetchMapImages];
             var count = 4;
 
             _tracker.ReportFetchImagesCount(count);
@@ -70,31 +62,14 @@ namespace TripToPrint.Core.Tests.UnitTests
         [TestMethod]
         public void When_step_2_is_reported_the_progress_is_calculated_properly()
         {
-            var value1 = _tracker.GetProgressStageWeights()[ProgressStages.ResourceEntriesExtract];
-            var value2 = _tracker.GetProgressStageWeights()[ProgressStages.ReportGeneration];
+            var value1 = _tracker.GetProgressStageWeights()[ResourceFetchingProgressStages.ResourceEntriesExtract];
+            var value2 = _tracker.GetProgressStageWeights()[ResourceFetchingProgressStages.FetchMapImages];
 
             _tracker.ReportResourceEntriesProcessed();
             _progressMock.Verify(x => x.Report(value1), Times.Once);
-
-            _tracker.ReportContentGenerationDone();
-            _progressMock.Verify(x => x.Report(value1 + value2), Times.Once);
-        }
-
-        [TestMethod]
-        public void When_step_3_is_reported_the_progress_is_calculated_properly()
-        {
-            var value1 = _tracker.GetProgressStageWeights()[ProgressStages.ResourceEntriesExtract];
-            var value2 = _tracker.GetProgressStageWeights()[ProgressStages.ReportGeneration];
-            var value3 = _tracker.GetProgressStageWeights()[ProgressStages.FetchMapImages];
-
-            _tracker.ReportResourceEntriesProcessed();
-            _progressMock.Verify(x => x.Report(value1), Times.Once);
-
-            _tracker.ReportContentGenerationDone();
-            _progressMock.Verify(x => x.Report(value1 + value2), Times.Once);
 
             _tracker.ReportFetchImagesCount(0);
-            _progressMock.Verify(x => x.Report(value1 + value2 + value3), Times.Once);
+            _progressMock.Verify(x => x.Report(value1 + value2), Times.Once);
         }
     }
 }

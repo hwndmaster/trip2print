@@ -5,6 +5,9 @@
     }
 
     export class Placemark extends React.Component<IPlacemarkProps, {}> {
+        private static readonly SOURCE_TYPE_HERE = "Here";
+        private static readonly SOURCE_TYPE_FOURSQUARE = "Foursquare";
+
         render() {
             let pm = this.props.placemark;
 
@@ -22,7 +25,7 @@
                            ? <div className="pm-desc" dangerouslySetInnerHTML={{ __html: pm.description }} />
                            : null}
                        {this.renderImages(pm.images)}
-                       {this.renderDiscoveredData(pm.discoveredData)}
+                       {pm.attachedVenues == null ? null : pm.attachedVenues.map(av => this.renderVenue(av))}
                    </div>;
         }
 
@@ -51,33 +54,18 @@
             console.log(`Image not loaded: ${element.getAttribute("src")}`);
         }
 
-        private renderDiscoveredData(discovered: Interfaces.IDiscoveredPlaceDto) {
-            if (discovered == null)
+        private renderVenue(venue: Interfaces.IVenueBaseDto) {
+            if (venue == null)
                 return null;
 
-            let output = "";
-            let sep = null;
-
-            if (discovered.address) {
-                output = discovered.address;
-                sep = " | ";
+            if (venue.sourceType === Placemark.SOURCE_TYPE_HERE) {
+                return <HereVenue venue={venue as Interfaces.IHereVenueDto} />;
             }
-            if (discovered.contactPhone) {
-                output += sep + discovered.contactPhone;
-                sep = " | ";
-            }
-            if (discovered.website) {
-                output += sep + discovered.website;
+            else if (venue.sourceType === Placemark.SOURCE_TYPE_FOURSQUARE) {
+                return <FoursquareVenue venue={venue as Interfaces.IFoursquareVenueDto}/>;
             }
 
-            return <div className="pm-xtra">
-                       <hr/>
-                       {output}
-                       {discovered.openingHours ? <span><br />Opening hours: {discovered.openingHours}</span> : null}
-                       {discovered.wikipediaContent
-                           ? <span><br />Wikipedia: <span dangerouslySetInnerHTML={{ __html: discovered.wikipediaContent }} /></span>
-                           : null}
-                   </div>;
+            throw new Error(`This type of venue is not supported: ${venue.sourceType}`);
         }
 
         private preventNavigation(event: React.MouseEvent<HTMLAnchorElement>) {

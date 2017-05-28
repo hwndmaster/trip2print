@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace TripToPrint.Core.Models
 {
-    public class KmlPlacemark : IKmlElement, IHaveCoordinates, IEquatable<KmlPlacemark>
+    public class KmlPlacemark : IKmlElement, IHasCoordinates, IEquatable<KmlPlacemark>
     {
         public string Name { get; set; }
         public string Description { get; set; }

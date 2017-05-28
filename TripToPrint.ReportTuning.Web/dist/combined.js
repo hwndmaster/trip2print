@@ -59,6 +59,112 @@ var TripToPrint;
 })(TripToPrint || (TripToPrint = {}));
 var TripToPrint;
 (function (TripToPrint) {
+    class Hideable extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = { hidden: false };
+        }
+        render() {
+            if (this.state.hidden) {
+                return React.createElement("div", { className: "hidden" },
+                    React.createElement(TripToPrint.Commands, null,
+                        React.createElement(TripToPrint.CommandShow, { onClick: () => { this.show(); } })));
+            }
+            return this.renderUnhidden();
+        }
+        hide() {
+            this.setState({
+                hidden: true
+            });
+        }
+        show() {
+            this.setState({
+                hidden: false
+            });
+        }
+    }
+    TripToPrint.Hideable = Hideable;
+})(TripToPrint || (TripToPrint = {}));
+var TripToPrint;
+(function (TripToPrint) {
+    class VenueBase extends TripToPrint.Hideable {
+        constructor(props) {
+            super(props);
+        }
+        createVenueBaseString(venue) {
+            let output = "";
+            let sep = null;
+            if (venue.address) {
+                output = venue.address;
+                sep = " | ";
+            }
+            if (venue.contactPhone) {
+                output += sep + venue.contactPhone;
+                sep = " | ";
+            }
+            if (venue.website) {
+                output += sep + venue.website;
+            }
+            return output;
+        }
+        renderOpeningHours(venue) {
+            return venue.openingHours
+                ? React.createElement("span", null,
+                    React.createElement("br", null),
+                    "Opening hours: ",
+                    venue.openingHours)
+                : null;
+        }
+    }
+    TripToPrint.VenueBase = VenueBase;
+})(TripToPrint || (TripToPrint = {}));
+var TripToPrint;
+(function (TripToPrint) {
+    class FoursquareVenue extends TripToPrint.VenueBase {
+        constructor(props) {
+            super(props);
+        }
+        renderUnhidden() {
+            let venue = this.props.venue;
+            return React.createElement("div", { className: "pm-xtra" },
+                React.createElement("hr", null),
+                this.renderRating(venue),
+                venue.likesCount != null ? React.createElement("div", { className: "v-prop" },
+                    venue.likesCount,
+                    " \u2764") : null,
+                React.createElement("div", { className: "v-prop" }, venue.category),
+                this.renderPrice(venue),
+                React.createElement("div", null, this.createVenueBaseString(venue)),
+                this.renderOpeningHours(venue),
+                React.createElement(TripToPrint.Commands, null,
+                    React.createElement(TripToPrint.CommandHide, { onClick: () => { this.hide(); } })));
+        }
+        renderRating(venue) {
+            if (venue.rating == null) {
+                return null;
+            }
+            const style = {
+                background: "#" + venue.ratingColor
+            };
+            return React.createElement("div", { className: "v-rating", style: style },
+                venue.rating,
+                React.createElement("span", { className: "v-maxrating" },
+                    "/",
+                    venue.maxRating));
+        }
+        renderPrice(venue) {
+            if (venue.priceLevel == null) {
+                return null;
+            }
+            return React.createElement("div", { className: "v-prop v-price" },
+                React.createElement("span", { className: "v-pricelvl" }, venue.priceLevel),
+                React.createElement("span", { className: "v-rempricelvl" }, venue.remainingPriceLevel));
+        }
+    }
+    TripToPrint.FoursquareVenue = FoursquareVenue;
+})(TripToPrint || (TripToPrint = {}));
+var TripToPrint;
+(function (TripToPrint) {
     class Group extends React.Component {
         render() {
             let group = this.props.group;
@@ -98,31 +204,25 @@ var TripToPrint;
 })(TripToPrint || (TripToPrint = {}));
 var TripToPrint;
 (function (TripToPrint) {
-    class Hideable extends React.Component {
+    class HereVenue extends TripToPrint.VenueBase {
         constructor(props) {
             super(props);
-            this.state = { hidden: false };
         }
-        render() {
-            if (this.state.hidden) {
-                return React.createElement("div", { className: "hidden" },
-                    React.createElement(TripToPrint.Commands, null,
-                        React.createElement(TripToPrint.CommandShow, { onClick: () => { this.show(); } })));
-            }
-            return this.renderUnhidden();
-        }
-        hide() {
-            this.setState({
-                hidden: true
-            });
-        }
-        show() {
-            this.setState({
-                hidden: false
-            });
+        renderUnhidden() {
+            const venue = this.props.venue;
+            return React.createElement("div", { className: "pm-xtra" },
+                React.createElement("hr", null),
+                this.createVenueBaseString(venue),
+                this.renderOpeningHours(venue),
+                venue.wikipediaContent
+                    ? React.createElement("span", null,
+                        React.createElement("br", null),
+                        "Wikipedia: ",
+                        React.createElement("span", { dangerouslySetInnerHTML: { __html: venue.wikipediaContent } }))
+                    : null);
         }
     }
-    TripToPrint.Hideable = Hideable;
+    TripToPrint.HereVenue = HereVenue;
 })(TripToPrint || (TripToPrint = {}));
 var TripToPrint;
 (function (TripToPrint) {
@@ -162,7 +262,7 @@ var TripToPrint;
                     ? React.createElement("div", { className: "pm-desc", dangerouslySetInnerHTML: { __html: pm.description } })
                     : null,
                 this.renderImages(pm.images),
-                this.renderDiscoveredData(pm.discoveredData));
+                pm.attachedVenues == null ? null : pm.attachedVenues.map(av => this.renderVenue(av)));
         }
         renderDistance() {
             let pm = this.props.placemark;
@@ -184,35 +284,16 @@ var TripToPrint;
             element.style.display = "none";
             console.log(`Image not loaded: ${element.getAttribute("src")}`);
         }
-        renderDiscoveredData(discovered) {
-            if (discovered == null)
+        renderVenue(venue) {
+            if (venue == null)
                 return null;
-            let output = "";
-            let sep = null;
-            if (discovered.address) {
-                output = discovered.address;
-                sep = " | ";
+            if (venue.sourceType === Placemark.SOURCE_TYPE_HERE) {
+                return React.createElement(TripToPrint.HereVenue, { venue: venue });
             }
-            if (discovered.contactPhone) {
-                output += sep + discovered.contactPhone;
-                sep = " | ";
+            else if (venue.sourceType === Placemark.SOURCE_TYPE_FOURSQUARE) {
+                return React.createElement(TripToPrint.FoursquareVenue, { venue: venue });
             }
-            if (discovered.website) {
-                output += sep + discovered.website;
-            }
-            return React.createElement("div", { className: "pm-xtra" },
-                React.createElement("hr", null),
-                output,
-                discovered.openingHours ? React.createElement("span", null,
-                    React.createElement("br", null),
-                    "Opening hours: ",
-                    discovered.openingHours) : null,
-                discovered.wikipediaContent
-                    ? React.createElement("span", null,
-                        React.createElement("br", null),
-                        "Wikipedia: ",
-                        React.createElement("span", { dangerouslySetInnerHTML: { __html: discovered.wikipediaContent } }))
-                    : null);
+            throw new Error(`This type of venue is not supported: ${venue.sourceType}`);
         }
         preventNavigation(event) {
             event.stopPropagation();
@@ -220,6 +301,8 @@ var TripToPrint;
             return false;
         }
     }
+    Placemark.SOURCE_TYPE_HERE = "Here";
+    Placemark.SOURCE_TYPE_FOURSQUARE = "Foursquare";
     TripToPrint.Placemark = Placemark;
 })(TripToPrint || (TripToPrint = {}));
 var TripToPrint;
@@ -265,15 +348,20 @@ var TripToPrint;
             super(props);
         }
         renderUnhidden() {
-            let pm = this.props.placemark;
+            const pm = this.props.placemark;
+            const style = {};
+            if (pm.iconPath.match(ThumbnailMap.FOURSQUARE_ICON_DOMAIN)) {
+                style["background"] = "lightslategray";
+            }
             return React.createElement("div", { className: "thumbnail-map-ctr" },
                 React.createElement("img", { className: "map", src: pm.thumbnailFilePath }),
-                React.createElement("img", { className: "icon", src: pm.iconPath }),
+                React.createElement("img", { className: "icon", src: pm.iconPath, style: style }),
                 React.createElement("div", { className: "ix" }, pm.index),
                 React.createElement(TripToPrint.Commands, null,
                     React.createElement(TripToPrint.CommandHide, { onClick: () => { this.hide(); } })));
         }
     }
+    ThumbnailMap.FOURSQUARE_ICON_DOMAIN = /4sqi\.net/;
     TripToPrint.ThumbnailMap = ThumbnailMap;
 })(TripToPrint || (TripToPrint = {}));
 //# sourceMappingURL=combined.js.map

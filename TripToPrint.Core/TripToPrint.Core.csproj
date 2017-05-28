@@ -61,13 +61,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CultureAgnosticFormatter.cs" />
+    <Compile Include="DiscoveringService.cs" />
     <Compile Include="EnumerableExtensionMethods.cs" />
     <Compile Include="FileService.cs" />
+    <Compile Include="FoursquareAdapter.cs" />
     <Compile Include="GoogleMyMapAdapter.cs" />
     <Compile Include="HereAdapter.cs" />
     <Compile Include="IocModule.cs" />
     <Compile Include="KmlCalculator.cs" />
     <Compile Include="KmlFileReader.cs" />
+    <Compile Include="Logging\ResourceFetchingLogger.cs" />
+    <Compile Include="Logging\DiscoveringLogger.cs" />
+    <Compile Include="Logging\GeneralLogger.cs" />
+    <Compile Include="Logging\LogCategory.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Logging\LogItem.cs" />
     <Compile Include="Logging\LogSeverity.cs" />
@@ -77,6 +83,10 @@
     <Compile Include="ModelFactories\MooiGroupFactory.cs" />
     <Compile Include="ModelFactories\MooiPlacemarkFactory.cs" />
     <Compile Include="Models\DiscoveredPlace.cs" />
+    <Compile Include="Models\Venues\FoursquareVenue.cs" />
+    <Compile Include="Models\Venues\FoursquareVenueTip.cs" />
+    <Compile Include="Models\Venues\HereVenue.cs" />
+    <Compile Include="Models\Venues\VenueBase.cs" />
     <Compile Include="Models\IKmlElement.cs" />
     <Compile Include="Models\KmlExtendedData.cs" />
     <Compile Include="Models\KmlDocument.cs" />
@@ -87,15 +97,22 @@
     <Compile Include="Models\MooiGroup.cs" />
     <Compile Include="Models\MooiPlacemark.cs" />
     <Compile Include="Models\MooiSection.cs" />
-    <Compile Include="ProgressTracker.cs" />
-    <Compile Include="ProgressTrackerFactory.cs" />
+    <Compile Include="Models\Venues\VenueSource.cs" />
+    <Compile Include="ProgressTracking\DiscoveringProgress.cs" />
+    <Compile Include="ProgressTracking\ResourceFetchingProgress.cs" />
+    <Compile Include="ProgressTracking\ProgressTrackerFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="ReportGenerator.cs" />
+    <Compile Include="ReportResourceFetcher.cs" />
     <Compile Include="ResourceNameProvider.cs" />
     <Compile Include="TestingEnvCore.cs" />
     <Compile Include="WebClientService.cs" />
@@ -110,6 +127,12 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

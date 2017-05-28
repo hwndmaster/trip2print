@@ -47,7 +47,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DiscoveredPlaceDto.cs" />
+    <Compile Include="FoursquareVenueDto.cs" />
+    <Compile Include="FoursquareVenueTipDto.cs" />
+    <Compile Include="HereVenueDto.cs" />
+    <Compile Include="VenueBaseDto.cs" />
     <Compile Include="IHostGate.cs" />
     <Compile Include="MooiDocumentDto.cs" />
     <Compile Include="MooiGroupDto.cs" />

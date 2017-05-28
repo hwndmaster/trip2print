@@ -5,22 +5,22 @@ namespace TripToPrint.Core.Logging
 {
     public interface ILogStorage
     {
-        void ClearAll();
+        void Clear(LogCategory category);
         void WriteLog(LogItem item);
 
         event EventHandler<LogItem> ItemAdded;
-        event EventHandler AllItemsRemoved;
+        event EventHandler<LogCategory> CategoryItemsRemoved;
     }
 
     public class LogStorage : ILogStorage
     {
         private readonly List<LogItem> _items = new List<LogItem>();
 
-        public void ClearAll()
+        public void Clear(LogCategory category)
         {
             _items.Clear();
 
-            AllItemsRemoved?.Invoke(this, null);
+            CategoryItemsRemoved?.Invoke(this, category);
         }
 
         public void WriteLog(LogItem item)
@@ -31,6 +31,6 @@ namespace TripToPrint.Core.Logging
         }
 
         public event EventHandler<LogItem> ItemAdded;
-        public event EventHandler AllItemsRemoved;
+        public event EventHandler<LogCategory> CategoryItemsRemoved;
     }
 }

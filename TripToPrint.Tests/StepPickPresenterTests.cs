@@ -18,9 +18,9 @@ using TripToPrint.Views;
 namespace TripToPrint.Tests
 {
     [TestClass]
-    public class StepSettingPresenterTests
+    public class StepPickPresenterTests
     {
-        private readonly Mock<IStepSettingView> _viewMock = new Mock<IStepSettingView>();
+        private readonly Mock<IStepPickView> _viewMock = new Mock<IStepPickView>();
         private readonly Mock<IWebClientService> _webClientkMock = new Mock<IWebClientService>();
         private readonly Mock<IFileService> _fileMock = new Mock<IFileService>();
         private readonly Mock<IGoogleMyMapAdapter> _googleMyMapAdapterMock = new Mock<IGoogleMyMapAdapter>();
@@ -31,14 +31,14 @@ namespace TripToPrint.Tests
         private readonly Mock<IKmlFileReader> _kmlFileReaderMock = new Mock<IKmlFileReader>();
         private readonly Mock<IKmlObjectsTreePresenter> _kmlObjectsTreePresenterMock = new Mock<IKmlObjectsTreePresenter>();
 
-        private Mock<StepSettingPresenter> _presenter;
+        private Mock<StepPickPresenter> _presenter;
 
         private const string DEFAULT_KML_URL = "http://kml-url";
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _presenter = new Mock<StepSettingPresenter>(
+            _presenter = new Mock<StepPickPresenter>(
                 _googleMyMapAdapterMock.Object,
                 _webClientkMock.Object,
                 _fileMock.Object,
@@ -132,7 +132,7 @@ namespace TripToPrint.Tests
             _userSessionMock.SetupGet(x => x.InputSource).Returns(InputSource.GoogleMyMapsUrl);
             _userSessionMock.SetupGet(x => x.InputUri).Returns("http://input-uri");
             // TODO: vm is needed?
-            _presenter.SetupGet(x => x.ViewModel).Returns(new StepSettingViewModel());
+            _presenter.SetupGet(x => x.ViewModel).Returns(new StepPickViewModel());
             _googleMyMapAdapterMock.Setup(x => x.GetKmlDownloadUrl(new Uri("http://input-uri"))).Returns(kmzUrl);
             _webClientkMock.Setup(x => x.GetAsync(kmzUrl)).Throws<Exception>();
 
@@ -157,7 +157,7 @@ namespace TripToPrint.Tests
                     )
                 }
             };
-            var vm = new StepSettingViewModel {
+            var vm = new StepPickViewModel {
                 KmlObjectsTree = {
                     FoldersToInclude = {
                         new KmlFolderNodeViewModel(kmlDocument.Folders[0]) {
@@ -202,7 +202,7 @@ namespace TripToPrint.Tests
                     )
                 }
             };
-            var vm = new StepSettingViewModel
+            var vm = new StepPickViewModel
             {
                 KmlObjectsTree = {
                     FoldersToInclude = {
@@ -243,10 +243,10 @@ namespace TripToPrint.Tests
             _fileMock.Verify(x => x.Delete(vm.InputFileName));
         }
 
-        private StepSettingViewModel SetupForActivatedMethod(KmlDocument kmlDocument)
+        private StepPickViewModel SetupForActivatedMethod(KmlDocument kmlDocument)
         {
             var kmzUrl = new Uri(DEFAULT_KML_URL);
-            var vm = new StepSettingViewModel();
+            var vm = new StepPickViewModel();
             _userSessionMock.SetupGet(x => x.InputSource).Returns(InputSource.GoogleMyMapsUrl);
             _userSessionMock.SetupGet(x => x.InputUri).Returns("http://input-uri");
             _presenter.SetupGet(x => x.ViewModel).Returns(vm);

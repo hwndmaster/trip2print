@@ -1,12 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Threading;
 
 using TripToPrint.Core;
 using TripToPrint.Core.Models;
-using TripToPrint.Services;
 using TripToPrint.ViewModels;
 using TripToPrint.Views;
 
@@ -16,20 +11,15 @@ namespace TripToPrint.Presenters
     {
         void HandleActivated(KmlDocument kmlDocument, CancellationToken cancellationToken);
         void SelectAllItemsToInclude(bool select);
-        void SelectBestMatchingDiscoveredPlaces(bool select);
     }
 
     public class KmlObjectsTreePresenter : IKmlObjectsTreePresenter
     {
         private readonly IKmlCalculator _kmlCalculator;
-        private readonly IHereAdapter _hereAdapter;
-        private readonly IUserSession _userSession;
 
-        public KmlObjectsTreePresenter(IKmlCalculator kmlCalculator, IHereAdapter hereAdapter, IUserSession userSession)
+        public KmlObjectsTreePresenter(IKmlCalculator kmlCalculator)
         {
             _kmlCalculator = kmlCalculator;
-            _hereAdapter = hereAdapter;
-            _userSession = userSession;
         }
 
         public IKmlObjectsTreeView View { get; private set; }
@@ -46,11 +36,7 @@ namespace TripToPrint.Presenters
 
         public void HandleActivated(KmlDocument kmlDocument, CancellationToken cancellationToken)
         {
-            ViewModel.DiscoveringIsDone = false;
-
             ReadKmlDocumentIntoViewModel(kmlDocument);
-
-            StartDiscoveringPlaces(cancellationToken);
         }
 
         public void SelectAllItemsToInclude(bool select)
@@ -61,24 +47,6 @@ namespace TripToPrint.Presenters
                 foreach (var placemarkVm in folderVm.Children)
                 {
                     placemarkVm.Enabled = select;
-                }
-            }
-        }
-
-        public void SelectBestMatchingDiscoveredPlaces(bool select)
-        {
-            foreach (var folderVm in ViewModel.FoldersToInclude)
-            {
-                foreach (var placemarkVm in folderVm.Children.OfType<KmlPlacemarkNodeViewModel>())
-                {
-                    if (select && placemarkVm.DiscoveredPlacesLoadedAndAvailable)
-                    {
-                        placemarkVm.SelectedDiscoveredPlace = placemarkVm.DiscoveredPlaces[0];
-                    }
-                    else
-                    {
-                        placemarkVm.SelectedDiscoveredPlace = null;
-                    }
                 }
             }
         }
@@ -100,37 +68,6 @@ namespace TripToPrint.Presenters
                 }
                 ViewModel.FoldersToInclude.Add(folderVm);
             }
-        }
-
-        private void StartDiscoveringPlaces(CancellationToken cancellationToken)
-        {
-            // TODO: Write unit test to cover this method
-            Task.Factory.StartNew(async () => {
-                var placemarksToDiscover = ViewModel.FoldersToInclude
-                    .Where(x => !x.IsPartOfRoute)
-                    .SelectMany(x => x.Children)
-                    .OfType<KmlPlacemarkNodeViewModel>();
-
-                var degreeOfParallelism = 4;
-                await placemarksToDiscover.ForEachAsync(degreeOfParallelism, async (placemarkNodeVm) => {
-                    if (cancellationToken.IsCancellationRequested)
-                        return;
-                    var placemark = placemarkNodeVm.Element as KmlPlacemark;
-                    var discoveredPlaces = await _hereAdapter.LookupPlaces(placemark, _userSession.UserLanguage, cancellationToken);
-                    if (discoveredPlaces != null && Application.Current != null)
-                    {
-                        await Application.Current.Dispatcher.InvokeAsync(() => {
-                            foreach (var discoveredPlace in discoveredPlaces)
-                            {
-                                placemarkNodeVm.DiscoveredPlaces.Add(discoveredPlace);
-                            }
-                        });
-                    }
-                    placemarkNodeVm.DiscoveredPlacesLoaded = true;
-                });
-
-                ViewModel.DiscoveringIsDone = true;
-            }, cancellationToken);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿@icon-size: 30px;
-@overview-height: 514px;
 @thumbnail-width: 200px;
 @thumbnail-height: 130px;
 @command-button-bg: #ffffff;
@@ -21,8 +20,6 @@ h3 {
 }
 
 .ov {
-    height: @overview-height;
-
     .title {
         position: absolute;
         left: 8px;
@@ -124,6 +121,33 @@ h3 {
             border: 0;
             border-top: 1px solid gray;
         }
+
+        .v-prop {
+            display: inline-block;
+            margin-left: 4px;
+        }
+
+        .v-rating {
+            display: inline-block;
+            color: white;
+            font-weight: bold;
+            padding: 1px 2px;
+
+            .v-maxrating {
+                font-size: 0.7em;
+                vertical-align: top;
+                margin-left: 2px;
+            }
+        }
+
+        .v-pricelvl {
+            color: red;
+            font-weight: bold;
+        }
+
+        .v-rempricelvl {
+            color: dimgray;
+        }
     }
 
     .pm-img img {
@@ -176,10 +200,9 @@ h3 {
 .commands-ctr {
     position: absolute;
     top: 0;
+    bottom: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    display: table;
+    right: 0;
     visibility: hidden;
 
     button {
@@ -187,8 +210,11 @@ h3 {
     }
 
     .commands-inner {
-        display: table-cell;
-        vertical-align: middle;
+        position: absolute;
+        top: 40%;
+        bottom: 0;
+        left: 0;
+        right: 0;
         text-align: center;
     }
 
@@ -203,10 +229,13 @@ h3 {
 
 .commands-parent:hover .commands-ctr {
     visibility: visible;
-    animation: commands-appear-bg 0.25s ease-in-out forwards;
+    animation: commands-appear-bg 0.6s cubic-bezier(0.8,0,1,.5) forwards;
 }
 .commands-parent:hover .commands-ctr button {
-    animation: commands-appear 0.25s ease-in-out forwards;
+    animation: commands-appear 0.6s cubic-bezier(0.8,0,1,.5) forwards;
+}
+.commands-parent.hidden:hover .commands-ctr {
+    animation: commands-appear-bg .25s ease-in-out forwards;
 }
 .commands-parent.hidden:hover .commands-ctr button {
     animation: none;

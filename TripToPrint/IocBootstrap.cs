@@ -29,21 +29,28 @@ namespace TripToPrint
             builder.RegisterType<MainWindowPresenter>().As<IMainWindowPresenter>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<StepIntroPresenter>().As<IStepIntroPresenter>();
-            builder.RegisterType<StepSettingPresenter>().As<IStepSettingPresenter>()
+            builder.RegisterType<StepPickPresenter>().As<IStepPickPresenter>()
+                .InstancePerLifetimeScope()
+                .PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies);
+            builder.RegisterType<StepDiscoveringPresenter>().As<IStepDiscoveringPresenter>()
+                .InstancePerLifetimeScope()
+                .PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies);
+            builder.RegisterType<StepExplorePresenter>().As<IStepExplorePresenter>()
                 .InstancePerLifetimeScope()
                 .PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies);
             builder.RegisterType<StepGenerationPresenter>().As<IStepGenerationPresenter>()
                 .InstancePerLifetimeScope()
                 .PropertiesAutowired(PropertyWiringOptions.AllowCircularDependencies);
-            builder.RegisterType<KmlObjectsTreePresenter>().As<IKmlObjectsTreePresenter>();
             builder.RegisterType<StepTuningPresenter>().As<IStepTuningPresenter>();
+            builder.RegisterType<KmlObjectsTreePresenter>().As<IKmlObjectsTreePresenter>();
             builder.RegisterType<TuningBrowserViewPresenter>().As<ITuningBrowserViewPresenter>();
 
             // Views
             builder.RegisterType<MainWindow>().As<IMainWindowView>();
             builder.RegisterType<StepIntro>().As<IStepIntroView>();
-            builder.RegisterType<StepSettingView>().As<IStepSettingView>();
-            builder.RegisterType<StepGenerationView>().As<IStepGenerationView>();
+            builder.RegisterType<StepPickView>().As<IStepPickView>();
+            builder.RegisterType<StepExploreView>().As<IStepExploreView>();
+            builder.RegisterType<StepInProgressView>().As<IStepInProgressView>();
             builder.RegisterType<StepTuningView>().As<IStepTuningView>();
             builder.RegisterType<KmlObjectsTreeView>().As<IKmlObjectsTreeView>();
             builder.RegisterType<TuningBrowserView>().As<ITuningBrowserView>();

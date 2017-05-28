@@ -15,7 +15,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Label Grid.Row="0" Content="Got it! Preview and adjust your report" Style="{DynamicResource StepHeader}" />
+        <Label Grid.Row="0" Content="Well done! Preview and adjust your report here" Style="{DynamicResource StepHeader}" />
         <Grid Grid.Row="1">
             <views:TuningBrowserView x:Name="tuningBrowser"/>
         </Grid>

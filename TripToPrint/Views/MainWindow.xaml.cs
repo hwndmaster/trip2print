@@ -11,8 +11,10 @@ namespace TripToPrint.Views
     public interface IMainWindowView : IView<IMainWindowPresenter>
     {
         IStepIntroView StepIntroView { get; }
-        IStepSettingView StepSettingView { get; }
-        IStepGenerationView StepGenerationView { get; }
+        IStepPickView StepPickView { get; }
+        IStepInProgressView StepDiscoveringView { get; }
+        IStepExploreView StepExploreView { get; }
+        IStepInProgressView StepGenerationView { get; }
         IStepTuningView StepTuningView { get; }
 
         void Show();
@@ -28,8 +30,10 @@ namespace TripToPrint.Views
 
         public IMainWindowPresenter Presenter { get; set; }
         public IStepIntroView StepIntroView => stepIntro;
-        public IStepSettingView StepSettingView => stepSetting;
-        public IStepGenerationView StepGenerationView => stepGeneration;
+        public IStepPickView StepPickView => stepPick;
+        public IStepInProgressView StepDiscoveringView => stepDiscovering;
+        public IStepExploreView StepExploreView => stepExplore;
+        public IStepInProgressView StepGenerationView => stepGeneration;
         public IStepTuningView StepTuningView => stepTuning;
 
         private void TabWizard_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

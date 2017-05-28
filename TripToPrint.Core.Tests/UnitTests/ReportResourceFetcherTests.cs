@@ -1,40 +1,37 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.ModelFactories;
 using TripToPrint.Core.Models;
+using TripToPrint.Core.ProgressTracking;
 
 namespace TripToPrint.Core.Tests.UnitTests
 {
-    // TODO: Currently this is not a report generator, but downloader of resources + creation of mooidocument
     [TestClass]
-    public class ReportGeneratorTests
+    public class ReportResourceFetcherTests
     {
         private readonly Mock<IMooiDocumentFactory> _mooiDocumentFactoryMock = new Mock<IMooiDocumentFactory>();
         private readonly Mock<IHereAdapter> _hereAdapterMock = new Mock<IHereAdapter>();
-        private readonly Mock<ILogger> _loggerMock = new Mock<ILogger>();
+        private readonly Mock<IResourceFetchingLogger> _loggerMock = new Mock<IResourceFetchingLogger>();
         private readonly Mock<IFileService> _fileMock = new Mock<IFileService>();
         private readonly Mock<IResourceNameProvider> _resourceNameMock = new Mock<IResourceNameProvider>();
-        private readonly Mock<IWebClientService> _webClientMock = new Mock<IWebClientService>();
-        private readonly Mock<IProgressTracker> _progressTrackerMock = new Mock<IProgressTracker>();
+        private readonly Mock<IResourceFetchingProgress> _progressMock = new Mock<IResourceFetchingProgress>();
 
-        private Mock<ReportGenerator> _reportGenerator;
+        private Mock<ReportResourceFetcher> _fetcher;
 
         private string _tempFolderName = "temp-folder-name";
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _reportGenerator = new Mock<ReportGenerator>(
+            _fetcher = new Mock<ReportResourceFetcher>(
                 _mooiDocumentFactoryMock.Object,
                 _hereAdapterMock.Object,
                 _loggerMock.Object,
                 _fileMock.Object,
-                _resourceNameMock.Object,
-                _webClientMock.Object) {
+                _resourceNameMock.Object) {
                 CallBase = true
             };
 
@@ -55,16 +52,16 @@ namespace TripToPrint.Core.Tests.UnitTests
                     new KmlResource { FileName = "resource-2", Blob = new byte[] {2}}
                 }
             };
-            _reportGenerator.Setup(x => x.FetchMapImages(It.IsAny<MooiDocument>(), It.IsAny<string>(), _progressTrackerMock.Object))
+            _fetcher.Setup(x => x.FetchMapImages(It.IsAny<MooiDocument>(), It.IsAny<string>(), _progressMock.Object))
                 .Returns(Task.CompletedTask);
 
             // Act
-            var result = await _reportGenerator.Object.Generate(document, null, _progressTrackerMock.Object);
+            var result = await _fetcher.Object.Generate(document, null, _progressMock.Object);
 
             // Verify
             Assert.IsTrue(result.tempPath.StartsWith(Path.Combine(Path.GetTempPath(), _tempFolderName)));
             AssertDocumentResourcesAreSaved(document);
-            _reportGenerator.Verify(x => x.FetchMapImages(It.IsAny<MooiDocument>(), result.tempPath, _progressTrackerMock.Object), Times.Once);
+            _fetcher.Verify(x => x.FetchMapImages(It.IsAny<MooiDocument>(), result.tempPath, _progressMock.Object), Times.Once);
         }
 
         [TestMethod]
@@ -72,16 +69,15 @@ namespace TripToPrint.Core.Tests.UnitTests
         {
             // Arrange
             var document = new KmlDocument();
-            _reportGenerator.Setup(x => x.FetchMapImages(It.IsAny<MooiDocument>(), It.IsAny<string>(), _progressTrackerMock.Object))
+            _fetcher.Setup(x => x.FetchMapImages(It.IsAny<MooiDocument>(), It.IsAny<string>(), _progressMock.Object))
                 .Returns(Task.CompletedTask);
 
             // Act
-            await _reportGenerator.Object.Generate(document, null, _progressTrackerMock.Object);
+            await _fetcher.Object.Generate(document, null, _progressMock.Object);
 
             // Verify
-            _progressTrackerMock.Verify(x => x.ReportResourceEntriesProcessed(), Times.Once);
-            _progressTrackerMock.Verify(x => x.ReportContentGenerationDone(), Times.Once);
-            _progressTrackerMock.Verify(x => x.ReportDone(), Times.Once);
+            _progressMock.Verify(x => x.ReportResourceEntriesProcessed(), Times.Once);
+            _progressMock.Verify(x => x.ReportDone(), Times.Once);
         }
 
         [TestMethod]
@@ -102,13 +98,13 @@ namespace TripToPrint.Core.Tests.UnitTests
                 .Returns(Task.FromResult(thumbnailBytes));
 
             // Act
-            await _reportGenerator.Object.FetchMapImages(document, tempPath, _progressTrackerMock.Object);
+            await _fetcher.Object.FetchMapImages(document, tempPath, _progressMock.Object);
 
             // Verify
             _fileMock.Verify(x => x.WriteBytesAsync(tempPath + @"\overview-path", overviewBytes));
             _fileMock.Verify(x => x.WriteBytesAsync(tempPath + @"\thumb-path", thumbnailBytes));
-            _progressTrackerMock.Verify(x => x.ReportFetchImagesCount(1 + 1), Times.Once);
-            _progressTrackerMock.Verify(x => x.ReportFetchImageProcessed(), Times.Exactly(2));
+            _progressMock.Verify(x => x.ReportFetchImagesCount(1 + 1), Times.Once);
+            _progressMock.Verify(x => x.ReportFetchImageProcessed(), Times.Exactly(2));
         }
 
         private void AssertDocumentResourcesAreSaved(KmlDocument document)

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="TripToPrint.Views.StepSettingView"
+﻿<UserControl x:Class="TripToPrint.Views.StepPickView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,7 +7,7 @@
              xmlns:viewModels="clr-namespace:TripToPrint.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600"
-             d:DataContext="{d:DesignInstance {x:Type viewModels:StepSettingViewModel}, IsDesignTimeCreatable=True}"
+             d:DataContext="{d:DesignInstance {x:Type viewModels:StepPickViewModel}, IsDesignTimeCreatable=True}"
              Background="WhiteSmoke">
     <Grid>
         <Grid.RowDefinitions>

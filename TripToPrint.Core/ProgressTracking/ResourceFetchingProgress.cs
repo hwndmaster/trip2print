@@ -1,55 +1,45 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
-namespace TripToPrint.Core
+namespace TripToPrint.Core.ProgressTracking
 {
-    public interface IProgressTracker
+    public interface IResourceFetchingProgress
     {
         void ReportResourceEntriesProcessed();
-        void ReportContentGenerationDone();
         void ReportFetchImagesCount(int count);
         void ReportFetchImageProcessed();
         void ReportDone();
     }
 
-    internal enum ProgressStages
+    internal enum ResourceFetchingProgressStages
     {
         ResourceEntriesExtract,
-        ReportGeneration,
         FetchMapImages,
     }
 
-    public class ProgressTracker : IProgressTracker
+    public class ResourceFetchingProgress : IResourceFetchingProgress
     {
         private readonly IProgress<int> _progress;
-        private readonly Dictionary<ProgressStages, int> _progressStageWeights;
+        private readonly Dictionary<ResourceFetchingProgressStages, int> _progressStageWeights;
 
         private bool _resourceEntriesProcessed;
-        private bool _reportGenerated;
         private int? _fetchImagesCount;
         private int _fetchImagesProcessed;
         private bool _done;
 
-        public ProgressTracker(IProgress<int> progress)
+        public ResourceFetchingProgress(IProgress<int> progress)
         {
             _progress = progress;
 
-            _progressStageWeights = new Dictionary<ProgressStages, int> {
-                { ProgressStages.ResourceEntriesExtract, 3 },
-                { ProgressStages.ReportGeneration, 3 },
-                { ProgressStages.FetchMapImages, 93 }
+            _progressStageWeights = new Dictionary<ResourceFetchingProgressStages, int> {
+                { ResourceFetchingProgressStages.ResourceEntriesExtract, 6 },
+                { ResourceFetchingProgressStages.FetchMapImages, 93 }
             };
         }
 
         public void ReportResourceEntriesProcessed()
         {
             _resourceEntriesProcessed = true;
-            _progress.Report(CalculateValue());
-        }
-
-        public void ReportContentGenerationDone()
-        {
-            _reportGenerated = true;
             _progress.Report(CalculateValue());
         }
 
@@ -71,7 +61,7 @@ namespace TripToPrint.Core
             _progress.Report(CalculateValue());
         }
 
-        internal Dictionary<ProgressStages, int> GetProgressStageWeights()
+        internal Dictionary<ResourceFetchingProgressStages, int> GetProgressStageWeights()
         {
             return _progressStageWeights;
         }
@@ -87,23 +77,18 @@ namespace TripToPrint.Core
 
             if (_resourceEntriesProcessed)
             {
-                sum += _progressStageWeights[ProgressStages.ResourceEntriesExtract];
-            }
-
-            if (_reportGenerated)
-            {
-                sum += _progressStageWeights[ProgressStages.ReportGeneration];
+                sum += _progressStageWeights[ResourceFetchingProgressStages.ResourceEntriesExtract];
             }
 
             if (_fetchImagesCount.HasValue)
             {
                 if (_fetchImagesCount == 0)
                 {
-                    sum += _progressStageWeights[ProgressStages.FetchMapImages];
+                    sum += _progressStageWeights[ResourceFetchingProgressStages.FetchMapImages];
                 }
                 else
                 {
-                    sum += (int)((float)_fetchImagesProcessed / _fetchImagesCount.Value * _progressStageWeights[ProgressStages.FetchMapImages]);
+                    sum += (int)((float)_fetchImagesProcessed / _fetchImagesCount.Value * _progressStageWeights[ResourceFetchingProgressStages.FetchMapImages]);
                 }
             }
 

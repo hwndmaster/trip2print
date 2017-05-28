@@ -13,6 +13,8 @@
 <# var ts = TypeScript.Definitions()
         //.For<TripToPrint.ReportTuning.Dto.IHostGate>()
         .For<TripToPrint.ReportTuning.Dto.MooiDocumentDto>()
+        .For<TripToPrint.ReportTuning.Dto.HereVenueDto>()
+        .For<TripToPrint.ReportTuning.Dto.FoursquareVenueDto>()
 		.WithReference("Enums.ts")
         .WithModuleNameFormatter((module) => "Interfaces")
         .WithTypeFormatter((type, f) => {

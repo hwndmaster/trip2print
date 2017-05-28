@@ -12,8 +12,6 @@ namespace TripToPrint.Tests
     public class KmlObjectsTreePresenterTests
     {
         private readonly Mock<IKmlCalculator> _kmlCalculatorMock = new Mock<IKmlCalculator>();
-        private readonly Mock<IHereAdapter> _hereAdapterMock = new Mock<IHereAdapter>();
-        private readonly Mock<IUserSession> _userSessionMock = new Mock<IUserSession>();
 
         private Mock<KmlObjectsTreePresenter> _presenter;
 
@@ -21,9 +19,7 @@ namespace TripToPrint.Tests
         public void TestInitialize()
         {
             _presenter = new Mock<KmlObjectsTreePresenter>(
-                _kmlCalculatorMock.Object,
-                _hereAdapterMock.Object,
-                _userSessionMock.Object) {
+                _kmlCalculatorMock.Object) {
                 CallBase = true
             };
         }

@@ -6,7 +6,7 @@ namespace TripToPrint.ViewModels
     {
         private string _inputUri;
         private InputSource _inputSource;
-        private string _userLanguage;
+        private string _reportLanguage;
 
         public string InputUri
         {
@@ -41,22 +41,22 @@ namespace TripToPrint.ViewModels
             }
         }
 
-        public string UserLanguage
+        public string ReportLanguage
         {
-            get { return _userLanguage; }
+            get { return _reportLanguage; }
             set
             {
-                if (value == _userLanguage)
+                if (value == _reportLanguage)
                     return;
-                _userLanguage = value;
+                _reportLanguage = value;
 
                 OnPropertyChanged();
-                UserLanguageChanged?.Invoke(this, value);
+                ReportLanguageChanged?.Invoke(this, value);
             }
         }
 
         public event EventHandler<string> InputUriChanged;
         public event EventHandler<InputSource> InputSourceChanged;
-        public event EventHandler<string> UserLanguageChanged;
+        public event EventHandler<string> ReportLanguageChanged;
     }
 }

@@ -8,7 +8,7 @@ namespace TripToPrint.Core.ModelFactories
 {
     public interface IMooiGroupFactory
     {
-        List<MooiGroup> CreateList(KmlFolder folder, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark, string reportTempPath);
+        List<MooiGroup> CreateList(KmlFolder folder, List<DiscoveredPlace> discoveredPlaces, string reportTempPath);
     }
 
     public class MooiGroupFactory : IMooiGroupFactory
@@ -29,14 +29,13 @@ namespace TripToPrint.Core.ModelFactories
             _mooiPlacemarkFactory = mooiPlacemarkFactory;
         }
 
-        public List<MooiGroup> CreateList(KmlFolder folder, Dictionary<KmlPlacemark, DiscoveredPlace> discoveredPlacePerPlacemark
-            , string reportTempPath)
+        public List<MooiGroup> CreateList(KmlFolder folder, List<DiscoveredPlace> discoveredPlaces, string reportTempPath)
         {
             var groups = new List<MooiGroup>();
 
             var placemarksConverted = folder.Placemarks
                 .Select(x => _mooiPlacemarkFactory.Create(x,
-                    discoveredPlacePerPlacemark?.ContainsKey(x) == true ? discoveredPlacePerPlacemark[x] : null,
+                    discoveredPlaces?.Where(dp => dp.AttachedToPlacemark == x).Select(dp => dp.Venue),
                     reportTempPath))
                 .ToList();
 
@@ -210,12 +209,7 @@ namespace TripToPrint.Core.ModelFactories
             return from pm1 in group2.Placemarks
                    from pm2 in group1.Placemarks
                    where pm1 != pm2
-                   select DistanceBetweenPlacemarks(pm1, pm2);
-        }
-
-        private double DistanceBetweenPlacemarks(MooiPlacemark placemark1, MooiPlacemark placemark2)
-        {
-            return placemark1.PrimaryCoordinate.GetDistanceTo(placemark2.PrimaryCoordinate);
+                   select _kmlCalculator.GetDistanceInMeters(pm1, pm2);
         }
 
         public class PlacemarkNeighbor

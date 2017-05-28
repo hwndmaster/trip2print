@@ -4,4 +4,6 @@
     xmlns:conv="clr-namespace:TripToPrint.ValueConverters">
     <conv:BooleanToVisibilityConverter x:Key="BoolToVis" />
     <conv:BooleanToVisibilityConverter x:Key="BoolToVisInverted" True="Collapsed" False="Visible" />
+    <conv:StringToBrushConverter x:Key="StringToBrushConverter"/>
 </ResourceDictionary>
+    
