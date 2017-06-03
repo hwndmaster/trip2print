@@ -30,14 +30,14 @@
                 </Style>
             </TreeView.ItemContainerStyle>
             <TreeView.Resources>
-                <HierarchicalDataTemplate 
+                <HierarchicalDataTemplate
                     DataType="{x:Type viewModels:DiscoveredSectionViewModel}"
                     ItemsSource="{Binding Groups}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Name}" Foreground="DarkGreen" FontWeight="Bold" />
                     </StackPanel>
                 </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate 
+                <HierarchicalDataTemplate
                     DataType="{x:Type viewModels:DiscoveredGroupViewModel}"
                     ItemsSource="{Binding Venues}">
                     <StackPanel Orientation="Horizontal">
@@ -68,7 +68,11 @@
                                     </Style>
                                 </Image.Style>
                             </Image>
-                            <TextBlock Text="{Binding Venue.Title}" VerticalAlignment="Center" />
+                            <TextBlock VerticalAlignment="Center">
+                                <Hyperlink NavigateUri="{Binding Venue.Websites[0]}" RequestNavigate="Hyperlink_OnRequestNavigate">
+                                    <Run Text="{Binding Venue.Title}" />
+                                </Hyperlink>
+                            </TextBlock>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
                             <ContentControl>

@@ -69,7 +69,7 @@ namespace TripToPrint.Tests
             await _presenter.Object.Activated();
 
             // Verify
-            _reportResourceFetcherMock.Verify(x => x.Generate(document, null, It.IsAny<IResourceFetchingProgress>()), Times.Once);
+            _reportResourceFetcherMock.Verify(x => x.Generate(document, null, null, It.IsAny<IResourceFetchingProgress>()), Times.Once);
         }
 
         [TestMethod]
@@ -84,7 +84,7 @@ namespace TripToPrint.Tests
             await _presenter.Object.Activated();
 
             // Verify
-            _reportResourceFetcherMock.Verify(x => x.Generate(document, null, It.IsAny<IResourceFetchingProgress>()), Times.Once);
+            _reportResourceFetcherMock.Verify(x => x.Generate(document, null, null, It.IsAny<IResourceFetchingProgress>()), Times.Once);
         }
 
         [TestMethod]
@@ -92,7 +92,7 @@ namespace TripToPrint.Tests
         {
             // Arrange
             _presenter.SetupGet(x => x.ViewModel).Returns(new StepInProgressViewModel());
-            _reportResourceFetcherMock.Setup(x => x.Generate(It.IsAny<KmlDocument>(), null, It.IsAny<IResourceFetchingProgress>()))
+            _reportResourceFetcherMock.Setup(x => x.Generate(It.IsAny<KmlDocument>(), null, null, It.IsAny<IResourceFetchingProgress>()))
                 .Throws(new Exception("exception-message"));
 
             // Act

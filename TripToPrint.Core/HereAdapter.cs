@@ -6,10 +6,12 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
+
+using Newtonsoft.Json;
 
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.Models;
+using TripToPrint.Core.Models.Integration;
 using TripToPrint.Core.Models.Venues;
 
 namespace TripToPrint.Core
@@ -36,7 +38,7 @@ namespace TripToPrint.Core
         internal const string APP_CODE_PARAM_NAME = "app_code";
 
         internal const int TOO_MUCH_OF_COORDINATE_POINTS = 400;
-        private const int LOOKUP_PLACES_WITHIN_DISTANCE_IN_METERS = 500;
+        private const int LOOKUP_PLACES_WITHIN_DISTANCE_IN_METERS = 300;
         private const int COORDINATE_PRECISION_ON_POINTS = 6;
         private const int COORDINATE_PRECISION_ON_ROUTES = 4;
         private const int OVERVIEW_MAP_WIDTH = 1200;
@@ -124,61 +126,64 @@ namespace TripToPrint.Core
                     return null;
                 }
 
-                dynamic json = JObject.Parse(jsonValue);
-
-                dynamic place = ((JArray) json.results.items)
-                    .FirstOrDefault(x => Convert.ToInt32(((dynamic) x).distance) < LOOKUP_PLACES_WITHIN_DISTANCE_IN_METERS);
-
+                var response = JsonConvert.DeserializeObject<HereDiscoverSearchResponse>(jsonValue);
+                var place = response.Results.Items.FirstOrDefault(x => x.Distance < LOOKUP_PLACES_WITHIN_DISTANCE_IN_METERS);
                 if (place == null)
                 {
                     return null;
                 }
 
                 var discoveredPlace = new HereVenue {
-                    Title = (string) place.title,
-                    Coordinate = new GeoCoordinate(Convert.ToDouble(place.position[0]), Convert.ToDouble(place.position[1])),
-                    Address = ReplaceHtmlNewLines((string) place.vicinity),
-                    IconUrl = new Uri((string) place.icon),
-                    OpeningHours = ReplaceHtmlNewLines((string)place.openingHours?.text),
-                    Category = place.category.title
+                    Id = place.Id,
+                    Title = place.Title,
+                    Coordinate = new GeoCoordinate(place.Position[0], place.Position[1]),
+                    Address = ReplaceHtmlNewLines(place.Vicinity),
+                    IconUrl = new Uri(place.Icon),
+                    OpeningHours = ReplaceHtmlNewLines(place.OpeningHours?.Text),
+                    Category = place.Category.Title,
+                    Websites = new string[0]
                 };
 
-                if (place.href != null)
+                if (place.Href != null)
                 {
-                    var extraInfoUrl = (string) place.href;
-                    extraInfoUrl += "&show_content=wikipedia";
+                    var extraInfoUrl = place.Href + "&show_content=wikipedia";
                     var jsonValueExtra = await DownloadString(extraInfoUrl, culture, cancellationToken);
                     if (jsonValueExtra != null)
                     {
-                        dynamic jsonExtra = JObject.Parse(jsonValueExtra);
-                        if (jsonExtra.contacts != null)
-                        {
-                            var phonesArray = jsonExtra.contacts.phone as JArray;
-                            if (phonesArray != null)
-                            {
-                                dynamic phone = phonesArray[0];
-                                discoveredPlace.ContactPhone = (string) phone.value;
-                            }
+                        var extra = JsonConvert.DeserializeObject<HerePlace>(jsonValueExtra);
 
-                            var websitesArray = jsonExtra.contacts.website as JArray;
-                            if (websitesArray != null)
-                            {
-                                dynamic website = websitesArray[0];
-                                discoveredPlace.Websites = new [] {
-                                    (string) website.value
-                                };
-                            }
-                        }
-                        var editorialsArray = jsonExtra.media?.editorials?.items as JArray;
-                        if (editorialsArray != null)
+                        if (extra.Location?.Address != null)
                         {
-                            // TODO: Что если элементов больше, чем 1?
-                            var editorialLanguage = (string) ((dynamic) editorialsArray[0]).language;
+                            discoveredPlace.Region = string.Join(", ", extra.Location.Address.State, extra.Location.Address.Country);
+                        }
+
+                        discoveredPlace.Tags = extra.Tags?.Select(x => x.Title).ToArray();
+
+                        if (!string.IsNullOrEmpty(extra.View))
+                        {
+                            discoveredPlace.Websites = new [] { extra.View };
+                        }
+
+                        if (extra.Contacts?.Phone?.Length > 0)
+                        {
+                            discoveredPlace.ContactPhone = extra.Contacts.Phone[0].Value;
+                        }
+
+                        if (extra.Contacts?.Website?.Length > 0)
+                        {
+                            discoveredPlace.Websites = discoveredPlace.Websites
+                                .Concat(extra.Contacts.Website.Select(x => x.Value)).ToArray();
+                        }
+
+                        var wikipedia = extra.Media?.Editorials?.Items
+                            .FirstOrDefault(x => x.Supplier.Id.Equals("wikipedia", StringComparison.OrdinalIgnoreCase));
+                        if (wikipedia != null)
+                        {
                             var requestedLanguage = culture.Split('-')[0];
-                            if (editorialLanguage.Equals(requestedLanguage, StringComparison.OrdinalIgnoreCase)
-                                || editorialLanguage.Equals(ACCEPTABLE_LANGUAGE, StringComparison.OrdinalIgnoreCase))
+                            if (wikipedia.Language.Equals(requestedLanguage, StringComparison.OrdinalIgnoreCase)
+                                || wikipedia.Language.Equals(ACCEPTABLE_LANGUAGE, StringComparison.OrdinalIgnoreCase))
                             {
-                                discoveredPlace.WikipediaContent = FilterContent((string)((dynamic)editorialsArray[0]).description);
+                                discoveredPlace.WikipediaContent = FilterContent(wikipedia.Description);
                             }
                         }
                     }

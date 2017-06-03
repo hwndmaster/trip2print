@@ -17,7 +17,7 @@ namespace TripToPrint.Presenters
         private readonly IDiscoveringService _discovering;
         private readonly IUserSession _userSession;
 
-        public StepDiscoveringPresenter(ILogStorage logStorage, IResourceFetchingLogger logger
+        public StepDiscoveringPresenter(ILogStorage logStorage, IDiscoveringLogger logger
             , IProgressTrackerFactory progressTrackerFactory, IDiscoveringService discovering, IUserSession userSession)
             : base(logger, logStorage)
         {

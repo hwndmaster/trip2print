@@ -5,6 +5,7 @@ namespace TripToPrint.Core.Models.Venues
 {
     public abstract class VenueBase : IEquatable<VenueBase>
     {
+        public string Id { get; set; }
         public abstract VenueSource SourceType { get; }
 
         public virtual string Title { get; set; }
@@ -16,6 +17,7 @@ namespace TripToPrint.Core.Models.Venues
         public string[] Websites { get; set; }
         public Uri IconUrl { get; set; }
         public string OpeningHours { get; set; }
+        public string[] Tags { get; set; }
 
         public abstract bool IsUseless();
 

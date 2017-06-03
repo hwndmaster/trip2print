@@ -138,7 +138,6 @@ namespace TripToPrint.Chromium
                     : null,
                 PhotoUrls = foursquareVenue.PhotoUrls,
                 Tags = foursquareVenue.Tags,
-                Phrases = foursquareVenue.Phrases,
                 Tips = foursquareVenue.Tips?.Select(x => new FoursquareVenueTipDto {
                     Message = x.Message,
                     Likes = x.Likes,

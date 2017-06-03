@@ -49,6 +49,7 @@ namespace TripToPrint.Presenters
                 (_userSession.GeneratedReportTempPath, _userSession.GeneratedDocument)
                     = await _reportResourceFetcher.Generate(_userSession.Document
                         , _userSession.IncludedVenues
+                        , _userSession.ReportLanguage
                         , progressTracker);
 
                 Logger.Info("Generation process complete");

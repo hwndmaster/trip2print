@@ -1,40 +1,46 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.ModelFactories;
 using TripToPrint.Core.Models;
-using TripToPrint.Core.Models.Venues;
 using TripToPrint.Core.ProgressTracking;
 
 namespace TripToPrint.Core
 {
     public interface IReportResourceFetcher
     {
-        Task<(string tempPath, MooiDocument document)> Generate(KmlDocument document, List<DiscoveredPlace> discoveredPlaces, IResourceFetchingProgress progress);
+        Task<(string tempPath, MooiDocument document)> Generate(KmlDocument document, List<DiscoveredPlace> discoveredPlaces, string language, IResourceFetchingProgress progress);
     }
 
     public class ReportResourceFetcher : IReportResourceFetcher
     {
         private readonly IMooiDocumentFactory _mooiDocumentFactory;
         private readonly IHereAdapter _hereAdapter;
+        private readonly IFoursquareAdapter _foursquare;
         private readonly IResourceFetchingLogger _logger;
         private readonly IFileService _file;
         private readonly IResourceNameProvider _resourceName;
 
         public ReportResourceFetcher(IMooiDocumentFactory mooiDocumentFactory, IHereAdapter hereAdapter,
-            IResourceFetchingLogger logger, IFileService file, IResourceNameProvider resourceName)
+            IFoursquareAdapter foursquare, IResourceFetchingLogger logger, IFileService file, IResourceNameProvider resourceName)
         {
             _mooiDocumentFactory = mooiDocumentFactory;
             _hereAdapter = hereAdapter;
+            _foursquare = foursquare;
             _logger = logger;
             _file = file;
             _resourceName = resourceName;
         }
 
-        public async Task<(string tempPath, MooiDocument document)> Generate(KmlDocument document, List<DiscoveredPlace> discoveredPlaces, IResourceFetchingProgress progress)
+        public async Task<(string tempPath, MooiDocument document)> Generate([NotNull] KmlDocument document
+            , [NotNull] List<DiscoveredPlace> discoveredPlaces, string language, IResourceFetchingProgress progress)
         {
+            // TODO: Add cancellationtoken approach
+
             var tempPath = CreateAndGetTempPath();
 
             foreach (var resource in document.Resources)
@@ -43,7 +49,7 @@ namespace TripToPrint.Core
             }
             progress.ReportResourceEntriesProcessed();
 
-            // TODO: Download {discoveredPlaces.Select(x => x.Venue.IconUrl)}
+            await _foursquare.PopulateWithDetailedInfo(discoveredPlaces.Where(x => !x.IsForPlacemark), language, CancellationToken.None);
 
             var mooiDocument = _mooiDocumentFactory.Create(document, discoveredPlaces, tempPath);
 

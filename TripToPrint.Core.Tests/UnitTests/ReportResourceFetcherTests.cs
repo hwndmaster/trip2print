@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -13,7 +14,8 @@ namespace TripToPrint.Core.Tests.UnitTests
     public class ReportResourceFetcherTests
     {
         private readonly Mock<IMooiDocumentFactory> _mooiDocumentFactoryMock = new Mock<IMooiDocumentFactory>();
-        private readonly Mock<IHereAdapter> _hereAdapterMock = new Mock<IHereAdapter>();
+        private readonly Mock<IHereAdapter> _hereMock = new Mock<IHereAdapter>();
+        private readonly Mock<IFoursquareAdapter> _foursquareMock = new Mock<IFoursquareAdapter>();
         private readonly Mock<IResourceFetchingLogger> _loggerMock = new Mock<IResourceFetchingLogger>();
         private readonly Mock<IFileService> _fileMock = new Mock<IFileService>();
         private readonly Mock<IResourceNameProvider> _resourceNameMock = new Mock<IResourceNameProvider>();
@@ -28,7 +30,8 @@ namespace TripToPrint.Core.Tests.UnitTests
         {
             _fetcher = new Mock<ReportResourceFetcher>(
                 _mooiDocumentFactoryMock.Object,
-                _hereAdapterMock.Object,
+                _hereMock.Object,
+                _foursquareMock.Object,
                 _loggerMock.Object,
                 _fileMock.Object,
                 _resourceNameMock.Object) {
@@ -56,7 +59,7 @@ namespace TripToPrint.Core.Tests.UnitTests
                 .Returns(Task.CompletedTask);
 
             // Act
-            var result = await _fetcher.Object.Generate(document, null, _progressMock.Object);
+            var result = await _fetcher.Object.Generate(document, new List<DiscoveredPlace>(), null, _progressMock.Object);
 
             // Verify
             Assert.IsTrue(result.tempPath.StartsWith(Path.Combine(Path.GetTempPath(), _tempFolderName)));
@@ -73,7 +76,7 @@ namespace TripToPrint.Core.Tests.UnitTests
                 .Returns(Task.CompletedTask);
 
             // Act
-            await _fetcher.Object.Generate(document, null, _progressMock.Object);
+            await _fetcher.Object.Generate(document, new List<DiscoveredPlace>(), null, _progressMock.Object);
 
             // Verify
             _progressMock.Verify(x => x.ReportResourceEntriesProcessed(), Times.Once);
@@ -92,9 +95,9 @@ namespace TripToPrint.Core.Tests.UnitTests
             var thumbnailBytes = new byte[] { 0x44 };
             _resourceNameMock.Setup(x => x.CreateFileNameForOverviewMap(group)).Returns("overview-path");
             _resourceNameMock.Setup(x => x.CreateFileNameForPlacemarkThumbnail(placemark)).Returns("thumb-path");
-            _hereAdapterMock.Setup(x => x.FetchOverviewMap(group))
+            _hereMock.Setup(x => x.FetchOverviewMap(group))
                 .Returns(Task.FromResult(overviewBytes));
-            _hereAdapterMock.Setup(x => x.FetchThumbnail(placemark))
+            _hereMock.Setup(x => x.FetchThumbnail(placemark))
                 .Returns(Task.FromResult(thumbnailBytes));
 
             // Act

@@ -7,10 +7,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.Models;
+using TripToPrint.Core.Models.Integration;
 using TripToPrint.Core.Models.Venues;
 
 namespace TripToPrint.Core
@@ -19,6 +20,7 @@ namespace TripToPrint.Core
     {
         Task<FoursquareVenue> LookupMatchingVenue(KmlPlacemark placemark, string language, CancellationToken cancellationToken);
         Task<List<FoursquareVenue>> ExplorePopular(KmlPlacemark placemark, string language, CancellationToken cancellationToken);
+        Task PopulateWithDetailedInfo(IEnumerable<DiscoveredPlace> discoveredPlaces, string language, CancellationToken cancellationToken);
     }
 
     public class FoursquareAdapter : IFoursquareAdapter
@@ -35,10 +37,13 @@ namespace TripToPrint.Core
         private const string VERSION_DATE = "20170526";
         private const int LIMIT_LOOKUP = 1;
         private const int LIMIT_EXPLORE = 8;
+        private const int TOP_TIPS_TO_GET = 3;
         private const int VENUE_MAX_RATING = 10;
         private const int VENUE_MAX_PRICE_LEVEL = 4;
         private const int VENUE_ICON_SIZE = 32;
         private const string VENUE_PHOTO_SIZE = "300x300";
+        private const int MAX_SIMULTANEOUS_HTTP_REQUESTS = 4;
+        private const string VENUE_WEB_URL = "https://foursquare.com/v/";
 
         internal const string CLIENT_ID_PARAM_NAME = "client_id";
         internal const string CLIENT_SECRET_PARAM_NAME = "client_secret";
@@ -65,27 +70,20 @@ namespace TripToPrint.Core
             {
                 return null;
             }
-            dynamic json = JObject.Parse(data);
-            if (!CheckMeta(url, json))
+            var response = JsonConvert.DeserializeObject<FoursquareResponse<FoursquareSearchResponseBody>>(data);
+            if (!CheckMeta(url, response))
             {
                 return null;
             }
-            if (((JArray) json.response.venues).Count == 0)
+            if (response.Response.Venues.Length == 0)
             {
                 return null;
             }
 
-            dynamic jsonVenue = json.response.venues[0];
+            var venue = response.Response.Venues[0];
+            venue = await DownloadVenueDetails(venue.Id, language, cancellationToken) ?? venue;
 
-            var venueDetailsUrl = $"{VENUES_URL}" + jsonVenue.id;
-            data = await DownloadString(venueDetailsUrl, language, cancellationToken);
-            json = JObject.Parse(data);
-            if (CheckMeta(url, json))
-            {
-                jsonVenue = json.response.venue;
-            }
-
-            return CreateVenueModel(jsonVenue);
+            return CreateVenueModel(venue);
         }
 
         public async Task<List<FoursquareVenue>> ExplorePopular(KmlPlacemark placemark, string language, CancellationToken cancellationToken)
@@ -105,18 +103,34 @@ namespace TripToPrint.Core
             {
                 return null;
             }
-            dynamic json = JObject.Parse(data);
-            if (!CheckMeta(url, json))
-            {
-                return null;
-            }
-            if (((JArray)json.response.groups).Count == 0)
-            {
-                return null;
-            }
-            var jsonItems = (JArray)json.response.groups[0].items;
 
-            return jsonItems.Select<JToken, FoursquareVenue>(x => CreateVenueModel(((dynamic)x).venue, placemark.Coordinates[0])).ToList();
+            var response = JsonConvert.DeserializeObject<FoursquareResponse<FoursquareExploreResponseBody>>(data);
+            if (!CheckMeta(url, response))
+            {
+                return null;
+            }
+            if (response.Response?.Groups.Length == 0)
+            {
+                return null;
+            }
+
+            return response.Response?.Groups[0].Items
+                .Take(LIMIT_EXPLORE)
+                .Select(x => CreateVenueModel(x.Venue, placemark.Coordinates[0]))
+                .ToList();
+        }
+
+        public async Task PopulateWithDetailedInfo(IEnumerable<DiscoveredPlace> discoveredPlaces, string language, CancellationToken cancellationToken)
+        {
+            await discoveredPlaces.ForEachAsync(MAX_SIMULTANEOUS_HTTP_REQUESTS, async (place) => {
+                var venue = (FoursquareVenue) place.Venue;
+
+                var venueDetails = await DownloadVenueDetails(venue.Id, language, cancellationToken);
+                if (venueDetails != null)
+                {
+                    place.Venue = CreateVenueModel(venueDetails);
+                }
+            });
         }
 
         private async Task<string> DownloadString(string url, string language, CancellationToken cancellationToken)
@@ -128,103 +142,116 @@ namespace TripToPrint.Core
                 });
         }
 
-        private bool CheckMeta(string url, dynamic json)
+        private bool CheckMeta<T>(string url, FoursquareResponse<T> response)
         {
-            if (json.meta.code == 200)
+            if (response.Meta.Code == 200)
             {
                 return true;
             }
 
-            _logger.Error($"Foursquare request failed on url={{{url}}}: {json.meta.errorType}. {json.meta.errorDetail}");
+            _logger.Error($"Foursquare request failed on url={{{url}}}: {response.Meta.ErrorType}. {response.Meta.ErrorDetail}");
 
             return false;
         }
 
-        private FoursquareVenue CreateVenueModel(dynamic jsonVenue, GeoCoordinate originCoordinate = null)
+        private async Task<FoursquareResponseVenue> DownloadVenueDetails(string id, string language, CancellationToken cancellationToken)
         {
-            var facebookUser = (string)(jsonVenue.contact?.facebookUsername ?? jsonVenue.contact?.facebook);
+            var venueDetailsUrl = $"{VENUES_URL}{id}";
+            var response = await DownloadString(venueDetailsUrl, language, cancellationToken);
+            var detailedVenueResponse = JsonConvert.DeserializeObject<FoursquareResponse<FoursquareDetailsResponseBody>>(response);
+            if (CheckMeta(venueDetailsUrl, detailedVenueResponse))
+            {
+                return detailedVenueResponse.Response.Venue;
+            }
+            return null;
+        }
+
+        private FoursquareVenue CreateVenueModel(FoursquareResponseVenue responseVenue, GeoCoordinate originCoordinate = null)
+        {
+            var facebookUser = responseVenue.Contact?.FacebookUsername ?? responseVenue.Contact?.Facebook;
             var facebookUrl = string.IsNullOrEmpty(facebookUser) ? null : $"https://www.facebook.com/{facebookUser}";
-            var mainCategory = jsonVenue.categories[0];
-            var coordinate = new GeoCoordinate(Convert.ToDouble(jsonVenue.location.lat), Convert.ToDouble(jsonVenue.location.lng));
+            var mainCategory = responseVenue.Categories.FirstOrDefault(x => x.Primary) ?? responseVenue.Categories[0];
+            var coordinate = new GeoCoordinate(responseVenue.Location.Lat, responseVenue.Location.Lng);
             const int takeTopCategories = 2;
 
             var venue = new FoursquareVenue {
-                Title = jsonVenue.name,
-                Category = string.Join(", ", ((JArray) jsonVenue.categories).Select(x => ((dynamic) x).shortName).Take(takeTopCategories)),
+                Id = responseVenue.Id,
+                Title = responseVenue.Name,
+                Category = string.Join(", ", responseVenue.Categories
+                    .OrderBy(x => x.Primary ? 1 : 2)
+                    .Select(x => x.ShortName)
+                    .Take(takeTopCategories)),
                 Coordinate = coordinate,
-                Rating = jsonVenue.rating,
-                RatingColor = jsonVenue.ratingColor,
+                Rating = responseVenue.Rating,
+                RatingColor = responseVenue.RatingColor,
                 MaxRating = VENUE_MAX_RATING,
-                LikesCount = jsonVenue.likes?.count,
+                LikesCount = responseVenue.Likes?.Count,
                 DistanceToPlacemark = _kmlCalculator.GetDistanceInMeters(originCoordinate, coordinate),
                 Region = string.Join(", ", new[] {
-                    (string) jsonVenue.location?.city,
-                    (string) jsonVenue.location?.state,
-                    (string) jsonVenue.location?.country
+                    responseVenue.Location?.City,
+                    responseVenue.Location?.State,
+                    responseVenue.Location?.Country
                 }.Where(x => x != null)),
-                Address = jsonVenue.location?.address == null ? null : string.Join(", ", ((JArray) jsonVenue.location?.formattedAddress ?? new JArray()).Values<string>().ToArray()),
-                ContactPhone = jsonVenue.contact?.formattedPhone,
-                Websites = new string[] {
-                    jsonVenue.url,
-                    jsonVenue.shortUrl,
+                Address = responseVenue.Location?.Address == null
+                    ? null
+                    : string.Join(", ", responseVenue.Location?.FormattedAddress ?? new string[0]),
+                ContactPhone = responseVenue.Contact?.FormattedPhone,
+                Websites = new[] {
+                    responseVenue.ShortUrl,
+                    responseVenue.Url,
                     facebookUrl
                 }.Where(x => !string.IsNullOrEmpty(x)).ToArray(),
-                IconUrl = new Uri($"{mainCategory.icon.prefix}{VENUE_ICON_SIZE}{mainCategory.icon.suffix}"),
-                PriceLevel = jsonVenue.price?.tier,
-                PriceCurrency = jsonVenue.price?.currency,
-                PriceMaxLevel = VENUE_MAX_PRICE_LEVEL
+                IconUrl = new Uri($"{mainCategory.Icon.Prefix}{VENUE_ICON_SIZE}{mainCategory.Icon.Suffix}"),
+                PriceLevel = responseVenue.Price?.Tier,
+                PriceCurrency = responseVenue.Price?.Currency,
+                PriceMaxLevel = VENUE_MAX_PRICE_LEVEL,
+                Tags = responseVenue.Tags
             };
 
-            if ("public".Equals((string)jsonVenue.bestPhoto?.visibility, StringComparison.OrdinalIgnoreCase))
+            if ("public".Equals(responseVenue.BestPhoto?.Visibility, StringComparison.OrdinalIgnoreCase))
             {
                 venue.PhotoUrls = new[] {
-                    $"{jsonVenue.bestPhoto.prefix}{VENUE_PHOTO_SIZE}{jsonVenue.bestPhoto.suffix}"
+                    $"{responseVenue.BestPhoto?.Prefix}{VENUE_PHOTO_SIZE}{responseVenue.BestPhoto?.Suffix}"
                 };
             }
 
-            if (jsonVenue.hours?.timeframes != null)
+            if (responseVenue.Hours?.Timeframes != null)
             {
                 var sb = new StringBuilder();
-                foreach (dynamic timeframe in (JArray) jsonVenue.hours.timeframes)
+                foreach (var timeframe in responseVenue.Hours.Timeframes)
                 {
                     if (sb.Length > 0)
                     {
                         sb.Append(", ");
                     }
 
-                    sb.Append((string) timeframe.days);
-                    sb.Append(": ");
-                    var openingHours = ((JArray) timeframe.open).Select(o => ((dynamic) o).renderedTime);
-                    sb.Append(string.Join(", ", openingHours));
+                    sb.Append($"{timeframe.Days}: ");
+                    sb.Append(string.Join(", ", timeframe.Open.Select(o => o.RenderedTime)));
                 }
                 venue.OpeningHours = sb.ToString();
             }
 
-            if (jsonVenue.phrases != null)
+            if (responseVenue.Tips != null)
             {
-                venue.Phrases = ((JArray) jsonVenue.phrases).Select(x => (string) ((dynamic) x).phrase).ToArray();
+                var tips = responseVenue.Tips.Groups[0].Items;
+
+                venue.Tips = tips
+                    .Where(x => x.AgreeCount > 0)
+                    .Take(TOP_TIPS_TO_GET)
+                    .Select(tip => new FoursquareVenueTip {
+                        Message = tip.Text,
+                        Likes = tip.Likes.Count,
+                        AgreeCount = tip.AgreeCount,
+                        DisagreeCount = tip.DisagreeCount
+                    }).ToArray();
             }
 
-            if (jsonVenue.tags != null)
+            if (venue.Websites.Length == 0)
             {
-                venue.Tags = ((JArray)jsonVenue.tags).Values<string>().ToArray();
+                venue.Websites = new[] {
+                    $"{VENUE_WEB_URL}{venue.Id}"
+                };
             }
-
-            if (jsonVenue.tips != null)
-            {
-                var jsonTips = (JArray) ((dynamic) ((JArray) jsonVenue.tips.groups)[0]).items;
-
-                venue.Tips = jsonTips.Take(5).Select(x => {
-                    dynamic tip = x;
-                    return new FoursquareVenueTip {
-                        Message = (string)tip.text,
-                        Likes = (int)tip.likes.count,
-                        AgreeCount = (int)tip.agreeCount,
-                        DisagreeCount = (int)tip.disagreeCount
-                    };
-                }).ToArray();
-            }
-
 
             return venue;
         }

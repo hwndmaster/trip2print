@@ -17,8 +17,6 @@ namespace TripToPrint.Core.Models.Venues
         public int PriceMaxLevel { get; set; }
         public string PriceCurrency { get; set; }
         public string[] PhotoUrls { get; set; }
-        public string[] Tags { get; set; }
-        public string[] Phrases { get; set; }
         public FoursquareVenueTip[] Tips { get; set; }
         public double? DistanceToPlacemark { get; set; }
 

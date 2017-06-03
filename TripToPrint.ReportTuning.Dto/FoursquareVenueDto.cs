@@ -10,7 +10,6 @@
         public string RemainingPriceLevel { get; set; }
         public string[] PhotoUrls { get; set; }
         public string[] Tags { get; set; }
-        public string[] Phrases { get; set; }
         public FoursquareVenueTipDto[] Tips { get; set; }
     }
 }
