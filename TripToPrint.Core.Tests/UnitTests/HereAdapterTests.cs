@@ -2,7 +2,6 @@
 using System.Device.Location;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -75,7 +74,7 @@ namespace TripToPrint.Core.Tests.UnitTests
                 }
             };
             var bytesToMatch = SetupWebClient(uri => uri.AbsoluteUri.StartsWith(HereAdapter.IMAGES_MAPVIEW_URL),
-                p => p.Contains("1.11,2.22,4.22,3.11") && p.Contains("poitxs=15"));
+                p => p.Contains("1.11,2.22,4.22,3.11"));
 
             // Act
             var bytes = await _here.Object.FetchOverviewMap(group);

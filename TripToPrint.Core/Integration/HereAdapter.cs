@@ -94,7 +94,7 @@ namespace TripToPrint.Core.Integration
             else
             {
                 var poi = _formatter.FormatCoordinates(null, group.Placemarks.Cast<IHasCoordinates>().ToArray());
-                parameters += $"&poi={poi}&poitxc=black&poifc=yellow&poitxs=15";
+                parameters += $"&poi={poi}&poitxc=fff&poifc=444&poitxs=18";
 
                 if (group.Placemarks.Count == 1)
                 {
