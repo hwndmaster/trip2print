@@ -4,7 +4,6 @@ using CefSharp;
 using TripToPrint.Core.Logging;
 using TripToPrint.ViewModels;
 using TripToPrint.Views;
-using TripToPrint.Chromium;
 using TripToPrint.Core.Models;
 
 namespace TripToPrint.Presenters

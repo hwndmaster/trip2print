@@ -4,7 +4,7 @@
     {
     }
 
-    public class DiscoveringLogger : LoggerBase, IDiscoveringLogger
+    internal class DiscoveringLogger : LoggerBase, IDiscoveringLogger
     {
         public DiscoveringLogger(ILogStorage logStorage) : base(logStorage)
         {

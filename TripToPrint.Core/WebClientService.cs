@@ -18,7 +18,7 @@ namespace TripToPrint.Core
     }
 
     [ExcludeFromCodeCoverage]
-    public class WebClientService : IWebClientService
+    internal class WebClientService : IWebClientService
     {
         private readonly ILogger _logger;
 

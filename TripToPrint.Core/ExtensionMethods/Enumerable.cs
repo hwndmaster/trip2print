@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TripToPrint.Core
+namespace TripToPrint.Core.ExtensionMethods
 {
-    public static class EnumerableExtensionMethods
+    internal static class Enumerable
     {
         /// <summary>
         /// Refer to: https://blogs.msdn.microsoft.com/pfxteam/2012/03/05/implementing-a-simple-foreachasync-part-2/

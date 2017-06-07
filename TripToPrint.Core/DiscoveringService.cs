@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using TripToPrint.Core.ExtensionMethods;
+using TripToPrint.Core.Integration;
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.Models;
 using TripToPrint.Core.ProgressTracking;
@@ -16,7 +18,7 @@ namespace TripToPrint.Core
         Task<List<DiscoveredPlace>> Discover(KmlDocument document, string language, IDiscoveringProgress progressTracker, CancellationToken cancellationToken);
     }
 
-    public class DiscoveringService : IDiscoveringService
+    internal class DiscoveringService : IDiscoveringService
     {
         private readonly IHereAdapter _here;
         private readonly IFoursquareAdapter _foursquare;

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Navigation;
 
@@ -12,7 +11,7 @@ namespace TripToPrint.Views
     }
 
     [ExcludeFromCodeCoverage]
-    public partial class StepExploreView : IStepExploreView
+    public sealed partial class StepExploreView : IStepExploreView
     {
         public StepExploreView()
         {
@@ -38,7 +37,7 @@ namespace TripToPrint.Views
 
         private void Hyperlink_OnRequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            Presenter.BrowsePlacemarkUrl(e.Uri);
             e.Handled = true;
         }
     }

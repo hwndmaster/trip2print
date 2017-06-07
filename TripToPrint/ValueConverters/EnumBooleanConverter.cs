@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace TripToPrint.ValueConverters
 {
-    public class EnumBooleanConverter : IValueConverter
+    public sealed class EnumBooleanConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

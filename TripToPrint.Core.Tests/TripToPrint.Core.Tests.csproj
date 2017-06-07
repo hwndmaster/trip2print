@@ -88,6 +88,7 @@
       <DependentUpon>GroupsGeneration.feature</DependentUpon>
     </Compile>
     <Compile Include="UnitTests\DiscoveringServiceTests.cs" />
+    <Compile Include="UnitTests\DummyVenue.cs" />
     <Compile Include="UnitTests\KmlCalculatorTests.cs" />
     <Compile Include="UnitTests\MooiPlacemarkFactoryTests.cs" />
     <Compile Include="UnitTests\ProgressTrackerTests.cs" />

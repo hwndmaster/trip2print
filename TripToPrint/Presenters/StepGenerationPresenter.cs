@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using TripToPrint.Core;
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.ProgressTracking;
+using TripToPrint.Properties;
 
 namespace TripToPrint.Presenters
 {
@@ -52,9 +53,15 @@ namespace TripToPrint.Presenters
                         , _userSession.ReportLanguage
                         , progressTracker);
 
-                Logger.Info("Generation process complete");
-
-                await MainWindow.GoNext();
+                if (LogStorage.HasWarningOrErrors(Logger.Category))
+                {
+                    Logger.Info(Resources.StepGeneration_GenerateReport_DoneWithIssues);
+                }
+                else
+                {
+                    Logger.Info(Resources.StepGeneration_GenerateReport_Done);
+                    await MainWindow.GoNext();
+                }
             }
             catch (Exception ex)
             {

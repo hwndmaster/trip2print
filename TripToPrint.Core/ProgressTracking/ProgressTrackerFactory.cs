@@ -8,7 +8,7 @@ namespace TripToPrint.Core.ProgressTracking
         IResourceFetchingProgress CreateForResourceFetching(Action<int> handler);
     }
 
-    public class ProgressTrackerFactory : IProgressTrackerFactory
+    internal class ProgressTrackerFactory : IProgressTrackerFactory
     {
         public IDiscoveringProgress CreateForDiscovering(Action<int> handler)
         {

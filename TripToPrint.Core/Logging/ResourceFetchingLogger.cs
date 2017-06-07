@@ -4,7 +4,7 @@
     {
     }
 
-    public class ResourceFetchingLogger : LoggerBase, IResourceFetchingLogger
+    internal class ResourceFetchingLogger : LoggerBase, IResourceFetchingLogger
     {
         public ResourceFetchingLogger(ILogStorage logStorage) : base(logStorage)
         {

@@ -1,8 +1,11 @@
-﻿using CefSharp;
+﻿using System.Diagnostics.CodeAnalysis;
+
+using CefSharp;
 
 namespace TripToPrint.Chromium
 {
-    public class MenuHandler : IContextMenuHandler
+    [ExcludeFromCodeCoverage]
+    public sealed class MenuHandler : IContextMenuHandler
     {
         public void OnBeforeContextMenu(IWebBrowser browserControl, IBrowser browser, IFrame frame, IContextMenuParams parameters, IMenuModel model)
         {

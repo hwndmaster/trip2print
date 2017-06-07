@@ -104,5 +104,23 @@ namespace TripToPrint.Properties {
                 return ResourceManager.GetString("StepExplore_UpperGroup_Placemarks", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generation process complete.
+        /// </summary>
+        public static string StepGeneration_GenerateReport_Done {
+            get {
+                return ResourceManager.GetString("StepGeneration_GenerateReport_Done", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generation process is done with issues. Check the generation log for details..
+        /// </summary>
+        public static string StepGeneration_GenerateReport_DoneWithIssues {
+            get {
+                return ResourceManager.GetString("StepGeneration_GenerateReport_DoneWithIssues", resourceCulture);
+            }
+        }
     }
 }

@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
+using TripToPrint.Core.Integration.Models;
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.Models;
-using TripToPrint.Core.Models.Integration;
 using TripToPrint.Core.Models.Venues;
 
-namespace TripToPrint.Core
+namespace TripToPrint.Core.Integration
 {
     public interface IHereAdapter
     {
@@ -23,7 +23,7 @@ namespace TripToPrint.Core
         Task<VenueBase> LookupMatchingVenue(KmlPlacemark placemark, string culture, CancellationToken cancellationToken);
     }
 
-    public class HereAdapter : IHereAdapter
+    internal class HereAdapter : IHereAdapter
     {
         private const string IMAGES_ROOT_URL = "https://image.maps.api.here.com/mia/1.6";
         internal const string IMAGES_MAPVIEW_URL = IMAGES_ROOT_URL + "/mapview?";

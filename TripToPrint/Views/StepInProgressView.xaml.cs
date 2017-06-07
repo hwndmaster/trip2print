@@ -13,7 +13,7 @@ namespace TripToPrint.Views
     }
 
     [ExcludeFromCodeCoverage]
-    public partial class StepInProgressView : IStepInProgressView
+    public sealed partial class StepInProgressView : IStepInProgressView
     {
         public StepInProgressView()
         {

@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TripToPrint.Core.Logging
 {
     public interface ILogStorage
     {
         void Clear(LogCategory category);
+        bool HasWarningOrErrors(LogCategory category);
         void WriteLog(LogItem item);
 
         event EventHandler<LogItem> ItemAdded;
         event EventHandler<LogCategory> CategoryItemsRemoved;
     }
 
-    public class LogStorage : ILogStorage
+    internal class LogStorage : ILogStorage
     {
         private readonly List<LogItem> _items = new List<LogItem>();
 
@@ -22,6 +24,9 @@ namespace TripToPrint.Core.Logging
 
             CategoryItemsRemoved?.Invoke(this, category);
         }
+
+        public bool HasWarningOrErrors(LogCategory category)
+            => _items.Any(x => x.Category == category && x.IsWarningOrError);
 
         public void WriteLog(LogItem item)
         {

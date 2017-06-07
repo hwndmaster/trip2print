@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+
+using TripToPrint.Core.Integration;
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.ModelFactories;
 using TripToPrint.Core.Models;
@@ -16,7 +18,7 @@ namespace TripToPrint.Core
         Task<(string tempPath, MooiDocument document)> Generate(KmlDocument document, List<DiscoveredPlace> discoveredPlaces, string language, IResourceFetchingProgress progress);
     }
 
-    public class ReportResourceFetcher : IReportResourceFetcher
+    internal class ReportResourceFetcher : IReportResourceFetcher
     {
         private readonly IMooiDocumentFactory _mooiDocumentFactory;
         private readonly IHereAdapter _hereAdapter;
@@ -85,9 +87,14 @@ namespace TripToPrint.Core
         private async Task FetchGroupMapImage(MooiGroup group, string tempPath)
         {
             var imageBytes = await _hereAdapter.FetchOverviewMap(group);
+            if (imageBytes == null)
+            {
+                _logger.Warn($"Was unable to download overview map image for '{group.Id}'");
+                return;
+            }
             var filePath = Path.Combine(tempPath, _resourceName.CreateFileNameForOverviewMap(group));
             await _file.WriteBytesAsync(filePath, imageBytes);
-            _logger.Info($"An overview map for '{group.Id}' has been successfully downloaded");
+            _logger.Info($"An overview map image for '{group.Id}' has been successfully downloaded");
         }
 
         private async Task FetchPlacemarkMapImage(MooiPlacemark placemark, string tempPath)
@@ -95,11 +102,16 @@ namespace TripToPrint.Core
             if (placemark.Type == PlacemarkType.Point)
             {
                 var imageBytes = await _hereAdapter.FetchThumbnail(placemark);
+                if (imageBytes == null)
+                {
+                    _logger.Warn($"Was unable to download thumbnail map image for '{placemark.Id}'");
+                    return;
+                }
                 var filePath = Path.Combine(tempPath, _resourceName.CreateFileNameForPlacemarkThumbnail(placemark));
                 await _file.WriteBytesAsync(filePath, imageBytes);
-            }
 
-            _logger.Info($"A thumbnail image for '{placemark.Id}' has been successfully downloaded");
+                _logger.Info($"A thumbnail map image for '{placemark.Id}' has been successfully downloaded");
+            }
         }
 
         private string CreateAndGetTempPath()

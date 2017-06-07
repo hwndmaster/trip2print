@@ -13,7 +13,7 @@ namespace TripToPrint.Core
         Task<KmlDocument> ReadFromFile(string inputFilePath);
     }
 
-    public class KmlFileReader : IKmlFileReader
+    internal class KmlFileReader : IKmlFileReader
     {
         private readonly IKmlDocumentFactory _kmlDocumentFactory;
         private readonly IZipService _zipService;

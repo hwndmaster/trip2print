@@ -13,7 +13,7 @@ namespace TripToPrint.Core
         string GetTempFolderPrefix();
     }
 
-    public class ResourceNameProvider : IResourceNameProvider
+    internal class ResourceNameProvider : IResourceNameProvider
     {
         public string CreateFileNameForOverviewMap(MooiGroup group)
         {

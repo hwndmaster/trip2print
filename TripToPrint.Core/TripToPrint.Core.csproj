@@ -62,11 +62,11 @@
   <ItemGroup>
     <Compile Include="CultureAgnosticFormatter.cs" />
     <Compile Include="DiscoveringService.cs" />
-    <Compile Include="EnumerableExtensionMethods.cs" />
+    <Compile Include="ExtensionMethods\Enumerable.cs" />
     <Compile Include="FileService.cs" />
-    <Compile Include="FoursquareAdapter.cs" />
+    <Compile Include="Integration\FoursquareAdapter.cs" />
     <Compile Include="GoogleMyMapAdapter.cs" />
-    <Compile Include="HereAdapter.cs" />
+    <Compile Include="Integration\HereAdapter.cs" />
     <Compile Include="IocModule.cs" />
     <Compile Include="KmlCalculator.cs" />
     <Compile Include="KmlFileReader.cs" />
@@ -83,8 +83,8 @@
     <Compile Include="ModelFactories\MooiGroupFactory.cs" />
     <Compile Include="ModelFactories\MooiPlacemarkFactory.cs" />
     <Compile Include="Models\DiscoveredPlace.cs" />
-    <Compile Include="Models\Integration\FoursquareClassesCombined.cs" />
-    <Compile Include="Models\Integration\HereClassesCombined.cs" />
+    <Compile Include="Integration\Models\FoursquareClassesCombined.cs" />
+    <Compile Include="Integration\Models\HereClassesCombined.cs" />
     <Compile Include="Models\Venues\FoursquareVenue.cs" />
     <Compile Include="Models\Venues\FoursquareVenueTip.cs" />
     <Compile Include="Models\Venues\HereVenue.cs" />
@@ -118,7 +118,7 @@
     <Compile Include="ResourceNameProvider.cs" />
     <Compile Include="TestingEnvCore.cs" />
     <Compile Include="WebClientService.cs" />
-    <Compile Include="XmlExtensionMethods.cs" />
+    <Compile Include="ExtensionMethods\Xml.cs" />
     <Compile Include="ZipFileWrapper.cs" />
     <Compile Include="ZipService.cs" />
   </ItemGroup>

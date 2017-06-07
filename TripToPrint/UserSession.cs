@@ -15,7 +15,7 @@ namespace TripToPrint
         List<DiscoveredPlace> IncludedVenues { get; }
     }
 
-    public class UserSession : IUserSession
+    public sealed class UserSession : IUserSession
     {
         public string ReportLanguage { get; set; }
         public string InputUri { get; set; }

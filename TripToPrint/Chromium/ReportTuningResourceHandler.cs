@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using CefSharp;
@@ -6,7 +7,8 @@ using TripToPrint.ReportTuning.Web;
 
 namespace TripToPrint.Chromium
 {
-    public class ReportTuningResourceHandler : ResourceHandler
+    [ExcludeFromCodeCoverage]
+    public sealed class ReportTuningResourceHandler : ResourceHandler
     {
         public override bool ProcessRequestAsync(IRequest request, ICallback callback)
         {

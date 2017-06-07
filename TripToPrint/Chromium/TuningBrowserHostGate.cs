@@ -1,11 +1,14 @@
-﻿using TripToPrint.ReportTuning.Dto;
+﻿using System.Diagnostics.CodeAnalysis;
+
+using TripToPrint.ReportTuning.Dto;
 using TripToPrint.Views;
 
 namespace TripToPrint.Chromium
 {
-    public class TuningBrowserHostGate : IHostGate
+    [ExcludeFromCodeCoverage]
+    public sealed class TuningBrowserHostGate : IHostGate
     {
-        ITuningBrowserView _view;
+        private readonly ITuningBrowserView _view;
 
         public TuningBrowserHostGate(ITuningBrowserView view)
         {

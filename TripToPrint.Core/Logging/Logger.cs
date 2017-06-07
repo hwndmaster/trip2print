@@ -12,7 +12,7 @@ namespace TripToPrint.Core.Logging
         void Exception(Exception exception);
     }
 
-    public abstract class LoggerBase : ILogger
+    internal abstract class LoggerBase : ILogger
     {
         private readonly ILogStorage _logStorage;
 

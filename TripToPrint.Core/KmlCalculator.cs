@@ -14,7 +14,7 @@ namespace TripToPrint.Core
         bool PlacemarkIsShape(IHasCoordinates placemark);
     }
 
-    public class KmlCalculator : IKmlCalculator
+    internal class KmlCalculator : IKmlCalculator
     {
         public double GetDistanceInMeters(IHasCoordinates placemark1, IHasCoordinates placemark2)
         {

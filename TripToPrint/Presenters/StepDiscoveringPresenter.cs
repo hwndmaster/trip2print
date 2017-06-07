@@ -11,7 +11,7 @@ namespace TripToPrint.Presenters
     {
     }
 
-    public class StepDiscoveringPresenter : StepInProgressPresenterBase, IStepDiscoveringPresenter
+    public sealed class StepDiscoveringPresenter : StepInProgressPresenterBase, IStepDiscoveringPresenter
     {
         private readonly IProgressTrackerFactory _progressTrackerFactory;
         private readonly IDiscoveringService _discovering;

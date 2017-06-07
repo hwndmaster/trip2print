@@ -9,12 +9,13 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
+using TripToPrint.Core.ExtensionMethods;
+using TripToPrint.Core.Integration.Models;
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.Models;
-using TripToPrint.Core.Models.Integration;
 using TripToPrint.Core.Models.Venues;
 
-namespace TripToPrint.Core
+namespace TripToPrint.Core.Integration
 {
     public interface IFoursquareAdapter
     {
@@ -23,7 +24,7 @@ namespace TripToPrint.Core
         Task PopulateWithDetailedInfo(IEnumerable<DiscoveredPlace> discoveredPlaces, string language, CancellationToken cancellationToken);
     }
 
-    public class FoursquareAdapter : IFoursquareAdapter
+    internal class FoursquareAdapter : IFoursquareAdapter
     {
         private readonly ILogger _logger;
         private readonly IWebClientService _webClient;

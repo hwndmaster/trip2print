@@ -3,6 +3,8 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+
+using TripToPrint.Core.Integration;
 using TripToPrint.Core.Logging;
 using TripToPrint.Core.ModelFactories;
 using TripToPrint.Core.Models;

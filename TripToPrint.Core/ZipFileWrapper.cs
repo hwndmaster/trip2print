@@ -18,7 +18,7 @@ namespace TripToPrint.Core
     }
 
     [ExcludeFromCodeCoverage]
-    public class ZipFileWrapper : IZipFileWrapper
+    internal class ZipFileWrapper : IZipFileWrapper
     {
         private readonly ZipFile _zip;
 

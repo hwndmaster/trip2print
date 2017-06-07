@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace TripToPrint.Core
 {
-    public static class TestingEnvCore
+    internal static class TestingEnvCore
     {
         public static string GetUrlString(Uri url)
         {

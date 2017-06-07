@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+
+using TripToPrint.Services;
 using TripToPrint.ViewModels;
 using TripToPrint.Views;
 
@@ -10,9 +13,10 @@ namespace TripToPrint.Presenters
         Task GoNext();
         void GetBackNextTitlesForCurrentStep(ref string back, ref string next);
         IStepPresenter GetWizardStepPresenter(int wizardStepIndex);
+        void BrowseUrl(Uri uri);
     }
 
-    public class MainWindowPresenter : IMainWindowPresenter
+    public sealed class MainWindowPresenter : IMainWindowPresenter
     {
         private readonly IStepIntroPresenter _stepIntroPresenter;
         private readonly IStepPickPresenter _stepPickPresenter;
@@ -20,10 +24,12 @@ namespace TripToPrint.Presenters
         private readonly IStepExplorePresenter _stepExplorePresenter;
         private readonly IStepGenerationPresenter _stepGenerationPresenter;
         private readonly IStepTuningPresenter _stepTuningPresenter;
+        private readonly IProcessService _process;
 
         public MainWindowPresenter(IStepIntroPresenter stepIntroPresenter, IStepPickPresenter stepPickPresenter,
             IStepDiscoveringPresenter stepDiscoveringPresenter, IStepExplorePresenter stepExplorePresenter,
-            IStepGenerationPresenter stepGenerationPresenter, IStepTuningPresenter stepTuningPresenter)
+            IStepGenerationPresenter stepGenerationPresenter, IStepTuningPresenter stepTuningPresenter,
+            IProcessService process)
         {
             _stepIntroPresenter = stepIntroPresenter;
             _stepPickPresenter = stepPickPresenter;
@@ -31,6 +37,7 @@ namespace TripToPrint.Presenters
             _stepExplorePresenter = stepExplorePresenter;
             _stepGenerationPresenter = stepGenerationPresenter;
             _stepTuningPresenter = stepTuningPresenter;
+            _process = process;
         }
 
         public IMainWindowView View { get; private set; }
@@ -113,6 +120,11 @@ namespace TripToPrint.Presenters
                 default:
                     return null;
             }
+        }
+
+        public void BrowseUrl(Uri uri)
+        {
+            _process.Start(uri.AbsoluteUri);
         }
     }
 }

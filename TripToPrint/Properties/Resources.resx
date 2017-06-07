@@ -132,4 +132,10 @@
   <data name="StepExplore_UpperGroup_Placemarks" xml:space="preserve">
     <value>Extra information found for your placemarks</value>
   </data>
+  <data name="StepGeneration_GenerateReport_Done" xml:space="preserve">
+    <value>Generation process complete</value>
+  </data>
+  <data name="StepGeneration_GenerateReport_DoneWithIssues" xml:space="preserve">
+    <value>Generation process is done with issues. Check the generation log for details.</value>
+  </data>
 </root>

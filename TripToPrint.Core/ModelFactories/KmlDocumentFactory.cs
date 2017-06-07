@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Device.Location;
 using System.Linq;
 using System.Xml.Linq;
 
+using TripToPrint.Core.ExtensionMethods;
 using TripToPrint.Core.Models;
 
 namespace TripToPrint.Core.ModelFactories
@@ -13,7 +13,7 @@ namespace TripToPrint.Core.ModelFactories
         KmlDocument Create(string content);
     }
 
-    public class KmlDocumentFactory : IKmlDocumentFactory
+    internal class KmlDocumentFactory : IKmlDocumentFactory
     {
         private readonly CultureAgnosticFormatter _formatter = new CultureAgnosticFormatter();
 

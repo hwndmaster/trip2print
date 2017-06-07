@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TripToPrint.Core;
@@ -9,14 +8,12 @@ using TripToPrint.Core.Models;
 using TripToPrint.Core.ProgressTracking;
 using TripToPrint.Presenters;
 using TripToPrint.ViewModels;
-using TripToPrint.Views;
 
 namespace TripToPrint.Tests
 {
     [TestClass]
     public class StepGenerationPresenterTests
     {
-        private readonly Mock<IStepInProgressView> _viewMock = new Mock<IStepInProgressView>();
         private readonly Mock<IReportResourceFetcher> _reportResourceFetcherMock = new Mock<IReportResourceFetcher>();
         private readonly Mock<ILogStorage> _logStorageMock = new Mock<ILogStorage>();
         private readonly Mock<IResourceFetchingLogger> _loggerMock = new Mock<IResourceFetchingLogger>();
@@ -42,19 +39,6 @@ namespace TripToPrint.Tests
 
             _progressTrackerFactoryMock.Setup(x => x.CreateForResourceFetching(It.IsAny<Action<int>>()))
                 .Returns(new Mock<IResourceFetchingProgress>().Object);
-        }
-
-        [TestMethod]
-        public void When_initializing_presenter_the_properties_are_set_correctly()
-        {
-            // Act
-            _presenter.Object.InitializePresenter(_viewMock.Object);
-
-            // Verify
-            Assert.AreEqual(_viewMock.Object, _presenter.Object.View);
-            Assert.IsNotNull(_presenter.Object.ViewModel);
-            _viewMock.VerifySet(x => x.Presenter = _presenter.Object);
-            _viewMock.VerifySet(x => x.DataContext = _presenter.Object.ViewModel);
         }
 
         [TestMethod]
@@ -100,32 +84,6 @@ namespace TripToPrint.Tests
 
             // Verify
             _loggerMock.Verify(x => x.Error(It.IsRegex("exception-message")));
-        }
-
-        [TestMethod]
-        public async Task When_process_is_done_the_validation_to_go_next_is_passing()
-        {
-            // Arrange
-            _presenter.SetupGet(x => x.ViewModel).Returns(new StepInProgressViewModel { ProgressInPercentage = 100 });
-
-            // Act
-            var result = await _presenter.Object.BeforeGoNext();
-
-            // Verify
-            Assert.AreEqual(true, result);
-        }
-
-        [TestMethod]
-        public async Task When_process_is_not_done_the_validation_to_go_next_is_not_passing()
-        {
-            // Arrange
-            _presenter.SetupGet(x => x.ViewModel).Returns(new StepInProgressViewModel { ProgressInPercentage = 99 });
-
-            // Act
-            var result = await _presenter.Object.BeforeGoNext();
-
-            // Verify
-            Assert.AreEqual(false, result);
         }
     }
 }

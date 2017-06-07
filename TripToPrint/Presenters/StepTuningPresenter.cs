@@ -1,8 +1,6 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 
 using TripToPrint.Core;
 using TripToPrint.Services;
@@ -21,22 +19,21 @@ namespace TripToPrint.Presenters
     public class StepTuningPresenter : IStepTuningPresenter
     {
         private readonly IDialogService _dialogService;
-        private readonly IResourceNameProvider _resourceName;
-        private readonly IReportResourceFetcher _reportResourceFetcher;
         private readonly IUserSession _userSession;
         private readonly IFileService _file;
         private readonly ITuningBrowserViewPresenter _tuningBrowserViewPresenter;
+        private readonly IClipboardService _clipboard;
+        private readonly IProcessService _process;
 
-        public StepTuningPresenter(IDialogService dialogService, IResourceNameProvider resourceName,
-            IReportResourceFetcher reportResourceFetcher, IFileService file, IUserSession userSession,
-            ITuningBrowserViewPresenter tuningBrowserViewPresenter)
+        public StepTuningPresenter(IDialogService dialogService, IFileService file, IUserSession userSession,
+            ITuningBrowserViewPresenter tuningBrowserViewPresenter, IClipboardService clipboard, IProcessService process)
         {
             _dialogService = dialogService;
-            _resourceName = resourceName;
-            _reportResourceFetcher = reportResourceFetcher;
             _file = file;
             _userSession = userSession;
             _tuningBrowserViewPresenter = tuningBrowserViewPresenter;
+            _clipboard = clipboard;
+            _process = process;
         }
 
         public virtual IStepTuningView View { get; private set; }
@@ -99,7 +96,7 @@ namespace TripToPrint.Presenters
         {
             if (ValidateReportToOpen())
             {
-                Process.Start(ViewModel.OutputFilePath);
+                _process.Start(ViewModel.OutputFilePath);
             }
         }
 
@@ -108,7 +105,7 @@ namespace TripToPrint.Presenters
             if (ValidateReportToOpen())
             {
                 string argument = "/select, \"" + ViewModel.OutputFilePath + "\"";
-                Process.Start("explorer.exe", argument);
+                _process.Start("explorer.exe", argument);
             }
         }
 
@@ -116,20 +113,24 @@ namespace TripToPrint.Presenters
         {
             if (ValidateReportToOpen())
             {
-                Clipboard.SetText(ViewModel.OutputFilePath, TextDataFormat.UnicodeText);
+                _clipboard.SetText(ViewModel.OutputFilePath);
             }
         }
 
         private string GetDesiredOutputFileName()
         {
             if (_userSession.InputSource == InputSource.LocalFile)
+            {
                 return Path.GetFileNameWithoutExtension(_userSession.InputUri);
+            }
 
             // TODO: cover with unit tests
-            string fileName = _userSession.Document.Title ?? "";
+            var fileName = _userSession.Document.Title ?? "";
             Path.GetInvalidFileNameChars().ToList().ForEach(c => fileName = fileName.Replace(c.ToString(), ""));
             if (fileName.Length > 0)
+            {
                 return fileName;
+            }
 
             return null;
         }

@@ -1,15 +1,22 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using CefSharp;
 
 namespace TripToPrint.Chromium
 {
-    public class FileResourceHandler : ResourceHandler
+    [ExcludeFromCodeCoverage]
+    public sealed class FileResourceHandler : ResourceHandler
     {
         public override bool ProcessRequestAsync(IRequest request, ICallback callback)
         {
             var uri = new Uri(request.Url);
+
+            if (!File.Exists(uri.LocalPath))
+            {
+                return false;
+            }
 
             this.Stream = File.OpenRead(uri.LocalPath);
             if (this.Stream == null)

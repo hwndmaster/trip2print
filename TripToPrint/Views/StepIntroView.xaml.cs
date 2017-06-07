@@ -10,7 +10,7 @@ namespace TripToPrint.Views
     }
 
     [ExcludeFromCodeCoverage]
-    public partial class StepIntro : IStepIntroView
+    public sealed partial class StepIntro : IStepIntroView
     {
         public StepIntro()
         {

@@ -85,7 +85,9 @@
     <Compile Include="AttachedProperties\VirtualToggleButton.cs" />
     <Compile Include="Chromium\FileResourceHandler.cs" />
     <Compile Include="Chromium\RequestHandler.cs" />
-    <Compile Include="Chromium\TuningDtoFactory.cs" />
+    <Compile Include="Services\ProcessService.cs" />
+    <Compile Include="Services\ClipboardService.cs" />
+    <Compile Include="TuningDtoFactory.cs" />
     <Compile Include="Chromium\MenuHandler.cs" />
     <Compile Include="Chromium\ReportTuningResourceHandler.cs" />
     <Compile Include="Chromium\SchemeHandlerFactory.cs" />

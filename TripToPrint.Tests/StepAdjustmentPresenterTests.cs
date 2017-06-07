@@ -15,11 +15,11 @@ namespace TripToPrint.Tests
     {
         private readonly Mock<IStepTuningView> _viewMock = new Mock<IStepTuningView>();
         private readonly Mock<IDialogService> _dialogServiceMock = new Mock<IDialogService>();
-        private readonly Mock<IResourceNameProvider> _resourceNameMock = new Mock<IResourceNameProvider>();
-        private readonly Mock<IReportResourceFetcher> _reportResourceFetcherMock = new Mock<IReportResourceFetcher>();
         private readonly Mock<IFileService> _fileServiceMock = new Mock<IFileService>();
         private readonly Mock<IUserSession> _userSessionMock = new Mock<IUserSession>();
         private readonly Mock<ITuningBrowserViewPresenter> _tuningBrowserViewPresenterMock = new Mock<ITuningBrowserViewPresenter>();
+        private readonly Mock<IClipboardService> _clipboardMock = new Mock<IClipboardService>();
+        private readonly Mock<IProcessService> _processMock = new Mock<IProcessService>();
 
         private Mock<StepTuningPresenter> _presenter;
 
@@ -28,11 +28,11 @@ namespace TripToPrint.Tests
         {
             _presenter = new Mock<StepTuningPresenter>(
                 _dialogServiceMock.Object,
-                _resourceNameMock.Object,
-                _reportResourceFetcherMock.Object,
                 _fileServiceMock.Object,
                 _userSessionMock.Object,
-                _tuningBrowserViewPresenterMock.Object) {
+                _tuningBrowserViewPresenterMock.Object,
+                _clipboardMock.Object,
+                _processMock.Object) {
                 CallBase = true
             };
         }

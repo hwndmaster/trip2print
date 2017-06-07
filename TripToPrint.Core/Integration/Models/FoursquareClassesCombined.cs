@@ -1,4 +1,4 @@
-﻿namespace TripToPrint.Core.Models.Integration
+﻿namespace TripToPrint.Core.Integration.Models
 {
     internal class FoursquareResponse<TResponse>
     {

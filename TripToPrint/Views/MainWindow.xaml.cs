@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -21,7 +20,7 @@ namespace TripToPrint.Views
     }
 
     [ExcludeFromCodeCoverage]
-    public partial class MainWindow : IMainWindowView
+    public sealed partial class MainWindow : IMainWindowView
     {
         public MainWindow()
         {
@@ -67,7 +66,7 @@ namespace TripToPrint.Views
 
         private void LinkGithub_OnRequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            Presenter.BrowseUrl(e.Uri);
         }
     }
 }

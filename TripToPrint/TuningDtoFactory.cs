@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using System.Device.Location;
 using System.Linq;
+
 using TripToPrint.Core;
 using TripToPrint.Core.Models;
 using TripToPrint.Core.Models.Venues;
 using TripToPrint.ReportTuning.Dto;
 
-namespace TripToPrint.Chromium
+namespace TripToPrint
 {
     public interface ITuningDtoFactory
     {
         MooiDocumentDto Create(MooiDocument document, string reportTempPath);
     }
 
-    public class TuningDtoFactory : ITuningDtoFactory
+    public sealed class TuningDtoFactory : ITuningDtoFactory
     {
         private readonly CultureAgnosticFormatter _formatter = new CultureAgnosticFormatter();
 

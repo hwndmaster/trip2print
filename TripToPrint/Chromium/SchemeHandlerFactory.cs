@@ -3,7 +3,7 @@ using CefSharp;
 
 namespace TripToPrint.Chromium
 {
-    public class SchemeHandlerFactory : ISchemeHandlerFactory
+    public sealed class SchemeHandlerFactory : ISchemeHandlerFactory
     {
         public const string T2P_SCHEME_NAME = "t2p";
         public const string FILE_SCHEME_NAME = "localfile";
@@ -16,7 +16,7 @@ namespace TripToPrint.Chromium
             {
                 return new ReportTuningResourceHandler();
             }
-            else if (uri.Scheme.Equals(FILE_SCHEME_NAME))
+            if (uri.Scheme.Equals(FILE_SCHEME_NAME))
             {
                 return new FileResourceHandler();
             }

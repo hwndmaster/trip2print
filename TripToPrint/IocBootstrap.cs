@@ -1,17 +1,14 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-
 using Autofac;
-
 using TripToPrint.Core;
 using TripToPrint.Presenters;
 using TripToPrint.Services;
 using TripToPrint.Views;
-using TripToPrint.Chromium;
 
 namespace TripToPrint
 {
     [ExcludeFromCodeCoverage]
-    public class IocBootstrap
+    public sealed class IocBootstrap
     {
         public static IContainer Init()
         {
@@ -23,7 +20,9 @@ namespace TripToPrint
             builder.RegisterType<UserSession>().As<IUserSession>().SingleInstance();
 
             // Services
+            builder.RegisterType<ClipboardService>().As<IClipboardService>();
             builder.RegisterType<DialogService>().As<IDialogService>();
+            builder.RegisterType<ProcessService>().As<IProcessService>();
 
             // Presenters
             builder.RegisterType<MainWindowPresenter>().As<IMainWindowPresenter>()

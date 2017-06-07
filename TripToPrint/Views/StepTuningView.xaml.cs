@@ -10,7 +10,7 @@ namespace TripToPrint.Views
     }
 
     [ExcludeFromCodeCoverage]
-    public partial class StepTuningView : IStepTuningView
+    public sealed partial class StepTuningView : IStepTuningView
     {
 
         public StepTuningView()

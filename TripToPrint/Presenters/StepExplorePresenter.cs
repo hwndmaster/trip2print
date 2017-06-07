@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TripToPrint.Core.Models;
 using TripToPrint.Core.Models.Venues;
 using TripToPrint.Properties;
+using TripToPrint.Services;
 using TripToPrint.ViewModels;
 using TripToPrint.Views;
 
@@ -15,15 +16,18 @@ namespace TripToPrint.Presenters
     {
         void SelectAll(bool enabled);
         void SelectBest();
+        void BrowsePlacemarkUrl(Uri uri);
     }
 
     public class StepExplorePresenter : IStepExplorePresenter
     {
         private readonly IUserSession _userSession;
+        private readonly IProcessService _process;
 
-        public StepExplorePresenter(IUserSession userSession)
+        public StepExplorePresenter(IUserSession userSession, IProcessService process)
         {
             _userSession = userSession;
+            _process = process;
         }
 
         public IStepExploreView View { get; private set; }
@@ -87,10 +91,13 @@ namespace TripToPrint.Presenters
             throw new NotImplementedException();
         }
 
+        public void BrowsePlacemarkUrl(Uri uri)
+        {
+            _process.Start(uri.AbsoluteUri);
+        }
+
         private void FillupViewModel()
         {
-            // TODO: Cover with unit test
-
             var previouslyEnabled = new HashSet<VenueBase>();
 
             foreach (var section in ViewModel.Sections)
@@ -160,8 +167,6 @@ namespace TripToPrint.Presenters
 
         private void UpdateSession()
         {
-            // TODO: Cover with unit test
-
             _userSession.IncludedVenues.Clear();
 
             foreach (var discovered in ViewModel.GetUpperGroupForMatchingPlacemarks())

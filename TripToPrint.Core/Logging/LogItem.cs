@@ -12,5 +12,9 @@
         public LogCategory Category { get; set; }
         public LogSeverity Severity { get; set; }
         public string Text { get; set; }
+
+        public bool IsWarningOrError => Severity == LogSeverity.Warning
+                                        || Severity == LogSeverity.Error
+                                        || Severity == LogSeverity.Fatal;
     }
 }

@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography.X509Certificates;
 using CefSharp;
 using TripToPrint.Core.Logging;
 
 namespace TripToPrint.Chromium
 {
-    public class RequestHandler : IRequestHandler
+    [ExcludeFromCodeCoverage]
+    public sealed class RequestHandler : IRequestHandler
     {
         private readonly ILogger _logger;
 

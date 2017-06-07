@@ -20,7 +20,7 @@ namespace TripToPrint.Views
     }
 
     [ExcludeFromCodeCoverage]
-    public partial class TuningBrowserView : ITuningBrowserView
+    public sealed partial class TuningBrowserView : ITuningBrowserView
     {
         public TuningBrowserView()
         {

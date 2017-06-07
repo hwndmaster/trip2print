@@ -8,7 +8,7 @@ namespace TripToPrint.Core
     }
 
     [ExcludeFromCodeCoverage]
-    public class ZipService : IZipService
+    internal class ZipService : IZipService
     {
         public IZipFileWrapper Open(string zipFileName) => new ZipFileWrapper(zipFileName);
     }

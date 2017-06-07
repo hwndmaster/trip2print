@@ -69,7 +69,7 @@ namespace TripToPrint.Presenters
         {
             if (ViewModel.ProgressInPercentage < PROGRESS_DONE_PERCENTAGE)
             {
-                CancellationTokenSource?.Cancel();
+                CancelOperation();
             }
 
             return Task.FromResult(true);
@@ -87,6 +87,11 @@ namespace TripToPrint.Presenters
 
         public void GetBackNextTitles(ref string back, ref string next)
         {
+        }
+
+        protected virtual void CancelOperation()
+        {
+            CancellationTokenSource?.Cancel();
         }
     }
 }

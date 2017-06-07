@@ -17,7 +17,7 @@ namespace TripToPrint.Core.ProgressTracking
         FetchMapImages,
     }
 
-    public class ResourceFetchingProgress : IResourceFetchingProgress
+    internal class ResourceFetchingProgress : IResourceFetchingProgress
     {
         private readonly IProgress<int> _progress;
         private readonly Dictionary<ResourceFetchingProgressStages, int> _progressStageWeights;

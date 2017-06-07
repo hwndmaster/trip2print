@@ -12,7 +12,7 @@ namespace TripToPrint.Core.ModelFactories
         MooiPlacemark Create(KmlPlacemark kmlPlacemark, IEnumerable<VenueBase> venues, string reportTempPath);
     }
 
-    public class MooiPlacemarkFactory : IMooiPlacemarkFactory
+    internal class MooiPlacemarkFactory : IMooiPlacemarkFactory
     {
         private readonly IKmlCalculator _kmlCalculator;
         private readonly IResourceNameProvider _resourceName;

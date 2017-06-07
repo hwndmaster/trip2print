@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using TripToPrint.Core.Models;
 
@@ -5,8 +6,12 @@ namespace TripToPrint.ViewModels
 {
     public abstract class KmlObjectTreeNodeViewModel : ViewModelBase
     {
-        private bool _enabled;
         private bool _suspendEnablingOfChildren;
+
+        protected KmlObjectTreeNodeViewModel()
+        {
+            EnabledChanged += (sender, enabled) => HandleEnabledChanged();
+        }
 
         public abstract string Name { get; }
         public abstract IKmlElement Element { get; }
@@ -14,29 +19,12 @@ namespace TripToPrint.ViewModels
         public bool IsPartOfRoute { get; set; }
         public KmlObjectTreeNodeViewModel Parent { get; set; }
 
+        public event EventHandler<bool> EnabledChanged;
+
         public bool Enabled
         {
-            get { return _enabled; }
-            set
-            {
-                if (value == _enabled)
-                    return;
-                _enabled = value;
-                OnPropertyChanged();
-
-                if (!_suspendEnablingOfChildren)
-                {
-                    foreach (var child in Children)
-                    {
-                        child.Enabled = value;
-                    }
-                }
-
-                if (Parent != null && value && !Parent.Enabled)
-                {
-                    Parent.EnableOnlySelf();
-                }
-            }
+            get => GetOrDefault<bool>();
+            set => RaiseAndSetIfChanged(value, EnabledChanged);
         }
 
         public ObservableCollection<KmlObjectTreeNodeViewModel> Children { get; }
@@ -47,6 +35,22 @@ namespace TripToPrint.ViewModels
             _suspendEnablingOfChildren = true;
             Enabled = true;
             _suspendEnablingOfChildren = false;
+        }
+
+        private void HandleEnabledChanged()
+        {
+            if (!_suspendEnablingOfChildren)
+            {
+                foreach (var child in Children)
+                {
+                    child.Enabled = Enabled;
+                }
+            }
+
+            if (Parent != null && Enabled && !Parent.Enabled)
+            {
+                Parent.EnableOnlySelf();
+            }
         }
     }
 }

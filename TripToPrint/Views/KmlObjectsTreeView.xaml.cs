@@ -10,7 +10,7 @@ namespace TripToPrint.Views
     }
 
     [ExcludeFromCodeCoverage]
-    public partial class KmlObjectsTreeView : IKmlObjectsTreeView
+    public sealed partial class KmlObjectsTreeView : IKmlObjectsTreeView
     {
         public KmlObjectsTreeView()
         {

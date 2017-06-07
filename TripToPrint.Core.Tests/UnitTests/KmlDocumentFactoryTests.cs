@@ -4,6 +4,7 @@ using System.Xml.Linq;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using TripToPrint.Core.ExtensionMethods;
 using TripToPrint.Core.ModelFactories;
 
 namespace TripToPrint.Core.Tests.UnitTests

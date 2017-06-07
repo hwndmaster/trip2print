@@ -60,8 +60,11 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="DummyVenue.cs" />
+    <Compile Include="StepExplorePresenterTests.cs" />
     <Compile Include="StepAdjustmentPresenterTests.cs" />
     <Compile Include="KmlObjectsTreePresenterTests.cs" />
+    <Compile Include="StepInProgressPresenterBaseTests.cs" />
     <Compile Include="StepPickPresenterTests.cs" />
     <Compile Include="StepGenerationPresenterTests.cs" />
     <Compile Include="StepIntroPresenterTests.cs" />

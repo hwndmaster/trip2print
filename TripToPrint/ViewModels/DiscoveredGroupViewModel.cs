@@ -1,6 +1,4 @@
-using System;
 using System.Collections.ObjectModel;
-
 using TripToPrint.Core.Models;
 
 namespace TripToPrint.ViewModels
@@ -14,9 +12,7 @@ namespace TripToPrint.ViewModels
         }
 
         public ObservableCollection<DiscoveredVenueViewModel> Venues
-        {
-            get => GetOrDefault(new ObservableCollection<DiscoveredVenueViewModel>());
-        }
+            => GetOrDefault(new ObservableCollection<DiscoveredVenueViewModel>());
 
         public KmlPlacemark AttachedPlacemark { get; set; }
     }

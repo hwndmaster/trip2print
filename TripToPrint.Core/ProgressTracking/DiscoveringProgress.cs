@@ -9,7 +9,7 @@ namespace TripToPrint.Core.ProgressTracking
         void ReportDone();
     }
 
-    public class DiscoveringProgress : IDiscoveringProgress
+    internal class DiscoveringProgress : IDiscoveringProgress
     {
         private readonly IProgress<int> _progress;
 

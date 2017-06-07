@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace TripToPrint.ViewModels
 {
-    public class ViewModelBase : INotifyPropertyChanged
+    public abstract class ViewModelBase : INotifyPropertyChanged
     {
         private readonly ConcurrentDictionary<string, object> _propertyBag = new ConcurrentDictionary<string, object>();
 

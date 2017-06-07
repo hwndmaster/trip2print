@@ -18,7 +18,7 @@ namespace TripToPrint.Services
     }
 
     [ExcludeFromCodeCoverage]
-    public class DialogService : IDialogService
+    public sealed class DialogService : IDialogService
     {
         public async Task InvalidOperationMessage(string message)
         {

@@ -9,7 +9,7 @@ namespace TripToPrint.Views
     }
 
     [ExcludeFromCodeCoverage]
-    public partial class StepPickView : IStepPickView
+    public sealed partial class StepPickView : IStepPickView
     {
         public StepPickView()
         {

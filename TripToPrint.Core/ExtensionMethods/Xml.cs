@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace TripToPrint.Core
+namespace TripToPrint.Core.ExtensionMethods
 {
-    public static class XmlExtensionMethods
+    internal static class Xml
     {
         public static XElement ElementByLocalName(this XElement xelement, string name)
         {

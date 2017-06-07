@@ -10,7 +10,7 @@ namespace TripToPrint.Core.ModelFactories
         MooiDocument Create(KmlDocument kmlDocument, List<DiscoveredPlace> discoveredPlaces, string reportTempPath);
     }
 
-    public class MooiDocumentFactory : IMooiDocumentFactory
+    internal class MooiDocumentFactory : IMooiDocumentFactory
     {
         private readonly IMooiGroupFactory _mooiGroupFactory;
 
@@ -29,7 +29,9 @@ namespace TripToPrint.Core.ModelFactories
 
             var foldersWithPlacemarks = kmlDocument.Folders.Where(x => x.Placemarks.Any()).ToList();
 
-            discoveredPlaces = AppendExploredPlaces(discoveredPlaces, foldersWithPlacemarks);
+            AppendExploredPlaces(discoveredPlaces, foldersWithPlacemarks);
+
+            discoveredPlaces = discoveredPlaces?.Where(x => x.IsForPlacemark).ToList();
 
             foreach (var folder in foldersWithPlacemarks)
             {
@@ -46,34 +48,27 @@ namespace TripToPrint.Core.ModelFactories
             return model;
         }
 
-        private List<DiscoveredPlace> AppendExploredPlaces(List<DiscoveredPlace> discoveredPlaces, ICollection<KmlFolder> folders)
+        private void AppendExploredPlaces(IEnumerable<DiscoveredPlace> discoveredPlaces, ICollection<KmlFolder> folders)
         {
-            if (discoveredPlaces == null)
+            var exploredPlaces = discoveredPlaces?.Where(x => !x.IsForPlacemark).ToList();
+            if (exploredPlaces == null || exploredPlaces.Count == 0)
             {
-                return null;
+                return;
             }
 
-            discoveredPlaces = discoveredPlaces.Select(x => x.Clone()).ToList();
-
-            var exploredPlaces = discoveredPlaces.Where(x => !x.IsForPlacemark).ToList();
-            if (exploredPlaces.Count > 0)
+            var folder = new KmlFolder(Resources.Kml_Folder_Explored);
+            foreach (var place in exploredPlaces)
             {
-                var folder = new KmlFolder(Resources.Kml_Folder_Explored);
-                foreach (var place in exploredPlaces)
+                var placemark = new KmlPlacemark
                 {
-                    var placemark = new KmlPlacemark
-                    {
-                        Name = place.Venue.Title,
-                        Coordinates = new[] { place.Venue.Coordinate },
-                        IconPath = place.Venue.IconUrl.ToString()
-                    };
-                    place.AttachedToPlacemark = placemark;
-                    folder.Placemarks.Add(placemark);
-                }
-                folders.Add(folder);
+                    Name = place.Venue.Title,
+                    Coordinates = new[] { place.Venue.Coordinate },
+                    IconPath = place.Venue.IconUrl?.ToString()
+                };
+                place.AttachedToPlacemark = placemark;
+                folder.Placemarks.Add(placemark);
             }
-
-            return discoveredPlaces;
+            folders.Add(folder);
         }
 
         private void ExtractGroupsFromFolderIntoSection(KmlFolder folder, MooiSection section, List<DiscoveredPlace> discoveredPlaces, string reportTempPath)

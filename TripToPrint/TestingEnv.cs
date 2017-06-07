@@ -55,7 +55,7 @@ namespace TripToPrint
 
         private void FoursquareTest()
         {
-            var adapter = new FoursquareAdapter(_logger, new WebClientService(_logger), new KmlCalculator());
+            /*var adapter = new FoursquareAdapter(_logger, new WebClientService(_logger), new KmlCalculator());
             var pm = new KmlPlacemark {
                 Name = " Restaurante El Chamo",
                 Coordinates = new [] {
@@ -74,7 +74,7 @@ namespace TripToPrint
                 {
                     throw ex;
                 }
-            });
+            });*/
         }
     }
 }

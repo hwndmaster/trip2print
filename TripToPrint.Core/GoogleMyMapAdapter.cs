@@ -8,7 +8,7 @@ namespace TripToPrint.Core
         bool DoesLookLikeMyMapsUrl(string url);
     }
 
-    public class GoogleMyMapAdapter : IGoogleMyMapAdapter
+    internal class GoogleMyMapAdapter : IGoogleMyMapAdapter
     {
         public Uri GetKmlDownloadUrl(Uri mymapUrl)
         {

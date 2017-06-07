@@ -3,7 +3,7 @@
 namespace TripToPrint.Views
 {
     [ExcludeFromCodeCoverage]
-    public partial class VenueDescriptionForHere
+    public sealed partial class VenueDescriptionForHere
     {
         public VenueDescriptionForHere()
         {

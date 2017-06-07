@@ -1,9 +1,9 @@
-﻿namespace TripToPrint.ViewModels
+﻿using System;
+
+namespace TripToPrint.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private int _wizardStepIndex;
-
         public MainWindowViewModel()
         {
             StepIntro = new StepIntroViewModel();
@@ -12,6 +12,8 @@
             StepExplore = new StepExploreViewModel();
             StepGeneration = new StepInProgressViewModel();
             StepTuning = new StepTuningViewModel();
+
+            WizardStepIndexChanged += (sender, wizardStepIndex) => HandleWizardStepIndexChanged();
         }
 
         public StepIntroViewModel StepIntro { get; }
@@ -21,19 +23,19 @@
         public StepInProgressViewModel StepGeneration { get; }
         public StepTuningViewModel StepTuning { get; }
 
+        public EventHandler<int> WizardStepIndexChanged;
+
         public int WizardStepIndex
         {
-            get => _wizardStepIndex;
-            set
-            {
-                if (value == _wizardStepIndex)
-                    return;
-                _wizardStepIndex = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(CanGoBack));
-            }
+            get => GetOrDefault<int>();
+            set => RaiseAndSetIfChanged(value, WizardStepIndexChanged);
         }
 
         public bool CanGoBack => WizardStepIndex > 0;
+
+        private void HandleWizardStepIndexChanged()
+        {
+            OnPropertyChanged(nameof(CanGoBack));
+        }
     }
 }

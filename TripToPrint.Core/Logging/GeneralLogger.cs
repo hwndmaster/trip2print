@@ -1,6 +1,6 @@
 ﻿namespace TripToPrint.Core.Logging
 {
-    public class GeneralLogger : LoggerBase
+    internal class GeneralLogger : LoggerBase
     {
         public GeneralLogger(ILogStorage logStorage) : base(logStorage)
         {

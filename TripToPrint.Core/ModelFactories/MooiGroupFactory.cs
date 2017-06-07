@@ -11,7 +11,7 @@ namespace TripToPrint.Core.ModelFactories
         List<MooiGroup> CreateList(KmlFolder folder, List<DiscoveredPlace> discoveredPlaces, string reportTempPath);
     }
 
-    public class MooiGroupFactory : IMooiGroupFactory
+    internal class MooiGroupFactory : IMooiGroupFactory
     {
         private const int MIN_GROUP_COUNT = 4;
         private const int MAX_GROUP_COUNT = 8;

@@ -16,7 +16,7 @@ namespace TripToPrint.Core
     }
 
     [ExcludeFromCodeCoverage]
-    public class FileService : IFileService
+    internal class FileService : IFileService
     {
         public bool Exists(string path)
         {
