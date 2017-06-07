@@ -2,6 +2,7 @@
 using System.Device.Location;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -54,7 +55,7 @@ namespace TripToPrint.Core.Tests.UnitTests
             var bytesToMatch = SetupWebClient(
                 uri => uri.Query.Contains(HereAdapter.APP_ID_PARAM_NAME + "=")
                        && uri.Query.Contains(HereAdapter.APP_CODE_PARAM_NAME + "="),
-                p => p == "param=value");
+                p => p.Contains("&param=value"));
 
             // Act
             var bytes = await _here.Object.DownloadData("http://url?", "param=value");
@@ -138,7 +139,10 @@ namespace TripToPrint.Core.Tests.UnitTests
         {
             var byteArray = new byte[] { 0x7f };
             _webClientMock
-                .Setup(x => x.PostAsync(It.Is(urlMatchExpression), It.Is(paramMatchExpression)))
+                //.Setup(x => x.PostAsync(It.Is(urlMatchExpression), It.Is(paramMatchExpression)))
+                .Setup(x => x.GetAsync(It.Is<Uri>(uri =>
+                    urlMatchExpression.Compile().Invoke(uri) && paramMatchExpression.Compile().Invoke(uri.Query)
+                )))
                 .Returns(Task.FromResult(byteArray));
             return byteArray;
         }

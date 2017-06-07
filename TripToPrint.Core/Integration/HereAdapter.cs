@@ -84,7 +84,8 @@ namespace TripToPrint.Core.Integration
                 var routeCoords = _formatter.FormatCoordinates(COORDINATE_PRECISION_ON_ROUTES, route);
 
                 parameters += $"&{IMAGES_ROUTE_ROUTE_PARAM_NAME}={routeCoords}";
-                parameters += $"&{IMAGES_ROUTE_POINT_PARAM_NAME}=" + _formatter.FormatCoordinates(COORDINATE_PRECISION_ON_POINTS, group.Placemarks
+                parameters += $"&{IMAGES_ROUTE_POINT_PARAM_NAME}="
+                              + _formatter.FormatCoordinates(COORDINATE_PRECISION_ON_POINTS, group.Placemarks
                                   .Where(x => x.Type == PlacemarkType.Point)
                                   .Cast<IHasCoordinates>()
                                   .ToArray());
@@ -214,7 +215,15 @@ namespace TripToPrint.Core.Integration
 
         internal async Task<byte[]> DownloadData(string url, string parameters)
         {
-            return await _webClient.PostAsync(new Uri(url + GetAppCodeUrlPart()), parameters);
+            // TODO: Temporarily had to switch to "GET" request since it seems like HERE API is blocking POST requests
+            //return await _webClient.PostAsync(new Uri(url + GetAppCodeUrlPart()), parameters);
+
+            if (parameters != null && parameters[0] != '&')
+            {
+                parameters = '&' + parameters;
+            }
+
+            return await _webClient.GetAsync(new Uri(url + GetAppCodeUrlPart() + parameters));
         }
 
         internal IHasCoordinates GetAndTrimRouteCoordinates(MooiGroup group)
