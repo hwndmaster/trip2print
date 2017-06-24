@@ -4,6 +4,7 @@ using System.Device.Location;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -64,25 +65,37 @@ namespace TripToPrint.Core.Integration
                 return null;
             }
 
-            var coord = _formatter.FormatCoordinates(null, placemark);
-            var url = $"{VENUES_SEARCH_URL}ll={coord}&query={Uri.EscapeUriString(placemark.Name)}&intent=match&limit={LIMIT_LOOKUP}";
-            var data = await DownloadString(url, language, cancellationToken);
-            if (data == null)
-            {
-                return null;
-            }
-            var response = JsonConvert.DeserializeObject<FoursquareResponse<FoursquareSearchResponseBody>>(data);
-            if (!CheckMeta(url, response))
-            {
-                return null;
-            }
-            if (response.Response.Venues.Length == 0)
-            {
-                return null;
-            }
+            FoursquareResponseVenue venue;
+            var venueUrl = ExtractFoursquareUrlFromDescription(placemark);
 
-            var venue = response.Response.Venues[0];
-            venue = await DownloadVenueDetails(venue.Id, language, cancellationToken) ?? venue;
+            if (string.IsNullOrEmpty(venueUrl))
+            {
+                var coord = _formatter.FormatCoordinates(null, placemark);
+                var url = $"{VENUES_SEARCH_URL}ll={coord}&query={Uri.EscapeUriString(placemark.Name)}&intent=match&limit={LIMIT_LOOKUP}";
+                var data = await DownloadString(url, language, cancellationToken);
+                if (data == null)
+                {
+                    return null;
+                }
+                var response = JsonConvert.DeserializeObject<FoursquareResponse<FoursquareSearchResponseBody>>(data);
+                if (!CheckMeta(url, response))
+                {
+                    return null;
+                }
+                if (response.Response.Venues.Length == 0)
+                {
+                    return null;
+                }
+                venue = response.Response.Venues[0];
+                venue = await DownloadVenueDetails(venue.Id, language, cancellationToken) ?? venue;
+            }
+            else
+            {
+                var venueId = ExtractVenueIdFromUrl(venueUrl);
+                venue = await DownloadVenueDetails(venueId, language, cancellationToken);
+
+                placemark.Description = placemark.Description.Replace(venueUrl, string.Empty).Trim();
+            }
 
             return CreateVenueModel(venue);
         }
@@ -263,6 +276,31 @@ namespace TripToPrint.Core.Integration
             var clientSecret = Properties.Settings.Default.FoursquareApiClientSecret;
             var sep = url.Contains("?") ? "&" : "?";
             return $"{sep}v={VERSION_DATE}&{CLIENT_ID_PARAM_NAME}={clientId}&{CLIENT_SECRET_PARAM_NAME}={clientSecret}";
+        }
+
+        private string ExtractVenueIdFromUrl(string venueUrl)
+        {
+            var match = Regex.Match(venueUrl, @"/v/.+?/(?<id>\w+)");
+            if (match.Success)
+            {
+                return match.Groups["id"].Value;
+            }
+            throw new InvalidOperationException("A venue ID from the following Foursquare URL cannot be recognized: " + venueUrl);
+        }
+
+        private string ExtractFoursquareUrlFromDescription(KmlPlacemark placemark)
+        {
+            // Example: https://foursquare.com/v/barcomis-deli/4af818bef964a520f70a22e3
+            if (string.IsNullOrEmpty(placemark.Description))
+            {
+                return null;
+            }
+            var match = Regex.Match(placemark.Description, @"https?://foursquare\.com/v/.+?/.+?/?(?=\s|$)");
+            if (match.Success)
+            {
+                return match.Value;
+            }
+            return null;
         }
     }
 }
