@@ -85,10 +85,13 @@
   <ItemGroup>
     <TypeScriptCompile Include="App.ts" />
     <TypeScriptCompile Include="Components\Commands\BaseCommand.tsx" />
+    <TypeScriptCompile Include="Components\Commands\CommandZoomOut.tsx" />
+    <TypeScriptCompile Include="Components\Commands\CommandZoomIn.tsx" />
     <TypeScriptCompile Include="Components\Commands\CommandShow.tsx" />
     <TypeScriptCompile Include="Components\Commands\Commands.tsx" />
     <TypeScriptCompile Include="Components\Commands\CommandHide.tsx" />
     <TypeScriptCompile Include="Components\HereVenue.tsx" />
+    <TypeScriptCompile Include="Components\PlacemarkImage.tsx" />
     <TypeScriptCompile Include="Components\VenueBase.tsx" />
     <TypeScriptCompile Include="Components\Group.tsx" />
     <TypeScriptCompile Include="Components\Placemark.tsx" />
@@ -110,6 +113,8 @@
     <EmbeddedResource Include="dist\Styles.css" />
     <EmbeddedResource Include="Images\Power.png" />
     <EmbeddedResource Include="Images\Play.png" />
+    <EmbeddedResource Include="Images\ZoomIn.png" />
+    <EmbeddedResource Include="Images\ZoomOut.png" />
     <Content Include="Styles.less" />
     <Content Include="ThirdParty\React\react-dom.js" />
     <EmbeddedResource Include="ThirdParty\React\react-dom.min.js" />

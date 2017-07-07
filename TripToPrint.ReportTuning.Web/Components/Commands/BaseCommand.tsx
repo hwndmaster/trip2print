@@ -1,9 +1,9 @@
-﻿﻿module TripToPrint {
+﻿module TripToPrint {
 ﻿    export interface IBaseCommandProps {
 ﻿        onClick: React.MouseEventHandler<HTMLButtonElement>;
 ﻿    }
 
-﻿    export abstract class BaseCommand extends React.Component<IBaseCommandProps, {}> {
+     export abstract class BaseCommand extends React.Component<IBaseCommandProps> {
 ﻿        abstract getTitle(): string;
 
 ﻿        abstract getImageName(): string;

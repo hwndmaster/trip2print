@@ -4,8 +4,8 @@
         hidden: boolean;
     }
 
-    export abstract class Hideable<TP> extends React.Component<TP, IHideableState>
-    {
+    //export abstract class HideableWithStatus<TP, TS extends IHideableState> extends React.Component<TP, TS> {
+    export abstract class Hideable<TP> extends React.Component<TP, IHideableState> {
         constructor(props) {
             super(props);
             this.state = { hidden: false };
@@ -15,7 +15,7 @@
             if (this.state.hidden) {
                 return <div className="hidden">
                            <Commands>
-                                <CommandShow onClick={() => { this.show(); }}/>
+                               <CommandShow onClick={() => { this.show(); }} />
                            </Commands>
                        </div>;
             }
@@ -37,4 +37,8 @@
             });
         }
     }
+
+    /*export abstract class Hideable<TP> extends HideableWithStatus<TP, IHideableState>
+    {
+    }*/
 }

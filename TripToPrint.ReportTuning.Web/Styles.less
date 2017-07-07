@@ -2,6 +2,8 @@
 @thumbnail-width: 200px;
 @thumbnail-height: 130px;
 @command-button-bg: #ffffff;
+@placemark-image-width-limit: 170px;
+@placemark-image-height-limit: 120px;
 
 body {
     margin: 0;
@@ -150,11 +152,19 @@ h3 {
         }
     }
 
-    .pm-img img {
-        max-width: 170px;
-        max-height: 120px;
-        float: left;
+    .pm-img-item {
+        display: inline-block;
         margin-right: 4px;
+
+        img {
+            max-width: @placemark-image-width-limit;
+            max-height: @placemark-image-height-limit;
+        }
+
+        img {
+            max-width: @placemark-image-width-limit;
+            max-height: @placemark-image-height-limit;
+        }
     }
 }
 

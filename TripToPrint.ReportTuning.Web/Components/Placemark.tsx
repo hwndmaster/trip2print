@@ -43,15 +43,7 @@
             if (images.length === 0)
                 return null;
 
-            return <div className="pm-img">
-                       {images.map(x => <img src={x} onError={this.onImageError} />)}
-                   </div>;
-        }
-
-        private onImageError(event: React.SyntheticEvent<HTMLImageElement>) {
-            let element = event.target as HTMLElement;
-            element.style.display = "none";
-            console.log(`Image not loaded: ${element.getAttribute("src")}`);
+            return images.map(x => <PlacemarkImage imageUrl={x}/>);
         }
 
         private renderVenue(venue: Interfaces.IVenueBaseDto) {

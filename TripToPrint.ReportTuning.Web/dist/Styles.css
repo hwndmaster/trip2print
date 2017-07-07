@@ -119,11 +119,17 @@ h3 {
 .pm .pm-xtra .v-rempricelvl {
   color: dimgray;
 }
-.pm .pm-img img {
+.pm .pm-img-item {
+  display: inline-block;
+  margin-right: 4px;
+}
+.pm .pm-img-item img {
   max-width: 170px;
   max-height: 120px;
-  float: left;
-  margin-right: 4px;
+}
+.pm .pm-img-item img {
+  max-width: 170px;
+  max-height: 120px;
 }
 .coord {
   color: gray;

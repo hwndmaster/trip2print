@@ -59,6 +59,22 @@ var TripToPrint;
 })(TripToPrint || (TripToPrint = {}));
 var TripToPrint;
 (function (TripToPrint) {
+    class CommandZoomIn extends TripToPrint.BaseCommand {
+        getTitle() { return "Increase size"; }
+        getImageName() { return "ZoomIn.png"; }
+    }
+    TripToPrint.CommandZoomIn = CommandZoomIn;
+})(TripToPrint || (TripToPrint = {}));
+var TripToPrint;
+(function (TripToPrint) {
+    class CommandZoomOut extends TripToPrint.BaseCommand {
+        getTitle() { return "Decrease size"; }
+        getImageName() { return "ZoomOut.png"; }
+    }
+    TripToPrint.CommandZoomOut = CommandZoomOut;
+})(TripToPrint || (TripToPrint = {}));
+var TripToPrint;
+(function (TripToPrint) {
     class Hideable extends React.Component {
         constructor(props) {
             super(props);
@@ -277,12 +293,7 @@ var TripToPrint;
         renderImages(images) {
             if (images.length === 0)
                 return null;
-            return React.createElement("div", { className: "pm-img" }, images.map(x => React.createElement("img", { src: x, onError: this.onImageError })));
-        }
-        onImageError(event) {
-            let element = event.target;
-            element.style.display = "none";
-            console.log(`Image not loaded: ${element.getAttribute("src")}`);
+            return images.map(x => React.createElement(TripToPrint.PlacemarkImage, { imageUrl: x }));
         }
         renderVenue(venue) {
             if (venue == null)
@@ -304,6 +315,27 @@ var TripToPrint;
     Placemark.SOURCE_TYPE_HERE = "Here";
     Placemark.SOURCE_TYPE_FOURSQUARE = "Foursquare";
     TripToPrint.Placemark = Placemark;
+})(TripToPrint || (TripToPrint = {}));
+var TripToPrint;
+(function (TripToPrint) {
+    class PlacemarkImage extends TripToPrint.Hideable {
+        renderUnhidden() {
+            return React.createElement("div", { className: "pm-img-item" },
+                React.createElement("img", { src: this.props.imageUrl, onError: this.onImageError }),
+                React.createElement(TripToPrint.Commands, null,
+                    React.createElement(TripToPrint.CommandHide, { onClick: () => { this.hide(); } }),
+                    React.createElement(TripToPrint.CommandZoomIn, { onClick: () => { this.zoom(true); } }),
+                    React.createElement(TripToPrint.CommandZoomOut, { onClick: () => { this.zoom(false); } })));
+        }
+        zoom(zoomIn) {
+        }
+        onImageError(event) {
+            let element = event.target;
+            element.style.display = "none";
+            console.log(`Image not loaded: ${element.getAttribute("src")}`);
+        }
+    }
+    TripToPrint.PlacemarkImage = PlacemarkImage;
 })(TripToPrint || (TripToPrint = {}));
 var TripToPrint;
 (function (TripToPrint) {
