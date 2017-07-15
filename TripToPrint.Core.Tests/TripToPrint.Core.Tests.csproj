@@ -79,13 +79,13 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="SpecflowDefinitions\GroupsGenerationDefinition.cs" />
-    <Compile Include="SpecflowDefinitions\PlacemarkInGroupTableRow.cs" />
+    <Compile Include="SpecflowDefinitions\ClustersGenerationDefinition.cs" />
+    <Compile Include="SpecflowDefinitions\PlacemarkInClusterTableRow.cs" />
     <Compile Include="SpecflowDefinitions\PlacemarkTableRow.cs" />
-    <Compile Include="SpecflowTests\GroupsGeneration.feature.cs">
+    <Compile Include="SpecflowTests\ClustersGeneration.feature.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>GroupsGeneration.feature</DependentUpon>
+      <DependentUpon>ClustersGeneration.feature</DependentUpon>
     </Compile>
     <Compile Include="UnitTests\DiscoveringServiceTests.cs" />
     <Compile Include="UnitTests\DummyVenue.cs" />
@@ -115,9 +115,9 @@
     </None>
     <None Include="packages.config" />
     <None Include="runtests.cmd" />
-    <None Include="SpecflowTests\GroupsGeneration.feature">
+    <None Include="SpecflowTests\ClustersGeneration.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
-      <LastGenOutput>GroupsGeneration.feature.cs</LastGenOutput>
+      <LastGenOutput>ClustersGeneration.feature.cs</LastGenOutput>
     </None>
     <None Include="SpecRunTestProfile.xsd">
       <SubType>Designer</SubType>

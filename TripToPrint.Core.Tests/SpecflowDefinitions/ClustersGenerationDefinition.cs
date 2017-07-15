@@ -11,7 +11,7 @@ using TripToPrint.Core.Models;
 namespace TripToPrint.Core.Tests.SpecflowDefinitions
 {
     [Binding]
-    public sealed class GroupsGenerationDefinition
+    public sealed class ClustersGenerationDefinition
     {
         private List<PlacemarkTableRow> _placemarkTableRows;
 
@@ -21,8 +21,8 @@ namespace TripToPrint.Core.Tests.SpecflowDefinitions
             _placemarkTableRows = table.CreateSet<PlacemarkTableRow>().ToList();
         }
 
-        [Then("these placemarks will be assigned to the following groups:")]
-        public void ThenThesePlacemarksWillBeAssignedToTheFollowingGroups(Table table)
+        [Then("these placemarks will be assigned to the following clusters:")]
+        public void ThenThesePlacemarksWillBeAssignedToTheFollowingClusters(Table table)
         {
             var folder = new KmlFolder(_placemarkTableRows.Select(x => new KmlPlacemark {
                 Coordinates = new[] { new GeoCoordinate(x.Latitude, x.Longitude) },
@@ -31,15 +31,15 @@ namespace TripToPrint.Core.Tests.SpecflowDefinitions
 
             var kmlCalculator = new KmlCalculator();
             var resourceName = new ResourceNameProvider();
-            var factory = new MooiGroupFactory(kmlCalculator, resourceName, new MooiPlacemarkFactory(kmlCalculator, resourceName));
-            var groups = factory.CreateList(folder, null, string.Empty);
-            var result = groups
-                .SelectMany((@group, groupIndex)
-                    => @group.Placemarks.Select(placemark
-                        => new { p = placemark, i = groupIndex }))
-                .Select(x => new PlacemarkInGroupTableRow {
+            var factory = new MooiClusterFactory(kmlCalculator, resourceName, new MooiPlacemarkFactory(kmlCalculator, resourceName));
+            var clusters = factory.CreateList(folder, null, string.Empty);
+            var result = clusters
+                .SelectMany((cluster, clusterIndex)
+                    => cluster.Placemarks.Select(placemark
+                        => new { p = placemark, i = clusterIndex }))
+                .Select(x => new PlacemarkInClusterTableRow {
                     Name = x.p.Name,
-                    GroupIndex = x.i
+                    ClusterIndex = x.i
                 });
 
             table.CompareToSet(result);

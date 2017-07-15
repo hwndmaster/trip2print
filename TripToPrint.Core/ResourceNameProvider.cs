@@ -6,7 +6,7 @@ namespace TripToPrint.Core
 {
     public interface IResourceNameProvider
     {
-        string CreateFileNameForOverviewMap(MooiGroup group);
+        string CreateFileNameForOverviewMap(MooiCluster cluster);
         string CreateFileNameForPlacemarkThumbnail(MooiPlacemark placemark);
         string CreateTempFolderName(string suffix = null);
         string GetDefaultHtmlReportName();
@@ -15,9 +15,9 @@ namespace TripToPrint.Core
 
     internal class ResourceNameProvider : IResourceNameProvider
     {
-        public string CreateFileNameForOverviewMap(MooiGroup group)
+        public string CreateFileNameForOverviewMap(MooiCluster cluster)
         {
-            return $"overview-{group.Id}.jpg";
+            return $"overview-{cluster.Id}.jpg";
         }
 
         public string CreateFileNameForPlacemarkThumbnail(MooiPlacemark placemark)

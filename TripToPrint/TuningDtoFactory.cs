@@ -44,17 +44,17 @@ namespace TripToPrint
         {
             return new MooiSectionDto {
                 Name = section.Name,
-                Groups = section.Groups.Select(CreateGroup).ToArray()
+                Clusters = section.Clusters.Select(CreateCluster).ToArray()
             };
         }
 
-        private MooiGroupDto CreateGroup(MooiGroup group)
+        private MooiClusterDto CreateCluster(MooiCluster cluster)
         {
-            return new MooiGroupDto {
-                Id = group.Id,
-                IsRoute = group.Type == GroupType.Routes,
-                OverviewMapFilePath = ConvertToLocalFileUrl(group.OverviewMapFilePath),
-                Placemarks = group.Placemarks.Select(CreatePlacemark).ToArray()
+            return new MooiClusterDto {
+                Id = cluster.Id,
+                IsRoute = cluster.Type == ClusterType.Routes,
+                OverviewMapFilePath = ConvertToLocalFileUrl(cluster.OverviewMapFilePath),
+                Placemarks = cluster.Placemarks.Select(CreatePlacemark).ToArray()
             };
         }
 
@@ -62,7 +62,7 @@ namespace TripToPrint
         {
             var pm = new MooiPlacemarkDto {
                 Id = placemark.Id,
-                Index = placemark.Group.Placemarks.IndexOf(placemark) + 1,
+                Index = placemark.Cluster.Placemarks.IndexOf(placemark) + 1,
                 Name = placemark.Name,
                 Description = placemark.Description,
                 Images = placemark.Images.ToArray(),

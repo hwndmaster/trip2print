@@ -13,7 +13,7 @@ namespace TripToPrint.Core.Tests.UnitTests
     [TestClass]
     public class MooiDocumentFactoryTests
     {
-        private readonly Mock<IMooiGroupFactory> _mooiGroupFactoryMock = new Mock<IMooiGroupFactory>();
+        private readonly Mock<IMooiClusterFactory> _mooiGroupFactoryMock = new Mock<IMooiClusterFactory>();
 
         private MooiDocumentFactory _factory;
 
@@ -36,7 +36,7 @@ namespace TripToPrint.Core.Tests.UnitTests
                         })
                 }
             };
-            _mooiGroupFactoryMock.Setup(x => x.CreateList(kmlDocument.Folders[0], null, string.Empty)).Returns(new List<MooiGroup>());
+            _mooiGroupFactoryMock.Setup(x => x.CreateList(kmlDocument.Folders[0], null, string.Empty)).Returns(new List<MooiCluster>());
 
             // Act
             var result = _factory.Create(kmlDocument, null, string.Empty);
@@ -67,11 +67,11 @@ namespace TripToPrint.Core.Tests.UnitTests
                 Coordinates = new []{ venue.Coordinate }
             };
             _mooiGroupFactoryMock.Setup(x => x.CreateList(kmlDocument.Folders[0], discoveredPlaces, string.Empty))
-                .Returns(new List<MooiGroup>());
+                .Returns(new List<MooiCluster>());
             _mooiGroupFactoryMock.Setup(x => x.CreateList(It.Is<KmlFolder>(f => f.Name == Resources.Kml_Folder_Explored),
                 discoveredPlaces, string.Empty))
-                .Returns((KmlFolder folder, List<DiscoveredPlace> dps, string path) => new List<MooiGroup> {
-                    new MooiGroup {
+                .Returns((KmlFolder folder, List<DiscoveredPlace> dps, string path) => new List<MooiCluster> {
+                    new MooiCluster {
                         Placemarks = {
                             placemarkExplored
                         }
@@ -85,9 +85,9 @@ namespace TripToPrint.Core.Tests.UnitTests
             var sectionWithExploredPlacemarks = result.Sections[1];
             Assert.AreEqual(kmlDocument.Folders[0].Name, result.Sections[0].Name);
             Assert.AreEqual(Resources.Kml_Folder_Explored, sectionWithExploredPlacemarks.Name);
-            Assert.AreEqual(1, sectionWithExploredPlacemarks.Groups.Count);
-            Assert.AreEqual(1, sectionWithExploredPlacemarks.Groups[0].Placemarks.Count);
-            Assert.AreEqual(placemarkExplored, sectionWithExploredPlacemarks.Groups[0].Placemarks[0]);
+            Assert.AreEqual(1, sectionWithExploredPlacemarks.Clusters.Count);
+            Assert.AreEqual(1, sectionWithExploredPlacemarks.Clusters[0].Placemarks.Count);
+            Assert.AreEqual(placemarkExplored, sectionWithExploredPlacemarks.Clusters[0].Placemarks[0]);
         }
     }
 }

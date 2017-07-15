@@ -64,15 +64,15 @@ namespace TripToPrint.Core
 
         public virtual async Task FetchMapImages(MooiDocument document, string tempPath, IResourceFetchingProgress progress)
         {
-            var groups = document.Sections.SelectMany(x => x.Groups).ToList();
-            var placemarks = document.Sections.SelectMany(x => x.Groups).SelectMany(x => x.Placemarks).ToList();
+            var clusters = document.Sections.SelectMany(x => x.Clusters).ToList();
+            var placemarks = document.Sections.SelectMany(x => x.Clusters).SelectMany(x => x.Placemarks).ToList();
 
-            progress.ReportFetchImagesCount(groups.Count + placemarks.Count);
+            progress.ReportFetchImagesCount(clusters.Count + placemarks.Count);
 
             _logger.Info("Downloading overviews");
-            foreach (var group in groups)
+            foreach (var cluster in clusters)
             {
-                await FetchGroupMapImage(group, tempPath);
+                await FetchClusterMapImage(cluster, tempPath);
                 progress.ReportFetchImageProcessed();
             }
 
@@ -84,17 +84,17 @@ namespace TripToPrint.Core
             }
         }
 
-        private async Task FetchGroupMapImage(MooiGroup group, string tempPath)
+        private async Task FetchClusterMapImage(MooiCluster cluster, string tempPath)
         {
-            var imageBytes = await _hereAdapter.FetchOverviewMap(group);
+            var imageBytes = await _hereAdapter.FetchOverviewMap(cluster);
             if (imageBytes == null)
             {
-                _logger.Warn($"Was unable to download overview map image for '{group.Id}'");
+                _logger.Warn($"Was unable to download overview map image for '{cluster.Id}'");
                 return;
             }
-            var filePath = Path.Combine(tempPath, _resourceName.CreateFileNameForOverviewMap(group));
+            var filePath = Path.Combine(tempPath, _resourceName.CreateFileNameForOverviewMap(cluster));
             await _file.WriteBytesAsync(filePath, imageBytes);
-            _logger.Info($"An overview map image for '{group.Id}' has been successfully downloaded");
+            _logger.Info($"An overview map image for '{cluster.Id}' has been successfully downloaded");
         }
 
         private async Task FetchPlacemarkMapImage(MooiPlacemark placemark, string tempPath)

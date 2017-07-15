@@ -6,6 +6,6 @@ namespace TripToPrint.Core.Models
     {
         public MooiDocument Document { get; set; }
         public string Name { get; set; }
-        public List<MooiGroup> Groups { get; } = new List<MooiGroup>();
+        public List<MooiCluster> Clusters { get; } = new List<MooiCluster>();
     }
 }

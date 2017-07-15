@@ -38,7 +38,7 @@ namespace TripToPrint.Core
             // Model Factories
             builder.RegisterType<KmlDocumentFactory>().As<IKmlDocumentFactory>();
             builder.RegisterType<MooiDocumentFactory>().As<IMooiDocumentFactory>();
-            builder.RegisterType<MooiGroupFactory>().As<IMooiGroupFactory>();
+            builder.RegisterType<MooiClusterFactory>().As<IMooiClusterFactory>();
             builder.RegisterType<MooiPlacemarkFactory>().As<IMooiPlacemarkFactory>();
 
             base.Load(builder);

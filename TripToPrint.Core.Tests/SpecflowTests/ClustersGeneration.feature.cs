@@ -18,19 +18,19 @@ namespace TripToPrint.Core.Tests.SpecflowTests
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "2.1.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute()]
-    public partial class GroupsGenerationFeature
+    public partial class ClustersGenerationFeature
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
         
-#line 1 "GroupsGeneration.feature"
+#line 1 "ClustersGeneration.feature"
 #line hidden
         
         [Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute()]
         public static void FeatureSetup(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner(null, 0);
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Groups Generation", "\tTest different scenarios of dividing placemarks by groups", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Clusters Generation", "\tTest different scenarios of dividing placemarks by clusters", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -45,9 +45,9 @@ namespace TripToPrint.Core.Tests.SpecflowTests
         public virtual void TestInitialize()
         {
             if (((testRunner.FeatureContext != null) 
-                        && (testRunner.FeatureContext.FeatureInfo.Title != "Groups Generation")))
+                        && (testRunner.FeatureContext.FeatureInfo.Title != "Clusters Generation")))
             {
-                TripToPrint.Core.Tests.SpecflowTests.GroupsGenerationFeature.FeatureSetup(null);
+                TripToPrint.Core.Tests.SpecflowTests.ClustersGenerationFeature.FeatureSetup(null);
             }
         }
         
@@ -68,11 +68,11 @@ namespace TripToPrint.Core.Tests.SpecflowTests
         }
         
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("A single group: 1 placemark")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Groups Generation")]
-        public virtual void ASingleGroup1Placemark()
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("A single cluster: 1 placemark")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Clusters Generation")]
+        public virtual void ASingleCluster1Placemark()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A single group: 1 placemark", ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A single cluster: 1 placemark", ((string[])(null)));
 #line 4
 this.ScenarioSetup(scenarioInfo);
 #line hidden
@@ -88,23 +88,23 @@ this.ScenarioSetup(scenarioInfo);
  testRunner.Given("I have these placemarks in my folder:", ((string)(null)), table1, "Given ");
 #line hidden
             TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Group Index",
+                        "Cluster Index",
                         "Name"});
             table2.AddRow(new string[] {
                         "0",
                         "1"});
 #line 8
- testRunner.Then("these placemarks will be assigned to the following groups:", ((string)(null)), table2, "Then ");
+ testRunner.Then("these placemarks will be assigned to the following clusters:", ((string)(null)), table2, "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
         
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("A single group: 6 placemark")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Groups Generation")]
-        public virtual void ASingleGroup6Placemark()
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("A single cluster: 6 placemark")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Clusters Generation")]
+        public virtual void ASingleCluster6Placemark()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A single group: 6 placemark", ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("A single cluster: 6 placemark", ((string[])(null)));
 #line 12
 this.ScenarioSetup(scenarioInfo);
 #line hidden
@@ -140,7 +140,7 @@ this.ScenarioSetup(scenarioInfo);
  testRunner.Given("I have these placemarks in my folder:", ((string)(null)), table3, "Given ");
 #line hidden
             TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Group Index",
+                        "Cluster Index",
                         "Name"});
             table4.AddRow(new string[] {
                         "0",
@@ -161,17 +161,17 @@ this.ScenarioSetup(scenarioInfo);
                         "0",
                         "6"});
 #line 21
- testRunner.Then("these placemarks will be assigned to the following groups:", ((string)(null)), table4, "Then ");
+ testRunner.Then("these placemarks will be assigned to the following clusters:", ((string)(null)), table4, "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
         
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("For two groups: 4 + 3 placemarks")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Groups Generation")]
-        public virtual void ForTwoGroups43Placemarks()
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("For two clusters: 4 + 3 placemarks")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Clusters Generation")]
+        public virtual void ForTwoClusters43Placemarks()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("For two groups: 4 + 3 placemarks", ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("For two clusters: 4 + 3 placemarks", ((string[])(null)));
 #line 30
 this.ScenarioSetup(scenarioInfo);
 #line hidden
@@ -211,7 +211,7 @@ this.ScenarioSetup(scenarioInfo);
  testRunner.Given("I have these placemarks in my folder:", ((string)(null)), table5, "Given ");
 #line hidden
             TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Group Index",
+                        "Cluster Index",
                         "Name"});
             table6.AddRow(new string[] {
                         "0",
@@ -235,17 +235,17 @@ this.ScenarioSetup(scenarioInfo);
                         "1",
                         "Tandem Paragliding @ Adeje"});
 #line 40
- testRunner.Then("these placemarks will be assigned to the following groups:", ((string)(null)), table6, "Then ");
+ testRunner.Then("these placemarks will be assigned to the following clusters:", ((string)(null)), table6, "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
         
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("For two groups: 8 + 1 placemarks")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Groups Generation")]
-        public virtual void ForTwoGroups81Placemarks()
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("For two clusters: 8 + 1 placemarks")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Clusters Generation")]
+        public virtual void ForTwoClusters81Placemarks()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("For two groups: 8 + 1 placemarks", ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("For two clusters: 8 + 1 placemarks", ((string[])(null)));
 #line 51
 this.ScenarioSetup(scenarioInfo);
 #line hidden
@@ -293,7 +293,7 @@ this.ScenarioSetup(scenarioInfo);
  testRunner.Given("I have these placemarks in my folder:", ((string)(null)), table7, "Given ");
 #line hidden
             TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Group Index",
+                        "Cluster Index",
                         "Name"});
             table8.AddRow(new string[] {
                         "0",
@@ -323,17 +323,17 @@ this.ScenarioSetup(scenarioInfo);
                         "1",
                         "9"});
 #line 63
- testRunner.Then("these placemarks will be assigned to the following groups:", ((string)(null)), table8, "Then ");
+ testRunner.Then("these placemarks will be assigned to the following clusters:", ((string)(null)), table8, "Then ");
 #line hidden
             this.ScenarioCleanup();
         }
         
         [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("For three groups: 4 + 5 + 1")]
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Groups Generation")]
-        public virtual void ForThreeGroups451()
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("For three clusters: 4 + 5 + 1")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "Clusters Generation")]
+        public virtual void ForThreeClusters451()
         {
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("For three groups: 4 + 5 + 1", ((string[])(null)));
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("For three clusters: 4 + 5 + 1", ((string[])(null)));
 #line 76
 this.ScenarioSetup(scenarioInfo);
 #line hidden
@@ -385,7 +385,7 @@ this.ScenarioSetup(scenarioInfo);
  testRunner.Given("I have these placemarks in my folder:", ((string)(null)), table9, "Given ");
 #line hidden
             TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
-                        "Group Index",
+                        "Cluster Index",
                         "Name"});
             table10.AddRow(new string[] {
                         "1",
@@ -418,7 +418,7 @@ this.ScenarioSetup(scenarioInfo);
                         "1",
                         "10"});
 #line 89
- testRunner.Then("these placemarks will be assigned to the following groups:", ((string)(null)), table10, "Then ");
+ testRunner.Then("these placemarks will be assigned to the following clusters:", ((string)(null)), table10, "Then ");
 #line hidden
             this.ScenarioCleanup();
         }

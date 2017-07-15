@@ -67,7 +67,7 @@ namespace TripToPrint.Core.Tests.UnitTests
         public async Task When_fetching_overview_for_points_the_parameters_passed_correctly()
         {
             // Arrange
-            var group = new MooiGroup {
+            var group = new MooiCluster {
                 Placemarks = {
                     new MooiPlacemark { Coordinates = new [] { new GeoCoordinate(1.11, 2.22) } },
                     new MooiPlacemark { Coordinates = new [] { new GeoCoordinate(4.22, 3.11) } }
@@ -87,7 +87,7 @@ namespace TripToPrint.Core.Tests.UnitTests
         public async Task When_fetching_overview_for_routes_the_parameters_passed_correctly()
         {
             // Arrange
-            var group = new MooiGroup
+            var group = new MooiCluster
             {
                 Placemarks = {
                     new MooiPlacemark { Coordinates = new [] {
@@ -120,7 +120,7 @@ namespace TripToPrint.Core.Tests.UnitTests
             var placemarkShouldBeExcluded = new MooiPlacemark {
                 Coordinates = new[] { new GeoCoordinate(1, 1) }
             };
-            var group = new MooiGroup {
+            var group = new MooiCluster {
                 Placemarks = {
                     routePlacemarkToInclude,
                     placemarkShouldBeExcluded

@@ -95,7 +95,7 @@
     <TypeScriptCompile Include="Components\HereVenue.tsx" />
     <TypeScriptCompile Include="Components\PlacemarkImage.tsx" />
     <TypeScriptCompile Include="Components\VenueBase.tsx" />
-    <TypeScriptCompile Include="Components\Group.tsx" />
+    <TypeScriptCompile Include="Components\Cluster.tsx" />
     <TypeScriptCompile Include="Components\Placemark.tsx" />
     <TypeScriptCompile Include="Components\Hideable.tsx" />
     <TypeScriptCompile Include="Components\OverviewMap.tsx" />

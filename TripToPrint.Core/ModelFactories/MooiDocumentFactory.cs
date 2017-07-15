@@ -12,11 +12,11 @@ namespace TripToPrint.Core.ModelFactories
 
     internal class MooiDocumentFactory : IMooiDocumentFactory
     {
-        private readonly IMooiGroupFactory _mooiGroupFactory;
+        private readonly IMooiClusterFactory _mooiClusterFactory;
 
-        public MooiDocumentFactory(IMooiGroupFactory mooiGroupFactory)
+        public MooiDocumentFactory(IMooiClusterFactory mooiClusterFactory)
         {
-            _mooiGroupFactory = mooiGroupFactory;
+            _mooiClusterFactory = mooiClusterFactory;
         }
 
         public MooiDocument Create(KmlDocument kmlDocument, List<DiscoveredPlace> discoveredPlaces, string reportTempPath)
@@ -73,9 +73,9 @@ namespace TripToPrint.Core.ModelFactories
 
         private void ExtractGroupsFromFolderIntoSection(KmlFolder folder, MooiSection section, List<DiscoveredPlace> discoveredPlaces, string reportTempPath)
         {
-            var groups = _mooiGroupFactory.CreateList(folder, discoveredPlaces, reportTempPath);
+            var groups = _mooiClusterFactory.CreateList(folder, discoveredPlaces, reportTempPath);
             groups.ForEach(x => x.Section = section);
-            section.Groups.AddRange(groups);
+            section.Clusters.AddRange(groups);
         }
     }
 }

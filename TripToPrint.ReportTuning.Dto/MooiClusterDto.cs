@@ -1,6 +1,6 @@
 ﻿namespace TripToPrint.ReportTuning.Dto
 {
-    public class MooiGroupDto
+    public class MooiClusterDto
     {
         public string Id { get; set; }
         public string OverviewMapFilePath { get; set; }

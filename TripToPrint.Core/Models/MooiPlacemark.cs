@@ -22,7 +22,7 @@ namespace TripToPrint.Core.Models
 
     public class MooiPlacemark : IHasCoordinates
     {
-        public MooiGroup Group { get; set; }
+        public MooiCluster Cluster { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public VenueBase[] AttachedVenues { get; set; }

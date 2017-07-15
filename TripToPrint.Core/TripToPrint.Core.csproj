@@ -80,7 +80,7 @@
     <Compile Include="Logging\LogStorage.cs" />
     <Compile Include="ModelFactories\KmlDocumentFactory.cs" />
     <Compile Include="ModelFactories\MooiDocumentFactory.cs" />
-    <Compile Include="ModelFactories\MooiGroupFactory.cs" />
+    <Compile Include="ModelFactories\MooiClusterFactory.cs" />
     <Compile Include="ModelFactories\MooiPlacemarkFactory.cs" />
     <Compile Include="Models\DiscoveredPlace.cs" />
     <Compile Include="Integration\Models\FoursquareClassesCombined.cs" />
@@ -96,7 +96,7 @@
     <Compile Include="Models\KmlPlacemark.cs" />
     <Compile Include="Models\KmlResource.cs" />
     <Compile Include="Models\MooiDocument.cs" />
-    <Compile Include="Models\MooiGroup.cs" />
+    <Compile Include="Models\MooiCluster.cs" />
     <Compile Include="Models\MooiPlacemark.cs" />
     <Compile Include="Models\MooiSection.cs" />
     <Compile Include="Models\Venues\VenueSource.cs" />

@@ -1,6 +1,6 @@
 ﻿module TripToPrint {
     export interface IOverviewMapProps {
-        group: Interfaces.IMooiGroupDto;
+        cluster: Interfaces.IMooiClusterDto;
         section: Interfaces.IMooiSectionDto;
         isFirst: boolean;
     }
@@ -15,7 +15,7 @@
 
             return <div className={className}>
                        <h4 className="title">{this.props.section.name}</h4>
-                       <img src={this.props.group.overviewMapFilePath}/>
+                       <img src={this.props.cluster.overviewMapFilePath}/>
                        <Commands>
                            <CommandHide onClick={() => { this.hide(); }}/>
                        </Commands>

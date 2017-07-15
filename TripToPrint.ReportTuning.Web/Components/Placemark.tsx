@@ -1,7 +1,7 @@
 ﻿module TripToPrint {
     export interface IPlacemarkProps {
         placemark: Interfaces.IMooiPlacemarkDto,
-        isInRouteGroup: boolean;
+        isInRouteCluster: boolean;
     }
 
     export class Placemark extends React.Component<IPlacemarkProps, {}> {
@@ -12,8 +12,8 @@
             let pm = this.props.placemark;
 
             return <div className="pm">
-                       {this.props.isInRouteGroup ? null : <ThumbnailMap placemark={pm} />}
-                       {this.props.isInRouteGroup ? <img className="small-icon" src={pm.iconPath} /> : null}
+                       {this.props.isInRouteCluster ? null : <ThumbnailMap placemark={pm} />}
+                       {this.props.isInRouteCluster ? <img className="small-icon" src={pm.iconPath} /> : null}
                        <div className="header">
                            <span className="coord">
                                (<a href={`http://maps.google.com/?ll=${pm.coordinates[0]}`} onClick={this.preventNavigation}>{pm.coordinates[0]}</a>)
@@ -51,12 +51,12 @@
                 return null;
 
             if (venue.sourceType === Placemark.SOURCE_TYPE_HERE) {
-                return <HereVenue venue={venue as Interfaces.IHereVenueDto} />;
-            }
-            else if (venue.sourceType === Placemark.SOURCE_TYPE_FOURSQUARE) {
+                return <HereVenue venue={venue as Interfaces.IHereVenueDto}/>;
+            } else if (venue.sourceType === Placemark.SOURCE_TYPE_FOURSQUARE) {
                 return [
-                    <FoursquareVenueTips tips={(venue as Interfaces.IFoursquareVenueDto).tips} />,
-                    <FoursquareVenue venue={venue as Interfaces.IFoursquareVenueDto} />];
+                    <FoursquareVenueTips tips={(venue as Interfaces.IFoursquareVenueDto).tips}/>,
+                    <FoursquareVenue venue={venue as Interfaces.IFoursquareVenueDto}/>
+                ];
             }
 
             throw new Error(`This type of venue is not supported: ${venue.sourceType}`);

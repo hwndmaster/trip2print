@@ -9,8 +9,8 @@
     {
         render() {
             return <div className="folder">
-                {this.props.section.groups.map((group, i) =>
-                    <Group group={group} section={this.props.section} isFirst={this.props.isFirst && i === 0} />
+                {this.props.section.clusters.map((cluster, i) =>
+                    <Cluster cluster={cluster} section={this.props.section} isFirst={this.props.isFirst && i === 0} />
                 )}
             </div>;
         }

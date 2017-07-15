@@ -1,8 +1,8 @@
 namespace TripToPrint.Core.Tests.SpecflowDefinitions
 {
-    public class PlacemarkInGroupTableRow
+    public class PlacemarkInClusterTableRow
     {
-        public int GroupIndex { get; set; }
+        public int ClusterIndex { get; set; }
         public string Name { get; set; }
     }
 }

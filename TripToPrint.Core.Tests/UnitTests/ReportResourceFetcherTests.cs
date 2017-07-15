@@ -43,7 +43,7 @@ namespace TripToPrint.Core.Tests.UnitTests
             _resourceNameMock.Setup(x => x.GetDefaultHtmlReportName()).Returns("default");
             _resourceNameMock.Setup(x => x.CreateTempFolderName(It.IsAny<string>())).Returns(_tempFolderName);
 
-            _resourceNameMock.Setup(x => x.CreateFileNameForOverviewMap(It.IsAny<MooiGroup>())).Returns(string.Empty);
+            _resourceNameMock.Setup(x => x.CreateFileNameForOverviewMap(It.IsAny<MooiCluster>())).Returns(string.Empty);
             _resourceNameMock.Setup(x => x.CreateFileNameForPlacemarkThumbnail(It.IsAny<MooiPlacemark>())).Returns(string.Empty);
         }
 
@@ -90,8 +90,8 @@ namespace TripToPrint.Core.Tests.UnitTests
         {
             // Arrange
             var placemark = new MooiPlacemark();
-            var group = new MooiGroup { Placemarks = { placemark } };
-            var document = new MooiDocument { Sections = { new MooiSection { Groups = { group } } } };
+            var group = new MooiCluster { Placemarks = { placemark } };
+            var document = new MooiDocument { Sections = { new MooiSection { Clusters = { group } } } };
             var tempPath = "temp-path";
             var overviewBytes = new byte[] { 0x22 };
             var thumbnailBytes = new byte[] { 0x44 };

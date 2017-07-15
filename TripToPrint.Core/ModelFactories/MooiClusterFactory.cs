@@ -6,15 +6,15 @@ using TripToPrint.Core.Models;
 
 namespace TripToPrint.Core.ModelFactories
 {
-    public interface IMooiGroupFactory
+    public interface IMooiClusterFactory
     {
-        List<MooiGroup> CreateList(KmlFolder folder, List<DiscoveredPlace> discoveredPlaces, string reportTempPath);
+        List<MooiCluster> CreateList(KmlFolder folder, List<DiscoveredPlace> discoveredPlaces, string reportTempPath);
     }
 
-    internal class MooiGroupFactory : IMooiGroupFactory
+    internal class MooiClusterFactory : IMooiClusterFactory
     {
-        private const int MIN_GROUP_COUNT = 4;
-        private const int MAX_GROUP_COUNT = 8;
+        private const int MIN_COUNT_PER_CLUSTER = 4;
+        private const int MAX_COUNT_PER_CLUSTER = 8;
         private const double MIN_DIST_TO_NEIGHBOR_IN_KM = 0.75d;
         private const double COEF_ROOM_OVER_MAX_DISTANCE = 1.5; // 50%
 
@@ -22,16 +22,16 @@ namespace TripToPrint.Core.ModelFactories
         private readonly IResourceNameProvider _resourceName;
         private readonly IMooiPlacemarkFactory _mooiPlacemarkFactory;
 
-        public MooiGroupFactory(IKmlCalculator kmlCalculator, IResourceNameProvider resourceName, IMooiPlacemarkFactory mooiPlacemarkFactory)
+        public MooiClusterFactory(IKmlCalculator kmlCalculator, IResourceNameProvider resourceName, IMooiPlacemarkFactory mooiPlacemarkFactory)
         {
             _kmlCalculator = kmlCalculator;
             _resourceName = resourceName;
             _mooiPlacemarkFactory = mooiPlacemarkFactory;
         }
 
-        public List<MooiGroup> CreateList(KmlFolder folder, List<DiscoveredPlace> discoveredPlaces, string reportTempPath)
+        public List<MooiCluster> CreateList(KmlFolder folder, List<DiscoveredPlace> discoveredPlaces, string reportTempPath)
         {
-            var groups = new List<MooiGroup>();
+            var clusters = new List<MooiCluster>();
 
             var placemarksConverted = folder.Placemarks
                 .Select(x => _mooiPlacemarkFactory.Create(x,
@@ -39,14 +39,14 @@ namespace TripToPrint.Core.ModelFactories
                     reportTempPath))
                 .ToList();
 
-            if (placemarksConverted.Count <= MIN_GROUP_COUNT)
+            if (placemarksConverted.Count <= MIN_COUNT_PER_CLUSTER)
             {
-                return CreateSingleGroup(placemarksConverted, reportTempPath);
+                return CreateSingleCluster(placemarksConverted, reportTempPath);
             }
 
             if (folder.ContainsRoute && _kmlCalculator.CompleteFolderIsRoute(folder))
             {
-                return CreateSingleGroup(placemarksConverted, reportTempPath);
+                return CreateSingleCluster(placemarksConverted, reportTempPath);
             }
 
             // TODO: Add support of lines within a folder which are not 'routes'
@@ -56,8 +56,8 @@ namespace TripToPrint.Core.ModelFactories
             var placemarksWithNeighbors = GetPlacemarksWithNeighbors(placemarksConverted).ToList();
             var placemarksWithNeighborsLookup = placemarksWithNeighbors.ToDictionary(x => x.Placemark);
 
-            var currentGroup = new MooiGroup();
-            groups.Add(currentGroup);
+            var currentCluster = new MooiCluster();
+            clusters.Add(currentCluster);
 
             var placemarksToProcess = placemarksWithNeighbors.ToList();
             while (placemarksToProcess.Any())
@@ -65,31 +65,31 @@ namespace TripToPrint.Core.ModelFactories
                 var startingPoint = placemarksToProcess[0];
                 placemarksToProcess.RemoveAt(0);
 
-                // Skip if the placemark has been added to any group before
-                if (groups.Any(g => g.Placemarks.Any(p => p == startingPoint.Placemark)))
+                // Skip if the placemark has been added to any cluster before
+                if (clusters.Any(g => g.Placemarks.Any(p => p == startingPoint.Placemark)))
                 {
                     continue;
                 }
 
-                AppendPlacemarkToGroup(startingPoint.Placemark, currentGroup);
+                AppendPlacemarkToCluster(startingPoint.Placemark, currentCluster);
 
-                // Add its closest neighbor to current group
-                if (!groups.Any(g => g.Placemarks.Any(p => p == startingPoint.NeighborWithMinDistance.Placemark)))
+                // Add its closest neighbor to current cluster
+                if (!clusters.Any(g => g.Placemarks.Any(p => p == startingPoint.NeighborWithMinDistance.Placemark)))
                 {
-                    AppendPlacemarkToGroup(startingPoint.NeighborWithMinDistance.Placemark, currentGroup);
+                    AppendPlacemarkToCluster(startingPoint.NeighborWithMinDistance.Placemark, currentCluster);
                 }
 
                 foreach (var pm in placemarksToProcess.Skip(1).ToList())
                 {
-                    if (currentGroup.Placemarks.Any(x => x == pm.Placemark
+                    if (currentCluster.Placemarks.Any(x => x == pm.Placemark
                         || x == pm.NeighborWithMinDistance.Placemark
                         || pm.Neighbors.Any(n => n.Placemark == x && pm.NeighborWithMinDistance.AllowedDistance > n.Distance)
                         ))
                     {
-                        if (currentGroup.Placemarks.Count >= MIN_GROUP_COUNT)
+                        if (currentCluster.Placemarks.Count >= MIN_COUNT_PER_CLUSTER)
                         {
-                            var maxDistanceAmongAddedPlacemarks = placemarksWithNeighborsLookup[currentGroup.Placemarks[0]]
-                                .Neighbors.Where(x => currentGroup.Placemarks.Any(y => y == x.Placemark))
+                            var maxDistanceAmongAddedPlacemarks = placemarksWithNeighborsLookup[currentCluster.Placemarks[0]]
+                                .Neighbors.Where(x => currentCluster.Placemarks.Any(y => y == x.Placemark))
                                 .Select(x => x.AllowedDistance)
                                 .Max();
 
@@ -99,39 +99,39 @@ namespace TripToPrint.Core.ModelFactories
                             }
                         }
 
-                        AppendPlacemarkToGroup(pm.Placemark, currentGroup);
+                        AppendPlacemarkToCluster(pm.Placemark, currentCluster);
                         placemarksToProcess.Remove(pm);
                     }
 
-                    if (currentGroup.Placemarks.Count == MAX_GROUP_COUNT)
+                    if (currentCluster.Placemarks.Count == MAX_COUNT_PER_CLUSTER)
                     {
                         break;
                     }
                 }
 
-                currentGroup.OverviewMapFilePath = Path.Combine(reportTempPath, _resourceName.CreateFileNameForOverviewMap(currentGroup));
-                currentGroup = new MooiGroup();
-                groups.Add(currentGroup);
+                currentCluster.OverviewMapFilePath = Path.Combine(reportTempPath, _resourceName.CreateFileNameForOverviewMap(currentCluster));
+                currentCluster = new MooiCluster();
+                clusters.Add(currentCluster);
             }
 
-            // Trim out the last group which is always empty
-            groups = groups.Where(x => x.Placemarks.Count > 0).ToList();
+            // Trim out the last cluster which is always empty
+            clusters = clusters.Where(x => x.Placemarks.Count > 0).ToList();
 
-            MergeGroups(groups);
+            MergeClusters(clusters);
 
-            return groups;
+            return clusters;
         }
 
-        public List<MooiGroup> CreateSingleGroup(List<MooiPlacemark> placemarks, string reportTempPath)
+        public List<MooiCluster> CreateSingleCluster(List<MooiPlacemark> placemarks, string reportTempPath)
         {
-            var group = new MooiGroup();
+            var cluster = new MooiCluster();
             foreach (var pm in placemarks)
             {
-                AppendPlacemarkToGroup(pm, group);
+                AppendPlacemarkToCluster(pm, cluster);
             }
-            group.OverviewMapFilePath = Path.Combine(reportTempPath, _resourceName.CreateFileNameForOverviewMap(group));
+            cluster.OverviewMapFilePath = Path.Combine(reportTempPath, _resourceName.CreateFileNameForOverviewMap(cluster));
 
-            return new List<MooiGroup> { group };
+            return new List<MooiCluster> { cluster };
         }
 
         public virtual IEnumerable<PlacemarkWithNeighbors> GetPlacemarksWithNeighbors(IList<MooiPlacemark> placemarks)
@@ -157,57 +157,57 @@ namespace TripToPrint.Core.ModelFactories
                    };
         }
 
-        public void MergeGroups(List<MooiGroup> groups)
+        public void MergeClusters(List<MooiCluster> clusters)
         {
-            var groupsConsideredAsFine = new List<MooiGroup>();
+            var clustersConsideredAsFine = new List<MooiCluster>();
 
             while (true)
             {
-                var groupToMerge = groups
-                    .Except(groupsConsideredAsFine)
-                    .FirstOrDefault(x => x.Placemarks.Count < MIN_GROUP_COUNT);
-                if (groupToMerge == null)
+                var clusterToMerge = clusters
+                    .Except(clustersConsideredAsFine)
+                    .FirstOrDefault(x => x.Placemarks.Count < MIN_COUNT_PER_CLUSTER);
+                if (clusterToMerge == null)
                     break;
 
-                var groupForMerge =
-                    (from forMergeCandidate in groups.Except(new[] { groupToMerge })
-                     where forMergeCandidate.Placemarks.Count + groupToMerge.Placemarks.Count <= MAX_GROUP_COUNT
-                     let minDist = CalculateDistances(groupToMerge, forMergeCandidate).Min()
-                     let placemarksInGroup = (double) forMergeCandidate.Placemarks.Count
-                     orderby placemarksInGroup < MIN_GROUP_COUNT
-                         ? minDist * (placemarksInGroup / MIN_GROUP_COUNT)
+                var clusterForMerge =
+                    (from forMergeCandidate in clusters.Except(new[] { clusterToMerge })
+                     where forMergeCandidate.Placemarks.Count + clusterToMerge.Placemarks.Count <= MAX_COUNT_PER_CLUSTER
+                     let minDist = CalculateDistances(clusterToMerge, forMergeCandidate).Min()
+                     let placemarksInCluster = (double) forMergeCandidate.Placemarks.Count
+                     orderby placemarksInCluster < MIN_COUNT_PER_CLUSTER
+                         ? minDist * (placemarksInCluster / MIN_COUNT_PER_CLUSTER)
                          : minDist
-                     select new { @group = forMergeCandidate, minDist }).FirstOrDefault();
+                     select new { cluster = forMergeCandidate, minDist }).FirstOrDefault();
 
-                if (groupForMerge == null)
+                if (clusterForMerge == null)
                 {
                     break;
                 }
 
-                if (groupForMerge.group.Placemarks.Count >= MIN_GROUP_COUNT)
+                if (clusterForMerge.cluster.Placemarks.Count >= MIN_COUNT_PER_CLUSTER)
                 {
-                    var dist1 = CalculateDistances(groupForMerge.group, groupForMerge.group).Max();
+                    var dist1 = CalculateDistances(clusterForMerge.cluster, clusterForMerge.cluster).Max();
 
-                    if (dist1 * COEF_ROOM_OVER_MAX_DISTANCE < groupForMerge.minDist)
+                    if (dist1 * COEF_ROOM_OVER_MAX_DISTANCE < clusterForMerge.minDist)
                     {
-                        groupsConsideredAsFine.Add(groupToMerge);
+                        clustersConsideredAsFine.Add(clusterToMerge);
                         continue;
                     }
                 }
 
-                foreach (var pm in groupToMerge.Placemarks)
+                foreach (var pm in clusterToMerge.Placemarks)
                 {
-                    AppendPlacemarkToGroup(pm, groupForMerge.group);
+                    AppendPlacemarkToCluster(pm, clusterForMerge.cluster);
                 }
 
-                groups.Remove(groupToMerge);
+                clusters.Remove(clusterToMerge);
             }
         }
 
-        private IEnumerable<double> CalculateDistances(MooiGroup group1, MooiGroup group2)
+        private IEnumerable<double> CalculateDistances(MooiCluster cluster1, MooiCluster cluster2)
         {
-            return from pm1 in group2.Placemarks
-                   from pm2 in group1.Placemarks
+            return from pm1 in cluster2.Placemarks
+                   from pm2 in cluster1.Placemarks
                    where pm1 != pm2
                    select _kmlCalculator.GetDistanceInMeters(pm1, pm2);
         }
@@ -226,10 +226,10 @@ namespace TripToPrint.Core.ModelFactories
             public PlacemarkNeighbor NeighborWithMinDistance { get; set; }
         }
 
-        private void AppendPlacemarkToGroup(MooiPlacemark placemark, MooiGroup group)
+        private void AppendPlacemarkToCluster(MooiPlacemark placemark, MooiCluster cluster)
         {
-            placemark.Group = group;
-            group.Placemarks.Add(placemark);
+            placemark.Cluster = cluster;
+            cluster.Placemarks.Add(placemark);
         }
     }
 }

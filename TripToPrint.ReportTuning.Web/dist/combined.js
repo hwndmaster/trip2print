@@ -180,42 +180,29 @@ var TripToPrint;
 })(TripToPrint || (TripToPrint = {}));
 var TripToPrint;
 (function (TripToPrint) {
-    class Group extends React.Component {
-        render() {
-            let group = this.props.group;
-            return React.createElement("div", null,
-                React.createElement(TripToPrint.OverviewMap, { group: this.props.group, section: this.props.section, isFirst: this.props.isFirst }),
-                group.isRoute ? this.renderRoute() : this.renderPoints());
+    class FoursquareVenueTips extends TripToPrint.Hideable {
+        renderUnhidden() {
+            return React.createElement("div", { className: "pm-xtra-tips" },
+                React.createElement("hr", null),
+                this.props.tips.map(tip => this.renderTip(tip)),
+                React.createElement(TripToPrint.Commands, null,
+                    React.createElement(TripToPrint.CommandHide, { onClick: () => { this.hide(); } })));
         }
-        renderRoute() {
-            let group = this.props.group;
-            return React.createElement("div", { className: "dir" }, group.placemarks.map(pm => React.createElement(TripToPrint.Placemark, { placemark: pm, isInRouteGroup: group.isRoute })));
-        }
-        renderPoints() {
-            let group = this.props.group;
-            let totalImagesCount = group.placemarks.map(x => Math.max(1, x.images.length) - 1)
-                .reduce((prev, curr) => prev + curr, 0);
-            let meaningSizeOfGroup = group.placemarks.length + totalImagesCount;
-            let placemarksInColumn1 = [];
-            let placemarksInColumn2 = [];
-            var incrementalColumnSize = 0;
-            for (let i = 0; i < group.placemarks.length; i++) {
-                let pm = group.placemarks[i];
-                let pmElement = React.createElement(TripToPrint.Placemark, { placemark: pm, isInRouteGroup: group.isRoute });
-                if (incrementalColumnSize >= meaningSizeOfGroup / 2) {
-                    placemarksInColumn2.push(pmElement);
-                }
-                else {
-                    placemarksInColumn1.push(pmElement);
-                }
-                incrementalColumnSize += Math.max(1, pm.images.length);
-            }
-            return React.createElement("div", { className: "pm-cols" },
-                React.createElement("div", { className: "pm-col" }, placemarksInColumn1),
-                React.createElement("div", { className: "pm-col" }, placemarksInColumn2));
+        renderTip(tip) {
+            let disaggrees = tip.disagreeCount > 0 ? ` ${tip.disagreeCount} 👎` : "";
+            let likes = tip.likes > 0 ? ` ${tip.likes} ❤` : "";
+            return React.createElement("p", null,
+                "\u2014 ",
+                tip.message,
+                " (",
+                tip.agreeCount,
+                "\uD83D\uDC4D",
+                disaggrees,
+                likes,
+                ")");
         }
     }
-    TripToPrint.Group = Group;
+    TripToPrint.FoursquareVenueTips = FoursquareVenueTips;
 })(TripToPrint || (TripToPrint = {}));
 var TripToPrint;
 (function (TripToPrint) {
@@ -249,7 +236,7 @@ var TripToPrint;
             }
             return React.createElement("div", { className: className },
                 React.createElement("h4", { className: "title" }, this.props.section.name),
-                React.createElement("img", { src: this.props.group.overviewMapFilePath }),
+                React.createElement("img", { src: this.props.cluster.overviewMapFilePath }),
                 React.createElement(TripToPrint.Commands, null,
                     React.createElement(TripToPrint.CommandHide, { onClick: () => { this.hide(); } })));
         }
@@ -262,8 +249,8 @@ var TripToPrint;
         render() {
             let pm = this.props.placemark;
             return React.createElement("div", { className: "pm" },
-                this.props.isInRouteGroup ? null : React.createElement(TripToPrint.ThumbnailMap, { placemark: pm }),
-                this.props.isInRouteGroup ? React.createElement("img", { className: "small-icon", src: pm.iconPath }) : null,
+                this.props.isInRouteCluster ? null : React.createElement(TripToPrint.ThumbnailMap, { placemark: pm }),
+                this.props.isInRouteCluster ? React.createElement("img", { className: "small-icon", src: pm.iconPath }) : null,
                 React.createElement("div", { className: "header" },
                     React.createElement("span", { className: "coord" },
                         "(",
@@ -384,7 +371,7 @@ var TripToPrint;
 (function (TripToPrint) {
     class Section extends React.Component {
         render() {
-            return React.createElement("div", { className: "folder" }, this.props.section.groups.map((group, i) => React.createElement(TripToPrint.Group, { group: group, section: this.props.section, isFirst: this.props.isFirst && i === 0 })));
+            return React.createElement("div", { className: "folder" }, this.props.section.clusters.map((cluster, i) => React.createElement(TripToPrint.Cluster, { cluster: cluster, section: this.props.section, isFirst: this.props.isFirst && i === 0 })));
         }
     }
     TripToPrint.Section = Section;
@@ -430,28 +417,41 @@ var TripToPrint;
 })(TripToPrint || (TripToPrint = {}));
 var TripToPrint;
 (function (TripToPrint) {
-    class FoursquareVenueTips extends TripToPrint.Hideable {
-        renderUnhidden() {
-            return React.createElement("div", { className: "pm-xtra-tips" },
-                React.createElement("hr", null),
-                this.props.tips.map(tip => this.renderTip(tip)),
-                React.createElement(TripToPrint.Commands, null,
-                    React.createElement(TripToPrint.CommandHide, { onClick: () => { this.hide(); } })));
+    class Cluster extends React.Component {
+        render() {
+            const cluster = this.props.cluster;
+            return React.createElement("div", null,
+                React.createElement(TripToPrint.OverviewMap, { cluster: cluster, section: this.props.section, isFirst: this.props.isFirst }),
+                cluster.isRoute ? this.renderRoute() : this.renderPoints());
         }
-        renderTip(tip) {
-            let disaggrees = tip.disagreeCount > 0 ? ` ${tip.disagreeCount} 👎` : "";
-            let likes = tip.likes > 0 ? ` ${tip.likes} ❤` : "";
-            return React.createElement("p", null,
-                "\u2014 ",
-                tip.message,
-                " (",
-                tip.agreeCount,
-                "\uD83D\uDC4D",
-                disaggrees,
-                likes,
-                ")");
+        renderRoute() {
+            let cluster = this.props.cluster;
+            return React.createElement("div", null, cluster.placemarks.map(pm => React.createElement(TripToPrint.Placemark, { placemark: pm, isInRouteCluster: cluster.isRoute })));
+        }
+        renderPoints() {
+            let cluster = this.props.cluster;
+            let totalImagesCount = cluster.placemarks.map(x => Math.max(1, x.images.length) - 1)
+                .reduce((prev, curr) => prev + curr, 0);
+            let meaningSizeOfCluster = cluster.placemarks.length + totalImagesCount;
+            let placemarksInColumn1 = [];
+            let placemarksInColumn2 = [];
+            var incrementalColumnSize = 0;
+            for (let i = 0; i < cluster.placemarks.length; i++) {
+                let pm = cluster.placemarks[i];
+                let pmElement = React.createElement(TripToPrint.Placemark, { placemark: pm, isInRouteCluster: cluster.isRoute });
+                if (incrementalColumnSize >= meaningSizeOfCluster / 2) {
+                    placemarksInColumn2.push(pmElement);
+                }
+                else {
+                    placemarksInColumn1.push(pmElement);
+                }
+                incrementalColumnSize += Math.max(1, pm.images.length);
+            }
+            return React.createElement("div", { className: "pm-cols" },
+                React.createElement("div", { className: "pm-col" }, placemarksInColumn1),
+                React.createElement("div", { className: "pm-col" }, placemarksInColumn2));
         }
     }
-    TripToPrint.FoursquareVenueTips = FoursquareVenueTips;
+    TripToPrint.Cluster = Cluster;
 })(TripToPrint || (TripToPrint = {}));
 //# sourceMappingURL=combined.js.map

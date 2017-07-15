@@ -8,11 +8,9 @@
 
 declare namespace Interfaces {
 	interface IFoursquareVenueDto extends Interfaces.IVenueBaseDto {
-		distance: number;
 		likesCount: number;
 		maxRating: number;
 		photoUrls: string[];
-		phrases: string[];
 		priceLevel: string;
 		rating: number;
 		ratingColor: string;
@@ -29,16 +27,16 @@ declare namespace Interfaces {
 	interface IHereVenueDto extends Interfaces.IVenueBaseDto {
 		wikipediaContent: string;
 	}
-	interface IMooiDocumentDto {
-		description: string;
-		sections: Interfaces.IMooiSectionDto[];
-		title: string;
-	}
-	interface IMooiGroupDto {
+	interface IMooiClusterDto {
 		id: string;
 		isRoute: boolean;
 		overviewMapFilePath: string;
 		placemarks: Interfaces.IMooiPlacemarkDto[];
+	}
+	interface IMooiDocumentDto {
+		description: string;
+		sections: Interfaces.IMooiSectionDto[];
+		title: string;
 	}
 	interface IMooiPlacemarkDto {
 		attachedVenues: Interfaces.IVenueBaseDto[];
@@ -54,7 +52,7 @@ declare namespace Interfaces {
 		thumbnailFilePath: string;
 	}
 	interface IMooiSectionDto {
-		groups: Interfaces.IMooiGroupDto[];
+		clusters: Interfaces.IMooiClusterDto[];
 		name: string;
 	}
 	interface IVenueBaseDto {

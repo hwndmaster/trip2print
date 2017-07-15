@@ -53,7 +53,7 @@
     <Compile Include="VenueBaseDto.cs" />
     <Compile Include="IHostGate.cs" />
     <Compile Include="MooiDocumentDto.cs" />
-    <Compile Include="MooiGroupDto.cs" />
+    <Compile Include="MooiClusterDto.cs" />
     <Compile Include="MooiPlacemarkDto.cs" />
     <Compile Include="MooiSectionDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

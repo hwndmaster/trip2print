@@ -16,12 +16,12 @@ namespace TripToPrint.Core.Tests.UnitTests
         private readonly Mock<IResourceNameProvider> _resourceNameMock = new Mock<IResourceNameProvider>();
         private readonly Mock<IMooiPlacemarkFactory> _mooiPlacemarkFactoryMock = new Mock<IMooiPlacemarkFactory>();
 
-        private Mock<MooiGroupFactory> _factory;
+        private Mock<MooiClusterFactory> _factory;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _factory = new Mock<MooiGroupFactory>(
+            _factory = new Mock<MooiClusterFactory>(
                 _kmlCalculatorMock.Object,
                 _resourceNameMock.Object,
                 _mooiPlacemarkFactoryMock.Object) {
@@ -30,7 +30,7 @@ namespace TripToPrint.Core.Tests.UnitTests
 
             _resourceNameMock.Setup(x => x.CreateFileNameForPlacemarkThumbnail(It.IsAny<MooiPlacemark>()))
                 .Returns("thumb.jpg");
-            _resourceNameMock.Setup(x => x.CreateFileNameForOverviewMap(It.IsAny<MooiGroup>()))
+            _resourceNameMock.Setup(x => x.CreateFileNameForOverviewMap(It.IsAny<MooiCluster>()))
                 .Returns("overview.jpg");
             _mooiPlacemarkFactoryMock.Setup(x => x.Create(
                 It.IsAny<KmlPlacemark>(),

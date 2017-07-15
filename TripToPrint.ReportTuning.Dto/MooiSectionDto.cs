@@ -3,6 +3,6 @@
     public class MooiSectionDto
     {
         public string Name { get; set; }
-        public MooiGroupDto[] Groups { get; set; }
+        public MooiClusterDto[] Clusters { get; set; }
     }
 }

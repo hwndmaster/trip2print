@@ -19,7 +19,7 @@ namespace TripToPrint.Core.Integration
     public interface IHereAdapter
     {
         Task<byte[]> FetchThumbnail(MooiPlacemark placemark);
-        Task<byte[]> FetchOverviewMap(MooiGroup group);
+        Task<byte[]> FetchOverviewMap(MooiCluster cluster);
         Task<VenueBase> LookupMatchingVenue(KmlPlacemark placemark, string culture, CancellationToken cancellationToken);
     }
 
@@ -72,20 +72,20 @@ namespace TripToPrint.Core.Integration
             return await DownloadData(IMAGES_MAPVIEW_URL, url);
         }
 
-        public async Task<byte[]> FetchOverviewMap(MooiGroup group)
+        public async Task<byte[]> FetchOverviewMap(MooiCluster cluster)
         {
-            var baseUrl = group.Type == GroupType.Routes ? IMAGES_ROUTE_URL : IMAGES_MAPVIEW_URL;
+            var baseUrl = cluster.Type == ClusterType.Routes ? IMAGES_ROUTE_URL : IMAGES_MAPVIEW_URL;
             baseUrl = $"{baseUrl}w={OVERVIEW_MAP_WIDTH}&h={OVERVIEW_MAP_HEIGHT}&sb=k&ppi=250";
 
             var parameters = string.Empty;
-            if (group.Type == GroupType.Routes)
+            if (cluster.Type == ClusterType.Routes)
             {
-                var route = GetAndTrimRouteCoordinates(group);
+                var route = GetAndTrimRouteCoordinates(cluster);
                 var routeCoords = _formatter.FormatCoordinates(COORDINATE_PRECISION_ON_ROUTES, route);
 
                 parameters += $"&{IMAGES_ROUTE_ROUTE_PARAM_NAME}={routeCoords}";
                 parameters += $"&{IMAGES_ROUTE_POINT_PARAM_NAME}="
-                              + _formatter.FormatCoordinates(COORDINATE_PRECISION_ON_POINTS, group.Placemarks
+                              + _formatter.FormatCoordinates(COORDINATE_PRECISION_ON_POINTS, cluster.Placemarks
                                   .Where(x => x.Type == PlacemarkType.Point)
                                   .Cast<IHasCoordinates>()
                                   .ToArray());
@@ -93,10 +93,10 @@ namespace TripToPrint.Core.Integration
             }
             else
             {
-                var poi = _formatter.FormatCoordinates(null, group.Placemarks.Cast<IHasCoordinates>().ToArray());
+                var poi = _formatter.FormatCoordinates(null, cluster.Placemarks.Cast<IHasCoordinates>().ToArray());
                 parameters += $"&poi={poi}&poitxc=fff&poifc=444&poitxs=18";
 
-                if (group.Placemarks.Count == 1)
+                if (cluster.Placemarks.Count == 1)
                 {
                     parameters += "&z=14";
                 }
@@ -226,9 +226,9 @@ namespace TripToPrint.Core.Integration
             return await _webClient.GetAsync(new Uri(url + GetAppCodeUrlPart() + parameters));
         }
 
-        internal IHasCoordinates GetAndTrimRouteCoordinates(MooiGroup group)
+        internal IHasCoordinates GetAndTrimRouteCoordinates(MooiCluster cluster)
         {
-            var route = group.Placemarks.Single(x => x.Type == PlacemarkType.Route);
+            var route = cluster.Placemarks.Single(x => x.Type == PlacemarkType.Route);
 
             if (route.Coordinates.Length > TOO_MUCH_OF_COORDINATE_POINTS)
             {
