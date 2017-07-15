@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Navigation;
 
 using TripToPrint.Presenters;
+using TripToPrint.ViewModels;
 
 namespace TripToPrint.Views
 {
@@ -67,6 +68,11 @@ namespace TripToPrint.Views
         private void LinkGithub_OnRequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             Presenter.BrowseUrl(e.Uri);
+        }
+
+        private async void WizardStepButton_OnClick(object sender, WizardStepButtonViewModel e)
+        {
+            await Presenter.GoToStep(e.Index - 1);
         }
     }
 }

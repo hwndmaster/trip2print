@@ -34,8 +34,6 @@ namespace TripToPrint.Views
         {
             RecreateBrowser();
 
-            var requestContextSettings = new RequestContextSettings { CachePath = "" };
-
             browser.AllowDrop = false;
             browser.ConsoleMessage += Browser_ConsoleMessage;
             browser.MenuHandler = new MenuHandler();

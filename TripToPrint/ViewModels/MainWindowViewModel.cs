@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TripToPrint.ViewModels
 {
@@ -13,6 +14,15 @@ namespace TripToPrint.ViewModels
             StepGeneration = new StepInProgressViewModel();
             StepTuning = new StepTuningViewModel();
 
+            StepButtons = new List<WizardStepButtonViewModel> {
+                new WizardStepButtonViewModel { Index = 1, Title = "Source selection", IsFirst = true },
+                new WizardStepButtonViewModel { Index = 2, Title = "Pick placemarks" },
+                new WizardStepButtonViewModel { Index = 3, Title = "Discovering\r\nrecommendations" },
+                new WizardStepButtonViewModel { Index = 4, Title = "Explore" },
+                new WizardStepButtonViewModel { Index = 5, Title = "Generating" },
+                new WizardStepButtonViewModel { Index = 6, Title = "Tuning", IsLast = true }
+            };
+
             WizardStepIndexChanged += (sender, wizardStepIndex) => HandleWizardStepIndexChanged();
         }
 
@@ -22,6 +32,8 @@ namespace TripToPrint.ViewModels
         public StepExploreViewModel StepExplore { get; }
         public StepInProgressViewModel StepGeneration { get; }
         public StepTuningViewModel StepTuning { get; }
+
+        public List<WizardStepButtonViewModel> StepButtons { get; }
 
         public EventHandler<int> WizardStepIndexChanged;
 

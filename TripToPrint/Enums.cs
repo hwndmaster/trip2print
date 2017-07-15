@@ -5,4 +5,11 @@
         LocalFile,
         GoogleMyMapsUrl
     }
+
+    public enum WizardStepState
+    {
+        Active,
+        Passed,
+        Upcoming
+    }
 }

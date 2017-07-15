@@ -5,15 +5,35 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TripToPrint.Views"
         xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:viewModels="clr-namespace:TripToPrint.ViewModels"
         mc:Ignorable="d"
-        Title="Trip-to-Print" Height="700" Width="1000" Background="WhiteSmoke"
-        WindowStartupLocation="CenterScreen" Icon="/TripToPrint;component/Resources/Logo.jpg">
+        Title="Trip-to-Print"
+        Height="700" Width="1000" Background="WhiteSmoke"
+        WindowStartupLocation="CenterScreen"
+        Icon="/TripToPrint;component/Resources/Logo.jpg"
+        d:DataContext="{d:DesignInstance {x:Type viewModels:MainWindowViewModel}, IsDesignTimeCreatable=True}">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="80"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="40"></RowDefinition>
         </Grid.RowDefinitions>
-        <TabControl x:Name="tabWizard" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,-4,0,0" SelectionChanged="TabWizard_OnSelectionChanged" SelectedIndex="{Binding WizardStepIndex}">
+        <Grid Grid.Row="0">
+            <ItemsControl ItemsSource="{Binding StepButtons}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <local:WizardStepButton DataContext="{Binding}" Click="WizardStepButton_OnClick" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Rows="1" Background="#66AAAAAA" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </Grid>
+        <TabControl Grid.Row="1" x:Name="tabWizard" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,-4,0,0"
+                    SelectionChanged="TabWizard_OnSelectionChanged" SelectedIndex="{Binding WizardStepIndex}">
             <TabItem Height="0">
                 <Grid HorizontalAlignment="Stretch" Margin="10,10,10,0">
                     <local:StepIntro x:Name="stepIntro" />
@@ -45,7 +65,7 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"></ColumnDefinition>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>

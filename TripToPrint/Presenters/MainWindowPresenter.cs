@@ -11,6 +11,7 @@ namespace TripToPrint.Presenters
     {
         Task GoBack();
         Task GoNext();
+        Task GoToStep(int stepIndex);
         void GetBackNextTitlesForCurrentStep(ref string back, ref string next);
         IStepPresenter GetWizardStepPresenter(int wizardStepIndex);
         void BrowseUrl(Uri uri);
@@ -57,6 +58,7 @@ namespace TripToPrint.Presenters
             _stepGenerationPresenter.InitializePresenter(View.StepGenerationView, ViewModel.StepGeneration);
             _stepTuningPresenter.InitializePresenter(View.StepTuningView, ViewModel.StepTuning);
 
+            UpdateWizardStepButtons();
             GetWizardStepPresenter(ViewModel.WizardStepIndex).Activated().GetAwaiter().GetResult();
         }
 
@@ -74,7 +76,28 @@ namespace TripToPrint.Presenters
                     step = GetWizardStepPresenter(ViewModel.WizardStepIndex);
                 }
 
+                UpdateWizardStepButtons();
+
                 await step.Activated();
+            }
+        }
+
+        private void UpdateWizardStepButtons()
+        {
+            foreach (var stepButton in ViewModel.StepButtons)
+            {
+                if (ViewModel.WizardStepIndex == stepButton.Index - 1)
+                {
+                    stepButton.State = WizardStepState.Active;
+                }
+                else if (ViewModel.WizardStepIndex > stepButton.Index - 1)
+                {
+                    stepButton.State = WizardStepState.Passed;
+                }
+                else
+                {
+                    stepButton.State = WizardStepState.Upcoming;
+                }
             }
         }
 
@@ -91,7 +114,17 @@ namespace TripToPrint.Presenters
                     wizardStep = GetWizardStepPresenter(ViewModel.WizardStepIndex);
                 }
 
+                UpdateWizardStepButtons();
+
                 await wizardStep.Activated();
+            }
+        }
+
+        public async Task GoToStep(int stepIndex)
+        {
+            while (ViewModel.WizardStepIndex > stepIndex)
+            {
+                await GoBack();
             }
         }
 
