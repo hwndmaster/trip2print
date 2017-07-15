@@ -4,13 +4,7 @@
         hidden: boolean;
     }
 
-    //export abstract class HideableWithStatus<TP, TS extends IHideableState> extends React.Component<TP, TS> {
-    export abstract class Hideable<TP> extends React.Component<TP, IHideableState> {
-        constructor(props) {
-            super(props);
-            this.state = { hidden: false };
-        }
-
+    export abstract class HideableWithStatus<TP, TS extends IHideableState> extends React.Component<TP, TS> {
         render() {
             if (this.state.hidden) {
                 return <div className="hidden">
@@ -26,19 +20,19 @@
         abstract renderUnhidden(): JSX.Element;
 
         protected hide() {
-            this.setState({
-                hidden: true
-            });
+            this.setState(Utils.extend(this.state, { hidden: true }));
         }
 
         protected show() {
-            this.setState({
-                hidden: false
-            });
+            this.setState(Utils.extend(this.state, { hidden: false }));
         }
     }
 
-    /*export abstract class Hideable<TP> extends HideableWithStatus<TP, IHideableState>
+    export abstract class Hideable<TP> extends HideableWithStatus<TP, IHideableState>
     {
-    }*/
+        constructor(props) {
+            super(props);
+            this.state = { hidden: false };
+        }
+    }
 }

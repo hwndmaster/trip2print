@@ -65,7 +65,7 @@ namespace TripToPrint
                 Index = placemark.Group.Placemarks.IndexOf(placemark) + 1,
                 Name = placemark.Name,
                 Description = placemark.Description,
-                Images = placemark.Images,
+                Images = placemark.Images.ToArray(),
                 Coordinates = placemark.Coordinates.Select(ConvertCoordinateToString).ToArray(),
                 AttachedVenues = placemark.AttachedVenues.Select(x => _venueConverters[x.SourceType](x)).ToArray(),
                 IconPath = placemark.IconPathIsOnWeb ? placemark.IconPath : ConvertToLocalFileUrl(placemark.IconPath),

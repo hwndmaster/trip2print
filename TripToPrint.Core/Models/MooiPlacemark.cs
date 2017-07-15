@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using JetBrains.Annotations;
 using System.Device.Location;
 using System.Linq;
@@ -24,7 +26,7 @@ namespace TripToPrint.Core.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public VenueBase[] AttachedVenues { get; set; }
-        [NotNull] public string[] Images { get; set; }
+        [NotNull] public List<string> Images { get; } = new List<string>();
         public string IconPath { get; set; }
         public GeoCoordinate[] Coordinates { get; set; } = new GeoCoordinate[0];
         public GeoCoordinate PrimaryCoordinate => Coordinates.FirstOrDefault();

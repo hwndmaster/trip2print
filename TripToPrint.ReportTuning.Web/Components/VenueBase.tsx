@@ -6,7 +6,7 @@
 
         protected createVenueBaseString(venue: Interfaces.IVenueBaseDto) {
             let output = "";
-            let sep = null;
+            let sep = "";
 
             if (venue.address) {
                 output = venue.address;

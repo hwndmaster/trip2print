@@ -48,11 +48,15 @@ namespace TripToPrint.Presenters
             };
         }
 
-        public Task Activated()
+        public async Task Activated()
         {
             FillupViewModel();
 
-            return Task.CompletedTask;
+            if (!ViewModel.GetUpperGroupForMatchingPlacemarks().Any()
+                && !ViewModel.GetUpperGroupForExploring().Any())
+            {
+                await MainWindow.GoNext();
+            }
         }
 
         public Task<bool> BeforeGoBack()

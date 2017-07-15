@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Device.Location;
+using System.Linq;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using TripToPrint.Core.ModelFactories;
@@ -62,9 +65,24 @@ namespace TripToPrint.Core.Tests.UnitTests
 
             // Verify
             Assert.AreEqual("text<br>text<br>text <a href='http://sample.url/path/page?q=1&w=2'>http://sample.url/path/page?q=1&w=2</a> text", result.Description);
-            Assert.AreEqual(2, result.Images.Length);
+            Assert.AreEqual(2, result.Images.Count);
             Assert.AreEqual("1", result.Images[0]);
             Assert.AreEqual("2", result.Images[1]);
+        }
+
+        [TestMethod]
+        public void Only_supported_venue_types_are_processed()
+        {
+            // Arrange
+            var placemark = new MooiPlacemark {
+                AttachedVenues = Enum.GetValues(typeof(VenueSource)).Cast<VenueSource>()
+                    .Where(x => x != VenueSource.Undefined)
+                    .Select(x => (VenueBase) new DummyVenue(x))
+                    .ToArray()
+            };
+
+            // Act
+            _factory.Object.ExtendPlacemarkWithVenueData(placemark);
         }
     }
 }

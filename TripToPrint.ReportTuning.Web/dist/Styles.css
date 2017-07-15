@@ -1,4 +1,8 @@
-﻿body {
+﻿@page {
+  size: A4;
+  margin: 0;
+}
+body {
   margin: 0;
   -webkit-print-color-adjust: exact;
   font-family: Arial;
@@ -17,6 +21,7 @@ h3 {
   top: 0;
   z-index: 2;
   padding: 1px 6px;
+  margin: 8px 0px;
   display: inline;
   background: white;
   border-radius: 8px;
@@ -88,9 +93,19 @@ h3 {
 .pm .pm-desc {
   font-size: 9.5pt;
 }
+.pm .pm-xtra-tips {
+  font-size: 9pt;
+  color: #444444;
+}
+.pm .pm-xtra-tips p {
+  margin: 0;
+}
 .pm .pm-xtra {
   font-size: 9pt;
   color: #444444;
+}
+.pm .pm-xtra p {
+  margin: 0;
 }
 .pm .pm-xtra hr {
   margin: 5px 0;
@@ -124,12 +139,9 @@ h3 {
   margin-right: 4px;
 }
 .pm .pm-img-item img {
-  max-width: 170px;
-  max-height: 120px;
-}
-.pm .pm-img-item img {
-  max-width: 170px;
-  max-height: 120px;
+  /*max-width: @placemark-image-width-limit;
+            max-height: @placemark-image-height-limit;*/
+  transition: max-width 0.5s, max-height 0.5s;
 }
 .coord {
   color: gray;

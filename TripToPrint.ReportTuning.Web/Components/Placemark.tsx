@@ -54,7 +54,9 @@
                 return <HereVenue venue={venue as Interfaces.IHereVenueDto} />;
             }
             else if (venue.sourceType === Placemark.SOURCE_TYPE_FOURSQUARE) {
-                return <FoursquareVenue venue={venue as Interfaces.IFoursquareVenueDto}/>;
+                return [
+                    <FoursquareVenueTips tips={(venue as Interfaces.IFoursquareVenueDto).tips} />,
+                    <FoursquareVenue venue={venue as Interfaces.IFoursquareVenueDto} />];
             }
 
             throw new Error(`This type of venue is not supported: ${venue.sourceType}`);

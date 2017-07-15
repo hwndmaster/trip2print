@@ -29,7 +29,7 @@ module TripToPrint {
         }
 
         private renderRating(venue: Interfaces.IFoursquareVenueDto) {
-            if (venue.rating == null) {
+            if (venue.rating == null || venue.rating === 0) {
                 return null;
             }
 

@@ -4,6 +4,12 @@
 @command-button-bg: #ffffff;
 @placemark-image-width-limit: 170px;
 @placemark-image-height-limit: 120px;
+@command-button-size: 30px;
+
+@page {
+    size: A4;
+    margin: 0;
+}
 
 body {
     margin: 0;
@@ -28,6 +34,7 @@ h3 {
         top: 0;
         z-index: 2;
         padding: 1px 6px;
+        margin: 8px 0px;
         display: inline;
         background: white;
         border-radius: 8px;
@@ -114,9 +121,17 @@ h3 {
         font-size: 9.5pt;
     }
 
-    .pm-xtra {
+    .pm-xtra-tips {
         font-size: 9pt;
         color: #444444;
+
+        p {
+            margin: 0;
+        }
+    }
+
+    .pm-xtra {
+        .pm-xtra-tips();
 
         hr {
             margin: 5px 0;
@@ -157,13 +172,9 @@ h3 {
         margin-right: 4px;
 
         img {
-            max-width: @placemark-image-width-limit;
-            max-height: @placemark-image-height-limit;
-        }
-
-        img {
-            max-width: @placemark-image-width-limit;
-            max-height: @placemark-image-height-limit;
+            /*max-width: @placemark-image-width-limit;
+            max-height: @placemark-image-height-limit;*/
+            transition: max-width 0.5s, max-height 0.5s;
         }
     }
 }
@@ -232,7 +243,7 @@ h3 {
         background: linear-gradient(@command-button-bg, darken(@command-button-bg, 10%));
         border: 1px solid darken(@command-button-bg, 10%);
         padding: 2px;
-        height: 30px;
+        height: @command-button-size;
         cursor: pointer;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -18,6 +19,8 @@ namespace TripToPrint.Core.ModelFactories
         private readonly IResourceNameProvider _resourceName;
         private readonly CultureAgnosticFormatter _formatter = new CultureAgnosticFormatter();
 
+        private const int MAX_PHOTOS_TO_PICK_FROM_VENUE = 2;
+
         public MooiPlacemarkFactory(IKmlCalculator kmlCalculator, IResourceNameProvider resourceName)
         {
             _kmlCalculator = kmlCalculator;
@@ -34,10 +37,14 @@ namespace TripToPrint.Core.ModelFactories
                 Name = kmlPlacemark.Name,
                 Description = description,
                 AttachedVenues = venues?.ToArray(),
-                Images = descriptionAndImages.images ?? new string[0],
                 Coordinates = kmlPlacemark.Coordinates,
                 IconPath = kmlPlacemark.IconPath
             };
+
+            if (descriptionAndImages.images != null)
+            {
+                placemark.Images.AddRange(descriptionAndImages.images);
+            }
 
             if (placemark.IconPath != null && !placemark.IconPathIsOnWeb)
             {
@@ -54,7 +61,35 @@ namespace TripToPrint.Core.ModelFactories
                 placemark.Distance = _formatter.FormatDistance(distanceInMeters);
             }
 
+            ExtendPlacemarkWithVenueData(placemark);
+
             return placemark;
+        }
+
+        public void ExtendPlacemarkWithVenueData(MooiPlacemark placemark)
+        {
+            if (placemark.AttachedVenues == null)
+            {
+                return;
+            }
+
+            foreach (var venue in placemark.AttachedVenues)
+            {
+                switch (venue.SourceType)
+                {
+                    case VenueSource.Here:
+                        break;
+                    case VenueSource.Foursquare:
+                        var fsq = venue as FoursquareVenue;
+                        if (fsq == null)
+                            continue;
+                        placemark.Images.AddRange(fsq.PhotoUrls.Take(MAX_PHOTOS_TO_PICK_FROM_VENUE));
+                        break;
+                    case VenueSource.Undefined:
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
         }
 
         private (string filteredContent, string[] images) ExtractImagesFromContent(string content)

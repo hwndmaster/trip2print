@@ -75,11 +75,7 @@ var TripToPrint;
 })(TripToPrint || (TripToPrint = {}));
 var TripToPrint;
 (function (TripToPrint) {
-    class Hideable extends React.Component {
-        constructor(props) {
-            super(props);
-            this.state = { hidden: false };
-        }
+    class HideableWithStatus extends React.Component {
         render() {
             if (this.state.hidden) {
                 return React.createElement("div", { className: "hidden" },
@@ -89,14 +85,17 @@ var TripToPrint;
             return this.renderUnhidden();
         }
         hide() {
-            this.setState({
-                hidden: true
-            });
+            this.setState(TripToPrint.Utils.extend(this.state, { hidden: true }));
         }
         show() {
-            this.setState({
-                hidden: false
-            });
+            this.setState(TripToPrint.Utils.extend(this.state, { hidden: false }));
+        }
+    }
+    TripToPrint.HideableWithStatus = HideableWithStatus;
+    class Hideable extends HideableWithStatus {
+        constructor(props) {
+            super(props);
+            this.state = { hidden: false };
         }
     }
     TripToPrint.Hideable = Hideable;
@@ -109,7 +108,7 @@ var TripToPrint;
         }
         createVenueBaseString(venue) {
             let output = "";
-            let sep = null;
+            let sep = "";
             if (venue.address) {
                 output = venue.address;
                 sep = " | ";
@@ -156,7 +155,7 @@ var TripToPrint;
                     React.createElement(TripToPrint.CommandHide, { onClick: () => { this.hide(); } })));
         }
         renderRating(venue) {
-            if (venue.rating == null) {
+            if (venue.rating == null || venue.rating === 0) {
                 return null;
             }
             const style = {
@@ -302,7 +301,10 @@ var TripToPrint;
                 return React.createElement(TripToPrint.HereVenue, { venue: venue });
             }
             else if (venue.sourceType === Placemark.SOURCE_TYPE_FOURSQUARE) {
-                return React.createElement(TripToPrint.FoursquareVenue, { venue: venue });
+                return [
+                    React.createElement(TripToPrint.FoursquareVenueTips, { tips: venue.tips }),
+                    React.createElement(TripToPrint.FoursquareVenue, { venue: venue })
+                ];
             }
             throw new Error(`This type of venue is not supported: ${venue.sourceType}`);
         }
@@ -318,16 +320,27 @@ var TripToPrint;
 })(TripToPrint || (TripToPrint = {}));
 var TripToPrint;
 (function (TripToPrint) {
-    class PlacemarkImage extends TripToPrint.Hideable {
+    class PlacemarkImage extends TripToPrint.HideableWithStatus {
+        constructor(props) {
+            super(props);
+            this.state = { hidden: false, zoom: 1 };
+        }
         renderUnhidden() {
+            let style = {
+                maxWidth: PlacemarkImage.DEFAULT_MAX_IMAGE_WIDTH * this.state.zoom,
+                maxHeight: PlacemarkImage.DEFAULT_MAX_IMAGE_HEIGHT * this.state.zoom
+            };
             return React.createElement("div", { className: "pm-img-item" },
-                React.createElement("img", { src: this.props.imageUrl, onError: this.onImageError }),
+                React.createElement("img", { src: this.props.imageUrl, onError: this.onImageError, style: style }),
                 React.createElement(TripToPrint.Commands, null,
                     React.createElement(TripToPrint.CommandHide, { onClick: () => { this.hide(); } }),
                     React.createElement(TripToPrint.CommandZoomIn, { onClick: () => { this.zoom(true); } }),
                     React.createElement(TripToPrint.CommandZoomOut, { onClick: () => { this.zoom(false); } })));
         }
         zoom(zoomIn) {
+            let coef = 1 + PlacemarkImage.ZOOM_STEP * (zoomIn ? 1 : -1);
+            let newZoom = coef * this.state.zoom;
+            this.setState(TripToPrint.Utils.extend(this.state, { zoom: newZoom }));
         }
         onImageError(event) {
             let element = event.target;
@@ -335,6 +348,9 @@ var TripToPrint;
             console.log(`Image not loaded: ${element.getAttribute("src")}`);
         }
     }
+    PlacemarkImage.DEFAULT_MAX_IMAGE_WIDTH = 170;
+    PlacemarkImage.DEFAULT_MAX_IMAGE_HEIGHT = 120;
+    PlacemarkImage.ZOOM_STEP = 0.2;
     TripToPrint.PlacemarkImage = PlacemarkImage;
 })(TripToPrint || (TripToPrint = {}));
 var TripToPrint;
@@ -395,5 +411,47 @@ var TripToPrint;
     }
     ThumbnailMap.FOURSQUARE_ICON_DOMAIN = /4sqi\.net/;
     TripToPrint.ThumbnailMap = ThumbnailMap;
+})(TripToPrint || (TripToPrint = {}));
+var TripToPrint;
+(function (TripToPrint) {
+    class Utils {
+        static extend(first, second) {
+            let result = {};
+            for (let id in first) {
+                result[id] = first[id];
+            }
+            for (let id in second) {
+                result[id] = second[id];
+            }
+            return result;
+        }
+    }
+    TripToPrint.Utils = Utils;
+})(TripToPrint || (TripToPrint = {}));
+var TripToPrint;
+(function (TripToPrint) {
+    class FoursquareVenueTips extends TripToPrint.Hideable {
+        renderUnhidden() {
+            return React.createElement("div", { className: "pm-xtra-tips" },
+                React.createElement("hr", null),
+                this.props.tips.map(tip => this.renderTip(tip)),
+                React.createElement(TripToPrint.Commands, null,
+                    React.createElement(TripToPrint.CommandHide, { onClick: () => { this.hide(); } })));
+        }
+        renderTip(tip) {
+            let disaggrees = tip.disagreeCount > 0 ? ` ${tip.disagreeCount} 👎` : "";
+            let likes = tip.likes > 0 ? ` ${tip.likes} ❤` : "";
+            return React.createElement("p", null,
+                "\u2014 ",
+                tip.message,
+                " (",
+                tip.agreeCount,
+                "\uD83D\uDC4D",
+                disaggrees,
+                likes,
+                ")");
+        }
+    }
+    TripToPrint.FoursquareVenueTips = FoursquareVenueTips;
 })(TripToPrint || (TripToPrint = {}));
 //# sourceMappingURL=combined.js.map

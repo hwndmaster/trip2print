@@ -83,6 +83,8 @@
     <EmbeddedResource Include="index.html" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Components\FoursquareVenueTips.tsx" />
+    <TypeScriptCompile Include="Utils.ts" />
     <TypeScriptCompile Include="App.ts" />
     <TypeScriptCompile Include="Components\Commands\BaseCommand.tsx" />
     <TypeScriptCompile Include="Components\Commands\CommandZoomOut.tsx" />
