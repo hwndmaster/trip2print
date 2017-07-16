@@ -6,6 +6,19 @@
 @placemark-image-height-limit: 120px;
 @command-button-size: 30px;
 
+/* MIXINS */
+.default-tips {
+    font-size: 9pt;
+    color: #444444;
+}
+.default-sep {
+    margin: 5px 0;
+    border: 0;
+    border-top: 1px solid #ccc;
+}
+
+/* STYLES */
+
 @page {
     size: A4;
     margin: 0;
@@ -60,7 +73,8 @@ h3 {
 
         .pm {
             border: 1px solid #ccc;
-            margin: 0 1px 2px 0;
+            margin: 0px 2px 4px 0px;
+            box-shadow: 1px 1px 1px 0px grey;
         }
     }
 }
@@ -122,21 +136,22 @@ h3 {
     }
 
     .pm-xtra-tips {
-        font-size: 9pt;
-        color: #444444;
+        &:extend(.default-tips);
 
         p {
             margin: 0;
         }
+
+        hr {
+            &:extend(.default-sep);
+        }
     }
 
     .pm-xtra {
-        .pm-xtra-tips();
+        &:extend(.default-tips);
 
         hr {
-            margin: 5px 0;
-            border: 0;
-            border-top: 1px solid gray;
+            &:extend(.default-sep);
         }
 
         .v-prop {

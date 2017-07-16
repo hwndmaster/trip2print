@@ -1,4 +1,19 @@
-﻿@page {
+﻿/* MIXINS */
+.default-tips,
+.pm .pm-xtra-tips,
+.pm .pm-xtra {
+  font-size: 9pt;
+  color: #444444;
+}
+.default-sep,
+.pm .pm-xtra-tips hr,
+.pm .pm-xtra hr {
+  margin: 5px 0;
+  border: 0;
+  border-top: 1px solid #ccc;
+}
+/* STYLES */
+@page {
   size: A4;
   margin: 0;
 }
@@ -43,7 +58,8 @@ h3 {
 }
 .pm-cols .pm-col .pm {
   border: 1px solid #ccc;
-  margin: 0 1px 2px 0;
+  margin: 0px 2px 4px 0px;
+  box-shadow: 1px 1px 1px 0px grey;
 }
 .pm {
   overflow: hidden;
@@ -93,24 +109,8 @@ h3 {
 .pm .pm-desc {
   font-size: 9.5pt;
 }
-.pm .pm-xtra-tips {
-  font-size: 9pt;
-  color: #444444;
-}
 .pm .pm-xtra-tips p {
   margin: 0;
-}
-.pm .pm-xtra {
-  font-size: 9pt;
-  color: #444444;
-}
-.pm .pm-xtra p {
-  margin: 0;
-}
-.pm .pm-xtra hr {
-  margin: 5px 0;
-  border: 0;
-  border-top: 1px solid gray;
 }
 .pm .pm-xtra .v-prop {
   display: inline-block;

@@ -38,6 +38,7 @@ namespace TripToPrint.Core.Integration
         internal const string APP_CODE_PARAM_NAME = "app_code";
 
         internal const int TOO_MUCH_OF_COORDINATE_POINTS = 400;
+        private const int PLACEMARK_URL_MAX_LENGTH = 80;
         private const int LOOKUP_PLACES_WITHIN_DISTANCE_IN_METERS = 300;
         private const int COORDINATE_PRECISION_ON_POINTS = 6;
         private const int COORDINATE_PRECISION_ON_ROUTES = 4;
@@ -160,7 +161,7 @@ namespace TripToPrint.Core.Integration
 
                         discoveredPlace.Tags = extra.Tags?.Select(x => x.Title).ToArray();
 
-                        if (!string.IsNullOrEmpty(extra.View))
+                        if (!string.IsNullOrEmpty(extra.View) && extra.View.Length <= PLACEMARK_URL_MAX_LENGTH)
                         {
                             discoveredPlace.Websites = new [] { extra.View };
                         }

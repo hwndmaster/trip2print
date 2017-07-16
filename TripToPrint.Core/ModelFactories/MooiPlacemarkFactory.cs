@@ -82,8 +82,13 @@ namespace TripToPrint.Core.ModelFactories
                     case VenueSource.Foursquare:
                         var fsq = venue as FoursquareVenue;
                         if (fsq == null)
+                        {
                             continue;
-                        placemark.Images.AddRange(fsq.PhotoUrls.Take(MAX_PHOTOS_TO_PICK_FROM_VENUE));
+                        }
+                        if (fsq.PhotoUrls != null)
+                        {
+                            placemark.Images.AddRange(fsq.PhotoUrls.Take(MAX_PHOTOS_TO_PICK_FROM_VENUE));
+                        }
                         break;
                     case VenueSource.Undefined:
                     default:
